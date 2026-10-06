@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Mype.Api/Mype.Api.csproj" />
+    <Project Path="src/Mype.Application/Mype.Application.csproj" />
+    <Project Path="src/Mype.Domain/Mype.Domain.csproj" />
+    <Project Path="src/Mype.Infrastructure/Mype.Infrastructure.csproj" />
+    <Project Path="src/Mype.Shared/Mype.Shared.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Mype.Tests/Mype.Tests.csproj" Id="068b96a0-a6ed-4f9e-8941-29619af78e81" />
+  </Folder>
+</Solution>

@@ -1,0 +1,75 @@
+name: Quality
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [opened, synchronize, reopened]
+jobs:
+  build:
+    name: Quality
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up JDK 21
+        uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6
+        with:
+          java-version: 21
+          distribution: "zulu" # Alternative distribution options are available
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of analysis
+
+      - name: Cache SonarQube packages
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+
+      - name: Cache SonarQube scanner
+        id: cache-sonar-scanner
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9
+        with:
+          path: ./.sonar/scanner
+          key: ${{ runner.os }}-sonar-scanner
+          restore-keys: ${{ runner.os }}-sonar-scanner
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Install SonarQube scanner
+        if: steps.cache-sonar-scanner.outputs.cache-hit != 'true'
+        shell: bash
+        run: |
+          mkdir -p ./.sonar/scanner
+
+          dotnet tool update dotnet-sonarscanner \
+          --tool-path ./.sonar/scanner
+
+      - name: Build and analyze
+        shell: bash
+        run: |
+          ./.sonar/scanner/dotnet-sonarscanner begin \
+          /k:"${{ secrets.SONAR_PROJECT }}" \
+          /d:sonar.token="${{ secrets.SONAR_TOKEN }}" \
+          /o:"${{ secrets.SONAR_ORGANIZATION }}" \
+          /d:sonar.host.url="https://sonarcloud.io" \
+          /d:sonar.cs.opencover.reportsPaths="**/coverage.opencover.xml" \
+          /d:sonar.verbose=true
+
+          dotnet restore Mype/Mype.slnx
+
+          dotnet build Mype/Mype.slnx \
+          --no-restore
+
+          dotnet test Mype/Mype.slnx \
+          --no-build \
+          --collect:"XPlat Code Coverage" \
+          --results-directory TestResults \
+          -- \
+          DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
+
+          ./.sonar/scanner/dotnet-sonarscanner end \
+          /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
