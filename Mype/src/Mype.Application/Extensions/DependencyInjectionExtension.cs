@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Mype.Application.Common.Interfaces;
+using Mype.Application.Common.Normalizers;
 
 namespace Mype.Application.Extensions
 {
@@ -11,7 +12,7 @@ namespace Mype.Application.Extensions
         {
             services.AddMediatR(x => x.RegisterServicesFromAssembly(typeof(DependencyInjectionExtension).Assembly));
 
-            services.AddSingleton<IEmailNormalizer, IEmailNormalizer>();
+            services.AddSingleton<IEmailNormalizer, EmailNormalizer>();
 
             return services;
         }
