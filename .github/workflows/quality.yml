@@ -61,7 +61,7 @@ jobs:
           dotnet tool update dotnet-sonarscanner \
           --tool-path ./.sonar/scanner
 
-      - name: Build and analyze
+      - name: SonarQube Begin
         shell: bash
         run: |
           ./.sonar/scanner/dotnet-sonarscanner begin \
@@ -72,11 +72,17 @@ jobs:
           /d:sonar.cs.opencover.reportsPaths="**/coverage.opencover.xml" \
           /d:sonar.verbose=true
 
+      - name: Build
+        shell: bash
+        run: |
           dotnet restore Mype/Mype.slnx
 
           dotnet build Mype/Mype.slnx \
           --no-restore
 
+      - name: Test
+        shell: bash
+        run: |
           dotnet test Mype/Mype.slnx \
           --no-build \
           --collect:"XPlat Code Coverage" \
@@ -84,5 +90,8 @@ jobs:
           -- \
           DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
 
+      - name: SonarQube End
+        shell: bash
+        run: |
           ./.sonar/scanner/dotnet-sonarscanner end \
           /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
