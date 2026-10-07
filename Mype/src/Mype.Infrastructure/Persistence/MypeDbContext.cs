@@ -1,9 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Mype.Application.Common.Interfaces;
 using Mype.Domain.Users;
 
 namespace Mype.Infrastructure.Persistence
 {
-    public class MypeDbContext : DbContext
+    public class MypeDbContext : DbContext, IUnitOfWork
     {
         public MypeDbContext(DbContextOptions<MypeDbContext> options) : base(options) {}
 
