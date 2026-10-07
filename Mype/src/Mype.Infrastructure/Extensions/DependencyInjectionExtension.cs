@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Mype.Application.Common.Interfaces;
 using Mype.Application.Users.Interfaces;
 using Mype.Infrastructure.Auth;
+using Mype.Infrastructure.Common;
 using Mype.Infrastructure.Persistence;
 using Mype.Infrastructure.Users.Repositories;
 using System.Diagnostics.CodeAnalysis;
@@ -25,6 +26,8 @@ namespace Mype.Infrastructure.Extensions
             services.AddScoped<IUnitOfWork>(provider =>
                 provider.GetRequiredService<MypeDbContext>()
             );
+
+            services.AddSingleton<IClock, SystemClock>();
 
             return services;
         }
