@@ -1,5 +1,6 @@
 ﻿using FluentAssertions;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Mype.Shared.Constants;
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -29,6 +30,8 @@ namespace Mype.Tests
             var body = await response.Content.ReadAsStringAsync();
 
             _output.WriteLine($"Status: {(int)response.StatusCode}, Body: {body}");
+
+            _output.WriteLine($"Length: {Environment.GetEnvironmentVariable(Env.ConnectionStringKey)?.Length ?? 0}");
 
             response.IsSuccessStatusCode.Should().BeTrue();
         }
