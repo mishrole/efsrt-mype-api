@@ -3,18 +3,22 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Xunit.Abstractions;
 
 namespace Mype.Tests
 {
     public class HealthTests : IClassFixture<WebApplicationFactory<Program>>
     {
         private readonly HttpClient _client;
+        private readonly ITestOutputHelper _output;
 
         public HealthTests(
-            WebApplicationFactory<Program> factory
+            WebApplicationFactory<Program> factory,
+            ITestOutputHelper output
         )
         {
             _client = factory.CreateClient();
+            _output = output;
         }
 
         [Fact]
@@ -24,7 +28,7 @@ namespace Mype.Tests
 
             var body = await response.Content.ReadAsStringAsync();
 
-            Console.WriteLine($"Status: {(int)response.StatusCode}, Body: {body}");
+            _output.WriteLine($"Status: {(int)response.StatusCode}, Body: {body}");
 
             response.IsSuccessStatusCode.Should().BeTrue();
         }
