@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Mype.Shared.Models
 {
+    [ExcludeFromCodeCoverage]
     public class HttpStatusCodeInfo
     {
         public int StatusCode { get; set; }

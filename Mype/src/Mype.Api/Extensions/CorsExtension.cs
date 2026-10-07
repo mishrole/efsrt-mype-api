@@ -3,10 +3,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Mype.Shared.Constants;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace Mype.Api.Extensions
 {
+    [ExcludeFromCodeCoverage]
     public static class CorsExtension
     {
         public static IServiceCollection AddCors(

@@ -1,5 +1,8 @@
-﻿namespace Mype.Shared.Models
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace Mype.Shared.Models
 {
+    [ExcludeFromCodeCoverage]
     public class ValidationFailure
     {
         public string PropertyName { get; set; }

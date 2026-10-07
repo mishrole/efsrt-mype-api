@@ -4,10 +4,12 @@ using Microsoft.Extensions.Logging;
 using Mype.Infrastructure.Persistence;
 using Mype.Shared.Constants;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 
 namespace Mype.Infrastructure.Extensions
 {
+    [ExcludeFromCodeCoverage]
     public static class MigrationExtension
     {
         public static async Task ApplyMigrationsAsync(

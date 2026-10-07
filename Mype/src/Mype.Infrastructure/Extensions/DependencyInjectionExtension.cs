@@ -2,9 +2,11 @@
 using Microsoft.Extensions.DependencyInjection;
 using Mype.Infrastructure.Auth;
 using Mype.Infrastructure.Persistence;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Mype.Infrastructure.Extensions
 {
+    [ExcludeFromCodeCoverage]
     public static class DependencyInjectionExtension
     {
         public static IServiceCollection AddInfrastructure(
