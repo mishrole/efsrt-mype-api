@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Mype.Application.Common.Interfaces;
 
 namespace Mype.Infrastructure.Auth
 {

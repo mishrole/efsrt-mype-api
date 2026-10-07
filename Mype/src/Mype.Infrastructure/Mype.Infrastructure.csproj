@@ -23,6 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Mype.Application\Mype.Application.csproj" />
     <ProjectReference Include="..\Mype.Domain\Mype.Domain.csproj" />
     <ProjectReference Include="..\Mype.Shared\Mype.Shared.csproj" />
   </ItemGroup>
