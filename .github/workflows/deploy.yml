@@ -2,6 +2,8 @@ name: Deploy
 on:
   workflow_run:
     workflows: ["Quality"]
+    branches:
+      - main
     types:
       - completed
 jobs:

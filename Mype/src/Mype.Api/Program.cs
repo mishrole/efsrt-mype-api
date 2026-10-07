@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -15,7 +16,6 @@ using Scalar.AspNetCore;
 using Serilog;
 using Serilog.Events;
 using System;
-using System.IO;
 using System.Text;
 
 try
@@ -95,6 +95,9 @@ try
         .AddDbContextCheck<MypeDbContext>();
 
     var app = builder.Build();
+
+    // Migrations
+    await app.Services.ApplyMigrationsAsync();
 
     // Middlewares
     app.AddMiddleware();
