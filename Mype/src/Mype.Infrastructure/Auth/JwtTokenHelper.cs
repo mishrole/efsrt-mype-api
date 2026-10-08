@@ -14,7 +14,6 @@ namespace Mype.Infrastructure.Auth
     [ExcludeFromCodeCoverage]
     public class JwtTokenHelper(IConfiguration configuration) : IJwtTokenHelper
     {
-        private const string TokenType = "Bearer";
         private readonly IConfiguration _configuration = configuration;
 
         public JwtTokenResult GenerateToken(
@@ -63,7 +62,7 @@ namespace Mype.Infrastructure.Auth
                 Value = tokenHandler.CreateToken(
                     tokenDescriptor
                 ),
-                TokenType = TokenType,
+                TokenType = AuthConstants.TokenType,
                 IssuedAt = issuedAt,
                 ExpiresAt = expiresAt
             };
