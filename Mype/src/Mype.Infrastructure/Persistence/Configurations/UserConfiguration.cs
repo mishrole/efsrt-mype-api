@@ -42,11 +42,6 @@ namespace Mype.Infrastructure.Persistence.Configurations
             .IsRequired();
 
             builder.Property(x => x.Status)
-            .HasConversion(
-            status => status.ToString().ToUpperInvariant(),
-            value => Enum.Parse<UserStatus>(value, true)
-            )
-            .HasMaxLength(UserConstraints.StatusMaxLength)
             .IsRequired();
 
             builder.Property(x => x.DeactivatedAt)

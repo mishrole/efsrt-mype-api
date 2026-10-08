@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Mype.Domain.Users;
+using System;
 
 namespace Mype.Application.Auth.Commands.Login
 {
@@ -10,6 +11,6 @@ namespace Mype.Application.Auth.Commands.Login
 
         public string DisplayName { get; set; } = string.Empty;
 
-        public string Status { get; set; } = string.Empty;
+        public UserStatus Status { get; set; }
     }
 }

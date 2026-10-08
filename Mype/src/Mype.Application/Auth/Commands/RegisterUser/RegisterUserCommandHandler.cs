@@ -80,7 +80,7 @@ namespace Mype.Application.Auth.Commands.RegisterUser
                     UserId = user.Id,
                     Email = user.Email,
                     DisplayName = user.DisplayName,
-                    Status = user.Status.ToString().ToUpperInvariant(),
+                    Status = user.Status,
                     CreatedAt = user.CreatedAt
                 }
             );
