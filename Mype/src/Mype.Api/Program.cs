@@ -131,7 +131,7 @@ catch (Exception ex)
 {
     Log.Fatal(ex, ErrorMessages.StartupFailed, ex.GetType().ToString());
 
-    Environment.ExitCode = 1;
+    throw;
 }
 finally
 {
