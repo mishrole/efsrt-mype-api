@@ -1,9 +1,15 @@
-﻿using System.Collections.Generic;
+﻿using Mype.Application.Common.Models;
+using System;
 
 namespace Mype.Application.Common.Interfaces
 {
     public interface IJwtTokenHelper
     {
-        string GenerateToken(int userId, string email, IDictionary<string, string> additionalClaims = null);
+        JwtTokenResult GenerateToken(
+            Guid userId,
+            string email,
+            string displayName,
+            DateTimeOffset issuedAt
+        );
     }
 }

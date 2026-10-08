@@ -20,7 +20,7 @@ namespace Mype.Tests.Api.Endpoints.v1.Auth
         private const string Email = "usuario@dominio.com";
         private const string Password = "password1";
         private const string TraceId = "test-trace-id";
-        private const string Status = "ACTIVE";
+        private const UserStatus Status = UserStatus.Active;
 
         private static readonly DateTimeOffset CreatedAt =
             new(2026, 10, 7, 12, 0, 0, TimeSpan.Zero);

@@ -2,11 +2,11 @@
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using Mype.Application.Common.Interfaces;
+using Mype.Application.Common.Models;
 using Mype.Shared.Constants;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Security.Claims;
 using System.Text;
 
 namespace Mype.Infrastructure.Auth
@@ -16,48 +16,41 @@ namespace Mype.Infrastructure.Auth
     {
         private readonly IConfiguration _configuration = configuration;
 
-        public string GenerateToken(int userId, string email, IDictionary<string, string> additionalClaims = null)
+        public JwtTokenResult GenerateToken(
+            Guid userId,
+            string email,
+            string displayName,
+            DateTimeOffset issuedAt
+        )
         {
-            var secretKey =
-                _configuration[Env.JwtSecretKeyStringKey]
-                ?? throw new InvalidOperationException(
-                    string.Format(ErrorMessages.VariableNotConfigured, Env.JwtSecretKeyStringKey));
+            var secretKey = GetRequiredConfiguration(Env.JwtSecretKeyStringKey);
 
-            var issuer =
-                _configuration[Env.JwtIssuerStringKey]
-                ?? throw new InvalidOperationException(
-                    string.Format(ErrorMessages.VariableNotConfigured, Env.JwtIssuerStringKey));
+            var issuer = GetRequiredConfiguration(Env.JwtIssuerStringKey);
 
-            var audience =
-                _configuration[Env.JwtAudienceStringKey]
-                ?? throw new InvalidOperationException(
-                    string.Format(ErrorMessages.VariableNotConfigured, Env.JwtAudienceStringKey));
+            var audience = GetRequiredConfiguration(Env.JwtAudienceStringKey);
+
+            var expirationMinutes = GetExpirationMinutes();
+
+            var expiresAt = issuedAt.AddMinutes(expirationMinutes);
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
+
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var claims = new Dictionary<string, object>
             {
-                [JwtRegisteredClaimNames.Jti] = Guid.NewGuid().ToString(),
                 [JwtRegisteredClaimNames.Sub] = userId.ToString(),
                 [JwtRegisteredClaimNames.Email] = email,
-                [ClaimTypes.NameIdentifier] = userId.ToString()
+                [JwtRegisteredClaimNames.Name] = displayName,
+                [JwtRegisteredClaimNames.Jti] = Guid.NewGuid().ToString()
             };
-
-            if (additionalClaims != null)
-            {
-                foreach (var claim in additionalClaims)
-                {
-                    claims[claim.Key] = claim.Value;
-                }
-            }
-            
-            var tokenExpiresInHours = 1;
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Claims = claims,
-                Expires = DateTime.UtcNow.AddHours(tokenExpiresInHours),
+                IssuedAt = issuedAt.UtcDateTime,
+                NotBefore = issuedAt.UtcDateTime,
+                Expires = expiresAt.UtcDateTime,
                 Issuer = issuer,
                 Audience = audience,
                 SigningCredentials = credentials
@@ -65,7 +58,53 @@ namespace Mype.Infrastructure.Auth
 
             var tokenHandler = new JsonWebTokenHandler();
 
-            return tokenHandler.CreateToken(tokenDescriptor);
+            return new JwtTokenResult
+            {
+                Value = tokenHandler.CreateToken(
+                    tokenDescriptor
+                ),
+                TokenType = AuthConstants.TokenType,
+                IssuedAt = issuedAt,
+                ExpiresAt = expiresAt
+            };
+        }
+
+        private string GetRequiredConfiguration(
+            string configurationKey
+        )
+        {
+            return _configuration[configurationKey]
+                ?? throw new InvalidOperationException(
+                    string.Format(
+                        ErrorMessages.VariableNotConfigured,
+                        configurationKey
+                    )
+                );
+        }
+
+        private int GetExpirationMinutes()
+        {
+            var configuredValue = GetRequiredConfiguration(
+                Env.JwtExpirationMinutesStringKey
+            );
+
+            if (
+                !int.TryParse(
+                    configuredValue,
+                    out var expirationMinutes
+                ) ||
+                expirationMinutes <= 0
+            )
+            {
+                throw new InvalidOperationException(
+                    string.Format(
+                        ErrorMessages.VariableNotValid,
+                        Env.JwtExpirationMinutesStringKey
+                    )
+                );
+            }
+
+            return expirationMinutes;
         }
     }
 }

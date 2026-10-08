@@ -20,6 +20,7 @@ namespace Mype.Infrastructure.Persistence
 
             services.AddDbContext<MypeDbContext>(opt =>
                 opt.UseNpgsql(connectionString)
+                .UseSnakeCaseNamingConvention()
             );
 
             return services;

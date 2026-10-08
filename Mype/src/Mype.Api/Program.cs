@@ -72,7 +72,8 @@ try
                             string.Format(ErrorMessages.VariableNotConfigured, Env.JwtSecretKeyStringKey)
                         )
                     )
-                )
+                ),
+                ClockSkew = TimeSpan.Zero
             };
         });
 

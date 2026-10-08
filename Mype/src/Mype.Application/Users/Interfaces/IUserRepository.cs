@@ -11,6 +11,11 @@ namespace Mype.Application.Users.Interfaces
             CancellationToken cancellationToken
         );
 
+        Task<User> GetByNormalizedEmailAsync(
+            string normalizedEmail,
+            CancellationToken cancellationToken
+        );
+
         Task AddAsync(
             User user,
             CancellationToken cancellationToken

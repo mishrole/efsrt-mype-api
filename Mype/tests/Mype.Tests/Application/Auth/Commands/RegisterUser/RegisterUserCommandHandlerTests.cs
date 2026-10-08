@@ -20,7 +20,7 @@ namespace Mype.Tests.Application.Auth.Commands.RegisterUser
         private const string Password = "password1";
         private const string PasswordHash = "password-hash";
         private const string DisplayName = "Test User";
-        private const string Status = "ACTIVE";
+        private const UserStatus Status = UserStatus.Active;
 
         private static readonly DateTimeOffset UtcNow =
         new(2026, 10, 6, 12, 0, 0, TimeSpan.Zero);
