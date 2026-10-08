@@ -6,6 +6,8 @@
         Unauthorized = 2,
         Forbidden = 3,
         NotFound = 4,
-        Conflict = 5
+        Conflict = 5,
+        UnprocessableEntity = 6,
+        Internal = 7
     }
 }

@@ -24,5 +24,17 @@
         public const string AccountUnavailable = "La cuenta no se encuentra disponible.";
 
         #endregion
+
+        #region Businesses
+
+        public const string UnsupportedCurrency = "La moneda seleccionada no se encuentra disponible.";
+
+        public const string SystemRoleUnavailable = "El rol requerido por el sistema no se encuentra disponible.";
+
+        public const string BusinessCreationFailed = "No fue posible crear el negocio.";
+
+        public const string InvalidRuc = "El RUC no es válido.";
+
+        #endregion
     }
 }

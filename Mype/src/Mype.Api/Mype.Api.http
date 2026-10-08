@@ -28,3 +28,17 @@ Accept: application/json
 }
 
 ###
+
+POST {{Mype.Api_HostAddress}}/api/v1/businesses
+Authorization: Bearer {{AccessToken}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "displayName": "Bodega Central",
+  "legalName": "Comercial Central E.I.R.L.",
+  "ruc": "20123456786",
+  "currencyCode": "PEN"
+}
+
+###

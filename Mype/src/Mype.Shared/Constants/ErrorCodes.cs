@@ -13,5 +13,15 @@
         public const string AccountUnavailable = "ACCOUNT_UNAVAILABLE";
 
         #endregion
+
+        #region Businesses
+
+        public const string UnsupportedCurrency = "UNSUPPORTED_CURRENCY";
+
+        public const string SystemRoleUnavailable = "SYSTEM_ROLE_UNAVAILABLE";
+
+        public const string BusinessCreationFailed = "BUSINESS_CREATION_FAILED";
+
+        #endregion
     }
 }

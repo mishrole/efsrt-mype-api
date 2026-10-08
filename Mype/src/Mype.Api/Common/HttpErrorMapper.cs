@@ -136,6 +136,12 @@ namespace Mype.Api.Common
                 ApplicationErrorType.Conflict =>
                     StatusCodes.Status409Conflict,
 
+                ApplicationErrorType.UnprocessableEntity =>
+                    StatusCodes.Status422UnprocessableEntity,
+
+                ApplicationErrorType.Internal =>
+                    StatusCodes.Status500InternalServerError,
+
                 _ =>
                     StatusCodes.Status500InternalServerError
             };

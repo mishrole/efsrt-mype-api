@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Mype.Api.Endpoints.v1.Auth;
+using Mype.Api.Endpoints.v1.Businesses;
 using Mype.Application.Auth.Commands.Login;
 using Mype.Application.Auth.Commands.RegisterUser;
+using Mype.Application.Businesses.Commands.CreateBusiness;
 using Mype.Shared.Models;
 using System.Diagnostics.CodeAnalysis;
 
@@ -63,6 +65,41 @@ namespace Mype.Api
                 )
                 .Produces<HttpStatusCodeInfo>(
                     StatusCodes.Status403Forbidden
+                )
+                .Produces<HttpStatusCodeInfo>(
+                    StatusCodes.Status500InternalServerError
+                );
+
+            #endregion
+
+            #region Businesses
+
+            var businessGroup = versionOneGroup
+                .MapGroup("/businesses")
+                .WithTags("Businesses")
+                .RequireAuthorization();
+
+            businessGroup
+                .MapPost(
+                    string.Empty,
+                    CreateBusinessEndpoint.DoAsync
+                )
+                .WithName("CreateBusiness")
+                .WithSummary("Crear un negocio")
+                .Produces<CreateBusinessResult>(
+                    StatusCodes.Status201Created
+                )
+                .Produces<HttpStatusCodeInfo>(
+                    StatusCodes.Status400BadRequest
+                )
+                .Produces<HttpStatusCodeInfo>(
+                    StatusCodes.Status401Unauthorized
+                )
+                .Produces<HttpStatusCodeInfo>(
+                    StatusCodes.Status403Forbidden
+                )
+                .Produces<HttpStatusCodeInfo>(
+                    StatusCodes.Status422UnprocessableEntity
                 )
                 .Produces<HttpStatusCodeInfo>(
                     StatusCodes.Status500InternalServerError
