@@ -3,6 +3,7 @@ using Mype.Application.Common;
 using Mype.Application.Common.Interfaces;
 using Mype.Application.Users.Interfaces;
 using Mype.Domain.Users;
+using Mype.Shared.Constants;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -11,9 +12,6 @@ namespace Mype.Application.Auth.Commands.RegisterUser
     public class RegisterUserCommandHandler
     : IRequestHandler<RegisterUserCommand, Result<RegisterUserResult>>
     {
-        private const string EmailAlreadyRegisteredError =
-        "EMAIL_ALREADY_REGISTERED";
-
         private readonly IUserRepository _userRepository;
         private readonly IPasswordHasherHelper _passwordHasher;
         private readonly IEmailNormalizer _emailNormalizer;
@@ -52,7 +50,7 @@ namespace Mype.Application.Auth.Commands.RegisterUser
             if (emailExists)
             {
                 return Result<RegisterUserResult>.Failure(
-                    EmailAlreadyRegisteredError
+                    ErrorCodes.EmailAlreadyRegistered
                 );
             }
 

@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Mype.Domain.Users;
+using Mype.Shared.Constants;
 using System;
 
 namespace Mype.Infrastructure.Persistence.Configurations
@@ -26,7 +27,7 @@ namespace Mype.Infrastructure.Persistence.Configurations
 
             builder.HasIndex(x => x.NormalizedEmail)
             .IsUnique()
-            .HasDatabaseName("ux_users_normalized_email");
+            .HasDatabaseName(DatabaseConstraints.UsersNormalizedEmail);
 
             builder.Property(x => x.PasswordHash)
             .HasMaxLength(500)

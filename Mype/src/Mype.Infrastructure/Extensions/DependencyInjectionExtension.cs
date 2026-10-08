@@ -5,6 +5,7 @@ using Mype.Application.Users.Interfaces;
 using Mype.Infrastructure.Auth;
 using Mype.Infrastructure.Common;
 using Mype.Infrastructure.Persistence;
+using Mype.Infrastructure.Persistence.Exceptions;
 using Mype.Infrastructure.Users.Repositories;
 using System.Diagnostics.CodeAnalysis;
 
@@ -28,6 +29,7 @@ namespace Mype.Infrastructure.Extensions
             );
 
             services.AddSingleton<IClock, SystemClock>();
+            services.AddSingleton<IPersistenceExceptionTranslator, PostgreSqlExceptionTranslator>();
 
             return services;
         }

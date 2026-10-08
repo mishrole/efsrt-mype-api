@@ -6,6 +6,7 @@ namespace Mype.Shared.Models
     [ExcludeFromCodeCoverage]
     public class HttpStatusCodeInfo
     {
+        public string Code { get; set; } = string.Empty;
         public int StatusCode { get; set; }
         public string Message { get; set; } = string.Empty;
         public string Detail { get; set; } = string.Empty;

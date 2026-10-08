@@ -4,6 +4,7 @@ using Mype.Application.Auth.Commands.RegisterUser;
 using Mype.Application.Common.Interfaces;
 using Mype.Application.Users.Interfaces;
 using Mype.Domain.Users;
+using Mype.Shared.Constants;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -170,7 +171,7 @@ namespace Mype.Tests.Application.Auth.Commands.RegisterUser
             );
 
             result.IsSuccess.Should().BeFalse();
-            result.Error.Should().Be("EMAIL_ALREADY_REGISTERED");
+            result.Error.Should().Be(ErrorCodes.EmailAlreadyRegistered);
             result.Value.Should().BeNull();
 
             _passwordHasherMock.Verify(

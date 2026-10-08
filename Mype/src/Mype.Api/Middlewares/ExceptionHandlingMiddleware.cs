@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Mype.Application.Common.Exceptions;
+using Mype.Shared.Constants;
 using Mype.Shared.Models;
 using System;
 using System.Collections.Generic;
@@ -39,7 +41,7 @@ namespace Mype.Api.Middlewares
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unhandled exception occurred");
+                _logger.LogError(ex, string.Format(ErrorMessages.ExceptionHandlingMiddlewareError, ex.Message));
                 await HandleExceptionAsync(context, ex);
             }
         }
@@ -48,6 +50,12 @@ namespace Mype.Api.Middlewares
         {
             var statusCode = exception switch
             {
+                ApplicationErrorException { ErrorType: ApplicationErrorType.Validation } => StatusCodes.Status400BadRequest,
+                ApplicationErrorException { ErrorType: ApplicationErrorType.Unauthorized } => StatusCodes.Status401Unauthorized,
+                ApplicationErrorException { ErrorType: ApplicationErrorType.Forbidden } => StatusCodes.Status403Forbidden,
+                ApplicationErrorException { ErrorType: ApplicationErrorType.NotFound } => StatusCodes.Status404NotFound,
+                ApplicationErrorException { ErrorType: ApplicationErrorType.Conflict } => StatusCodes.Status409Conflict,
+
                 ArgumentNullException => StatusCodes.Status400BadRequest,
                 ArgumentException => StatusCodes.Status400BadRequest,
                 UnauthorizedAccessException => StatusCodes.Status401Unauthorized,
@@ -56,10 +64,13 @@ namespace Mype.Api.Middlewares
                 _ => StatusCodes.Status500InternalServerError
             };
 
+            var code = exception is ApplicationErrorException appErrorException ? appErrorException.Code : ErrorCodes.InternalError;
+
             var response = new HttpStatusCodeInfo
             {
+                Code = code,
                 StatusCode = statusCode,
-                Message = exception.Message,
+                Message = statusCode == StatusCodes.Status500InternalServerError ? ErrorMessages.InternalError : exception.Message,
                 Detail = _env.IsDevelopment() ? exception.StackTrace : null,
                 TraceId = context.TraceIdentifier
             };

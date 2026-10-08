@@ -7,5 +7,14 @@
         public const string StartupFailed = "Critical error during application startup: {0}";
         public const string VariableRequiredInProduction = "{0} is required in production.";
         public const string DatabaseMigrationFailed = "Critical error during database migration: {0}";
+        public const string ExceptionHandlingMiddlewareError = "An unhandled exception occurred: {0}";
+
+        public const string InternalError = "Ocurrió un error interno.";
+
+        #region Auth
+
+        public const string EmailAlreadyRegistered = "El correo electrónico ya se encuentra registrado.";
+
+        #endregion
     }
 }
