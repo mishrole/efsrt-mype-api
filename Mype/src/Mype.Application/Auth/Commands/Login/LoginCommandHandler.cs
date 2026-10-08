@@ -91,8 +91,6 @@ namespace Mype.Application.Auth.Commands.Login
                         Email = user.Email,
                         DisplayName = user.DisplayName,
                         Status = user.Status
-                            .ToString()
-                            .ToUpperInvariant()
                     }
                 }
             );
