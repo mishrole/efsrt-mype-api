@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using Moq;
 using Mype.Application.Auth.Commands.RegisterUser;
+using Mype.Application.Common.Exceptions;
 using Mype.Application.Common.Interfaces;
 using Mype.Application.Users.Interfaces;
 using Mype.Domain.Users;
@@ -171,7 +172,21 @@ namespace Mype.Tests.Application.Auth.Commands.RegisterUser
             );
 
             result.IsSuccess.Should().BeFalse();
-            result.Error.Should().Be(ErrorCodes.EmailAlreadyRegistered);
+
+            result.Error.Should().NotBeNull();
+
+            result.Error.Code.Should().Be(
+                ErrorCodes.EmailAlreadyRegistered
+            );
+
+            result.Error.Message.Should().Be(
+                ErrorMessages.EmailAlreadyRegistered
+            );
+
+            result.Error.Type.Should().Be(
+                ApplicationErrorType.Conflict
+            );
+
             result.Value.Should().BeNull();
 
             _passwordHasherMock.Verify(
