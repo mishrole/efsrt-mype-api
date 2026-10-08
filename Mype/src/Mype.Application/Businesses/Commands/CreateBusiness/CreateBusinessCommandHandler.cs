@@ -192,7 +192,7 @@ namespace Mype.Application.Businesses.Commands.CreateBusiness
             );
         }
 
-        private IReadOnlyCollection<Category>
+        private Category[]
             CreateDefaultCategories(
                 Guid businessId,
                 Guid currentUserId,

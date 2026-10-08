@@ -54,6 +54,17 @@ namespace Mype.Domain.Categories
 
         public uint Version { get; private set; }
 
+        public void Deactivate(
+            Guid currentUserId,
+            DateTimeOffset utcNow
+        )
+        {
+            IsActive = false;
+            DeactivatedAt = utcNow;
+            UpdatedByUserId = currentUserId;
+            UpdatedAt = utcNow;
+        }
+
         public static Category CreateDefault(
             Guid businessId,
             CategoryType type,

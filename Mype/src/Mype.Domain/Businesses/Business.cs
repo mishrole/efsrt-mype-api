@@ -1,5 +1,6 @@
 ﻿using Mype.Domain.Common;
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Mype.Domain.Businesses
 {
@@ -72,6 +73,17 @@ namespace Mype.Domain.Businesses
         public bool IsActive()
         {
             return Status == BusinessStatus.Active;
+        }
+
+        public void Deactivate(
+            Guid currentUserId,
+            DateTimeOffset utcNow
+        )
+        {
+            Status = BusinessStatus.Inactive;
+            DeactivatedAt = utcNow;
+            UpdatedByUserId = currentUserId;
+            UpdatedAt = utcNow;
         }
 
         private static string NormalizeOptionalValue(

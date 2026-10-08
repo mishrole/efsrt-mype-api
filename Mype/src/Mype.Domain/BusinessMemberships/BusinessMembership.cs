@@ -53,6 +53,29 @@ namespace Mype.Domain.BusinessMemberships
 
         public uint Version { get; private set; }
 
+        public void Deactivate(
+            Guid currentUserId,
+            DateTimeOffset utcNow
+        )
+        {
+            Status = BusinessMembershipStatus.Inactive;
+            DeactivatedAt = utcNow;
+            UpdatedByUserId = currentUserId;
+            UpdatedAt = utcNow;
+        }
+
+        public void Reactivate(
+            Guid currentUserId,
+            DateTimeOffset utcNow
+        )
+        {
+            Status = BusinessMembershipStatus.Active;
+            ReactivatedAt = utcNow;
+            DeactivatedAt = null;
+            UpdatedByUserId = currentUserId;
+            UpdatedAt = utcNow;
+        }
+
         public static BusinessMembership CreateOwner(
             Guid businessId,
             Guid userId,

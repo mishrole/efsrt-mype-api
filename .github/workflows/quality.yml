@@ -71,6 +71,7 @@ jobs:
           /o:"${{ secrets.SONAR_ORGANIZATION }}" \
           /d:sonar.host.url="https://sonarcloud.io" \
           /d:sonar.cs.opencover.reportsPaths="**/coverage.opencover.xml" \
+          /d:sonar.exclusions="**/Persistence/Migrations/**" \
           /d:sonar.coverage.exclusions="**/Persistence/Migrations/**,**/regenerate-migration.ps1,**/add-migration.ps1" \
           /d:sonar.verbose=true
 
