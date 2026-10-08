@@ -19,6 +19,10 @@
 
         public const string EmailAlreadyRegistered = "El correo electrónico ya se encuentra registrado.";
 
+        public const string InvalidCredentials = "El correo electrónico o la contraseña no son válidos.";
+
+        public const string AccountUnavailable = "La cuenta no se encuentra disponible.";
+
         #endregion
     }
 }

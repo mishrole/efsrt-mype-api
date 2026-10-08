@@ -1,4 +1,6 @@
 ﻿using FluentValidation;
+using Mype.Application.Auth.Constraints;
+using Mype.Domain.Users.Constraints;
 using Mype.Shared.Constants;
 
 namespace Mype.Application.Auth.Commands.RegisterUser
@@ -6,23 +8,19 @@ namespace Mype.Application.Auth.Commands.RegisterUser
     public class RegisterUserCommandValidator
         : AbstractValidator<RegisterUserCommand>
     {
-        private const int DisplayNameMaxLength = 150;
-        private const int EmailMaxLength = 320;
-        private const int PasswordMinLength = 8;
-
         public RegisterUserCommandValidator()
         {
             RuleFor(command => command.DisplayName)
                 .NotEmpty()
                 .WithMessage(ValidationMessages.Required)
-                .MaximumLength(DisplayNameMaxLength)
+                .MaximumLength(UserConstraints.DisplayNameMaxLength)
                 .WithMessage(ValidationMessages.MaximumLength)
                 .WithName("Nombre");
 
             RuleFor(command => command.Email)
                 .NotEmpty()
                 .WithMessage(ValidationMessages.Required)
-                .MaximumLength(EmailMaxLength)
+                .MaximumLength(UserConstraints.EmailMaxLength)
                 .WithMessage(ValidationMessages.MaximumLength)
                 .EmailAddress()
                 .WithMessage(ValidationMessages.Invalid)
@@ -31,7 +29,7 @@ namespace Mype.Application.Auth.Commands.RegisterUser
             RuleFor(command => command.Password)
                 .NotEmpty()
                 .WithMessage(ValidationMessages.Required)
-                .MinimumLength(PasswordMinLength)
+                .MinimumLength(PasswordConstraints.PasswordMinLength)
                 .WithMessage(ValidationMessages.MinimumLength)
                 .Matches("[A-Za-z]")
                 .WithMessage(ValidationMessages.MustContainLetter)

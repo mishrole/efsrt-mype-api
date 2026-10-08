@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Mype.Domain.Users;
+using Mype.Domain.Users.Constraints;
 using Mype.Shared.Constants;
 using System;
 
@@ -18,11 +19,11 @@ namespace Mype.Infrastructure.Persistence.Configurations
             .ValueGeneratedNever();
 
             builder.Property(x => x.Email)
-            .HasMaxLength(320)
+            .HasMaxLength(UserConstraints.EmailMaxLength)
             .IsRequired();
 
             builder.Property(x => x.NormalizedEmail)
-            .HasMaxLength(320)
+            .HasMaxLength(UserConstraints.EmailMaxLength)
             .IsRequired();
 
             builder.HasIndex(x => x.NormalizedEmail)
@@ -30,11 +31,11 @@ namespace Mype.Infrastructure.Persistence.Configurations
             .HasDatabaseName(DatabaseConstraints.UsersNormalizedEmail);
 
             builder.Property(x => x.PasswordHash)
-            .HasMaxLength(500)
+            .HasMaxLength(UserConstraints.PasswordHashMaxLength)
             .IsRequired();
 
             builder.Property(x => x.DisplayName)
-            .HasMaxLength(150)
+            .HasMaxLength(UserConstraints.DisplayNameMaxLength)
             .IsRequired();
 
             builder.Property(x => x.EmailVerified)
@@ -45,7 +46,7 @@ namespace Mype.Infrastructure.Persistence.Configurations
             status => status.ToString().ToUpperInvariant(),
             value => Enum.Parse<UserStatus>(value, true)
             )
-            .HasMaxLength(20)
+            .HasMaxLength(UserConstraints.StatusMaxLength)
             .IsRequired();
 
             builder.Property(x => x.DeactivatedAt)
