@@ -1,8 +1,10 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Mype.Application.Categories.Interfaces;
 using Mype.Application.Common.Interfaces;
 using Mype.Application.Users.Interfaces;
 using Mype.Infrastructure.Auth;
+using Mype.Infrastructure.Categories;
 using Mype.Infrastructure.Common;
 using Mype.Infrastructure.Persistence;
 using Mype.Infrastructure.Persistence.Exceptions;
@@ -30,6 +32,7 @@ namespace Mype.Infrastructure.Extensions
 
             services.AddSingleton<IClock, SystemClock>();
             services.AddSingleton<IPersistenceExceptionTranslator, PostgreSqlExceptionTranslator>();
+            services.AddSingleton<IDefaultCategoryProvider, DefaultCategoryProvider>();
 
             return services;
         }
