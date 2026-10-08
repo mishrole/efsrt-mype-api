@@ -49,6 +49,7 @@ namespace Mype.Infrastructure.Auth
             {
                 Claims = claims,
                 IssuedAt = issuedAt.UtcDateTime,
+                NotBefore = issuedAt.UtcDateTime,
                 Expires = expiresAt.UtcDateTime,
                 Issuer = issuer,
                 Audience = audience,
