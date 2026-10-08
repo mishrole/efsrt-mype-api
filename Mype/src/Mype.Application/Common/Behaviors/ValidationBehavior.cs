@@ -28,7 +28,7 @@ namespace Mype.Application.Common.Behaviors
 
             if (validators.Length == 0)
             {
-                return await next();
+                return await next(cancellationToken);
             }
 
             var context = new ValidationContext<TRequest>(request);
@@ -52,7 +52,7 @@ namespace Mype.Application.Common.Behaviors
                 throw new ValidationException(failures);
             }
 
-            return await next();
+            return await next(cancellationToken);
         }
     }
 }
