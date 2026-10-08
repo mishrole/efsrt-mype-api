@@ -2,11 +2,9 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Mype.Application.Common.Exceptions;
+using Mype.Api.Common;
 using Mype.Shared.Constants;
-using Mype.Shared.Models;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -48,35 +46,17 @@ namespace Mype.Api.Middlewares
 
         private Task HandleExceptionAsync(HttpContext context, Exception exception)
         {
-            var statusCode = exception switch
-            {
-                ApplicationErrorException { ErrorType: ApplicationErrorType.Validation } => StatusCodes.Status400BadRequest,
-                ApplicationErrorException { ErrorType: ApplicationErrorType.Unauthorized } => StatusCodes.Status401Unauthorized,
-                ApplicationErrorException { ErrorType: ApplicationErrorType.Forbidden } => StatusCodes.Status403Forbidden,
-                ApplicationErrorException { ErrorType: ApplicationErrorType.NotFound } => StatusCodes.Status404NotFound,
-                ApplicationErrorException { ErrorType: ApplicationErrorType.Conflict } => StatusCodes.Status409Conflict,
 
-                ArgumentNullException => StatusCodes.Status400BadRequest,
-                ArgumentException => StatusCodes.Status400BadRequest,
-                UnauthorizedAccessException => StatusCodes.Status401Unauthorized,
-                KeyNotFoundException => StatusCodes.Status404NotFound,
-                InvalidOperationException => StatusCodes.Status409Conflict,
-                _ => StatusCodes.Status500InternalServerError
-            };
-
-            var code = exception is ApplicationErrorException appErrorException ? appErrorException.Code : ErrorCodes.InternalError;
-
-            var response = new HttpStatusCodeInfo
-            {
-                Code = code,
-                StatusCode = statusCode,
-                Message = statusCode == StatusCodes.Status500InternalServerError ? ErrorMessages.InternalError : exception.Message,
-                Detail = _env.IsDevelopment() ? exception.StackTrace : null,
-                TraceId = context.TraceIdentifier
-            };
+            var response = HttpErrorMapper.FromException(
+                exception,
+                context.TraceIdentifier,
+                _env.IsDevelopment()
+                    ? exception.StackTrace
+                    : null
+            );
 
             context.Response.ContentType = "application/json";
-            context.Response.StatusCode = statusCode;
+            context.Response.StatusCode = response.StatusCode;
 
             return context.Response.WriteAsync(JsonSerializer.Serialize(response, _jsonOptions));
         }

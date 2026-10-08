@@ -1,12 +1,10 @@
 ﻿using FluentValidation;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using Mype.Shared.Constants;
 
 namespace Mype.Application.Auth.Commands.RegisterUser
 {
     public class RegisterUserCommandValidator
-    : AbstractValidator<RegisterUserCommand>
+        : AbstractValidator<RegisterUserCommand>
     {
         private const int DisplayNameMaxLength = 150;
         private const int EmailMaxLength = 320;
@@ -15,40 +13,38 @@ namespace Mype.Application.Auth.Commands.RegisterUser
         public RegisterUserCommandValidator()
         {
             RuleFor(command => command.DisplayName)
-            .NotEmpty()
-            .WithMessage("Display name is required.")
-            .MaximumLength(DisplayNameMaxLength)
-            .WithMessage(
-                $"Display name must not exceed {DisplayNameMaxLength} characters."
-            );
+                .NotEmpty()
+                .WithMessage(ValidationMessages.Required)
+                .MaximumLength(DisplayNameMaxLength)
+                .WithMessage(ValidationMessages.MaximumLength)
+                .WithName("Nombre");
 
             RuleFor(command => command.Email)
-            .NotEmpty()
-            .WithMessage("Email is required.")
-            .MaximumLength(EmailMaxLength)
-            .WithMessage(
-                $"Email must not exceed {EmailMaxLength} characters."
-            )
-            .EmailAddress()
-            .WithMessage("Email is not valid.");
+                .NotEmpty()
+                .WithMessage(ValidationMessages.Required)
+                .MaximumLength(EmailMaxLength)
+                .WithMessage(ValidationMessages.MaximumLength)
+                .EmailAddress()
+                .WithMessage(ValidationMessages.Invalid)
+                .WithName("Correo electrónico");
 
             RuleFor(command => command.Password)
-            .NotEmpty()
-            .WithMessage("Password is required.")
-            .MinimumLength(PasswordMinLength)
-            .WithMessage(
-                $"Password must contain at least {PasswordMinLength} characters."
-            )
-            .Matches("[A-Za-z]")
-            .WithMessage("Password must contain at least one letter.")
-            .Matches("[0-9]")
-            .WithMessage("Password must contain at least one number.");
+                .NotEmpty()
+                .WithMessage(ValidationMessages.Required)
+                .MinimumLength(PasswordMinLength)
+                .WithMessage(ValidationMessages.MinimumLength)
+                .Matches("[A-Za-z]")
+                .WithMessage(ValidationMessages.MustContainLetter)
+                .Matches("[0-9]")
+                .WithMessage(ValidationMessages.MustContainNumber)
+                .WithName("Contraseña");
 
             RuleFor(command => command.PasswordConfirmation)
-            .NotEmpty()
-            .WithMessage("Password confirmation is required.")
-            .Equal(command => command.Password)
-            .WithMessage("Passwords do not match.");
+                .NotEmpty()
+                .WithMessage(ValidationMessages.Required)
+                .Equal(command => command.Password)
+                .WithMessage(ValidationMessages.PasswordsDoNotMatch)
+                .WithName("Confirmación de contraseña");
         }
     }
 }

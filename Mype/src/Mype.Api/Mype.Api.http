@@ -1,6 +1,19 @@
 @Mype.Api_HostAddress = http://localhost:5010
 
-GET {{Mype.Api_HostAddress}}/health/
+GET {{Mype.Api_HostAddress}}/health
 Accept: application/json
+
+###
+
+POST {{Mype.Api_HostAddress}}/api/v1/auth/register
+Content-Type: application/json
+Accept: application/json
+
+{
+  "displayName": "Usuario de prueba",
+  "email": "usuario@dominio.com",
+  "password": "password1",
+  "passwordConfirmation": "password1"
+}
 
 ###

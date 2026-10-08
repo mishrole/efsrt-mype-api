@@ -3,7 +3,6 @@ using Mype.Application.Common;
 using Mype.Application.Common.Interfaces;
 using Mype.Application.Users.Interfaces;
 using Mype.Domain.Users;
-using Mype.Shared.Constants;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -50,7 +49,7 @@ namespace Mype.Application.Auth.Commands.RegisterUser
             if (emailExists)
             {
                 return Result<RegisterUserResult>.Failure(
-                    ErrorCodes.EmailAlreadyRegistered
+                    RegisterUserErrors.EmailAlreadyRegistered
                 );
             }
 

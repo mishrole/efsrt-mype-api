@@ -5,7 +5,7 @@
     {
         public bool IsSuccess { get; set; }
         public T? Value { get; set; }
-        public string? Error { get; set; }
+        public ApplicationError? Error { get; set; }
 
         private Result(T? value)
         {
@@ -13,7 +13,7 @@
             Value = value;
         }
 
-        private Result(string error)
+        private Result(ApplicationError error)
         {
             IsSuccess = false;
             Error = error;
@@ -21,6 +21,6 @@
 
         public static Result<T> Success(T value) => new(value);
 
-        public static Result<T> Failure(string error) => new(error);
+        public static Result<T> Failure(ApplicationError error) => new(error);
     }
 }

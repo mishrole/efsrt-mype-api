@@ -26,8 +26,4 @@
     <ProjectReference Include="..\Mype.Shared\Mype.Shared.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Endpoints\v1\" />
-  </ItemGroup>
-
 </Project>
