@@ -29,7 +29,7 @@ namespace Mype.Infrastructure.Extensions
                 logger.LogInformation(SuccessMessages.DatabaseMigrationSucceeded);
             } catch (Exception ex)
             {
-                logger.LogCritical(ex, string.Format(ErrorMessages.DatabaseMigrationFailed, ex.GetType().ToString()));
+                logger.LogCritical(ex, ErrorMessages.DatabaseMigrationFailed);
 
                 throw;
             }

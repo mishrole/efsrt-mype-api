@@ -15,11 +15,11 @@ namespace Mype.Api.Extensions
         {
             if (result.IsSuccess)
             {
-                return success(result.Value!);
+                return success(result.Value);
             }
 
             var response = HttpErrorMapper.FromApplicationError(
-                result.Error!,
+                result.Error,
                 context.TraceIdentifier
             );
 

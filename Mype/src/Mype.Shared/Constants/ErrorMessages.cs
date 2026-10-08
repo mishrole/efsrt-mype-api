@@ -4,10 +4,10 @@
     {
         public const string VariableNotConfigured = "{0} no está configurado.";
         public const string DataMigrationFailed = "Error crítico durante la migración de datos.";
-        public const string StartupFailed = "Error crítico durante el inicio de la aplicación: {0}";
+        public const string StartupFailed = "Error crítico durante el inicio de la aplicación: {ExceptionType}";
         public const string VariableRequiredInProduction = "{0} es requerido en producción.";
-        public const string DatabaseMigrationFailed = "Error crítico durante la migración de la base de datos: {0}";
-        public const string ExceptionHandlingMiddlewareError = "Ocurrió una excepción no controlada: {0}";
+        public const string DatabaseMigrationFailed = "Error crítico durante la migración de la base de datos.";
+        public const string ExceptionHandlingMiddlewareError = "Ocurrió una excepción no controlada: {ExceptionMessage}";
         public const string UnexpectedError = "Ocurrió un error inesperado.";
         public const string SaveChangesError = "Ocurrió un error al guardar los cambios.";
 

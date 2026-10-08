@@ -28,6 +28,19 @@ namespace Mype.Api.Common
             };
         }
 
+        public static HttpStatusCodeInfo FromApplicationError(
+            ApplicationError error,
+            string traceId
+        )
+        {
+            return FromApplicationError(
+                error.Code,
+                error.Message,
+                error.Type,
+                traceId
+            );
+        }
+
         public static HttpStatusCodeInfo FromException(
             Exception exception,
             string traceId,
@@ -126,19 +139,6 @@ namespace Mype.Api.Common
                 _ =>
                     StatusCodes.Status500InternalServerError
             };
-        }
-
-        public static HttpStatusCodeInfo FromApplicationError(
-            ApplicationError error,
-            string traceId
-        )
-        {
-            return FromApplicationError(
-                error.Code,
-                error.Message,
-                error.Type,
-                traceId
-            );
         }
     }
 }

@@ -39,7 +39,7 @@ namespace Mype.Api.Middlewares
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, string.Format(ErrorMessages.ExceptionHandlingMiddlewareError, ex.Message));
+                _logger.LogError(ex, ErrorMessages.ExceptionHandlingMiddlewareError, ex.Message);
                 await HandleExceptionAsync(context, ex);
             }
         }
