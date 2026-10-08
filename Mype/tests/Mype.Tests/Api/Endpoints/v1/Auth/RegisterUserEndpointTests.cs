@@ -20,6 +20,7 @@ namespace Mype.Tests.Api.Endpoints.v1.Auth
         private const string Email = "usuario@dominio.com";
         private const string Password = "password1";
         private const string TraceId = "test-trace-id";
+        private const string Status = "ACTIVE";
 
         private static readonly DateTimeOffset CreatedAt =
             new(2026, 10, 7, 12, 0, 0, TimeSpan.Zero);
@@ -56,7 +57,7 @@ namespace Mype.Tests.Api.Endpoints.v1.Auth
                         UserId = userId,
                         Email = Email,
                         DisplayName = DisplayName,
-                        Status = UserStatus.Active,
+                        Status = Status,
                         CreatedAt = CreatedAt
                     }
                 );
@@ -100,7 +101,7 @@ namespace Mype.Tests.Api.Endpoints.v1.Auth
             response.UserId.Should().Be(userId);
             response.Email.Should().Be(Email);
             response.DisplayName.Should().Be(DisplayName);
-            response.Status.Should().Be(UserStatus.Active);
+            response.Status.Should().Be(Status);
             response.CreatedAt.Should().Be(CreatedAt);
 
             _senderMock.Verify(

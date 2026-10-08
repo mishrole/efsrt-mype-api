@@ -11,7 +11,7 @@ namespace Mype.Application.Auth.Commands.RegisterUser
 
         public string DisplayName { get; set; } = string.Empty;
 
-        public UserStatus Status { get; set; }
+        public string Status { get; set; } = string.Empty;
 
         public DateTimeOffset CreatedAt { get; set; }
     }

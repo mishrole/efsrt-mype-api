@@ -20,6 +20,7 @@ namespace Mype.Tests.Application.Auth.Commands.RegisterUser
         private const string Password = "password1";
         private const string PasswordHash = "password-hash";
         private const string DisplayName = "Test User";
+        private const string Status = "ACTIVE";
 
         private static readonly DateTimeOffset UtcNow =
         new(2026, 10, 6, 12, 0, 0, TimeSpan.Zero);
@@ -88,7 +89,7 @@ namespace Mype.Tests.Application.Auth.Commands.RegisterUser
             result.Value.UserId.Should().NotBeEmpty();
             result.Value.Email.Should().Be(TrimmedEmail);
             result.Value.DisplayName.Should().Be(DisplayName);
-            result.Value.Status.Should().Be(UserStatus.Active);
+            result.Value.Status.Should().Be(Status);
             result.Value.CreatedAt.Should().Be(UtcNow);
 
             _userRepositoryMock.Verify(
