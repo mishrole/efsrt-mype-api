@@ -1,5 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Mype.Application.Common.Interfaces;
+using Mype.Domain.Businesses;
+using Mype.Domain.BusinessMemberships;
+using Mype.Domain.BusinessRoles;
+using Mype.Domain.Categories;
+using Mype.Domain.Currencies;
 using Mype.Domain.Users;
 using Mype.Infrastructure.Persistence.Exceptions;
 using System.Threading;
@@ -40,6 +45,11 @@ namespace Mype.Infrastructure.Persistence
         }
 
         public DbSet<User> Users => Set<User>();
+        public DbSet<Currency> Currencies => Set<Currency>();
+        public DbSet<BusinessRole> BusinessRoles => Set<BusinessRole>();
+        public DbSet<Business> Businesses => Set<Business>();
+        public DbSet<BusinessMembership> BusinessMemberships => Set<BusinessMembership>();
+        public DbSet<Category> Categories => Set<Category>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
