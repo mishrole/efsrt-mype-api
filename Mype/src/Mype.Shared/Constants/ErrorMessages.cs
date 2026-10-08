@@ -3,6 +3,7 @@
     public static class ErrorMessages
     {
         public const string VariableNotConfigured = "{0} no está configurado.";
+        public const string VariableNotValid = "{0} no es válido.";
         public const string DataMigrationFailed = "Error crítico durante la migración de datos.";
         public const string StartupFailed = "Error crítico durante el inicio de la aplicación: {ExceptionType}";
         public const string VariableRequiredInProduction = "{0} es requerido en producción.";

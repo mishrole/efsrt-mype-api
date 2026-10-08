@@ -1,8 +1,10 @@
-﻿namespace Mype.Api.Context
+﻿using System;
+
+namespace Mype.Api.Context
 {
     public interface IUserContextProvider
     {
-        string GetCurrentUserId();
+        Guid GetCurrentUserId();
         bool IsAuthenticated { get; }
     }
 }

@@ -21,11 +21,9 @@ jobs:
       RETRY_COUNT: ${{ secrets.RETRY_COUNT }}
       SLEEP_DURATION_PROVIDER: ${{ secrets.SLEEP_DURATION_PROVIDER }}
       CORS_POLICY_NAME: ${{ secrets.CORS_POLICY_NAME }}
+      JWT_EXPIRATION_MINUTES: ${{ secrets.JWT_EXPIRATION_MINUTES }}
 
     steps:
-      - name: Debug DB_CONNECTION
-        run: |
-          echo "Length: ${#DB_CONNECTION}"
       - name: Set up JDK 21
         uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6
         with:

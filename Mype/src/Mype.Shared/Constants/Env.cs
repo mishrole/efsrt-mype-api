@@ -12,5 +12,6 @@
         public const string RetryCountStringKey = "RETRY_COUNT";
         public const string SleepDurationProviderStringKey = "SLEEP_DURATION_PROVIDER";
         public const string CorsPolicyNameStringKey = "CORS_POLICY_NAME";
+        public const string JwtExpirationMinutesStringKey = "JWT_EXPIRATION_MINUTES";
     }
 }
