@@ -129,10 +129,9 @@ try
 }
 catch (Exception ex)
 {
-    throw new InvalidOperationException(
-        string.Format(ErrorMessages.StartupFailed, ex.GetType().ToString()),
-        ex
-    );
+    Log.Fatal(ex, ErrorMessages.StartupFailed, ex.GetType().ToString());
+
+    Environment.ExitCode = 1;
 }
 finally
 {

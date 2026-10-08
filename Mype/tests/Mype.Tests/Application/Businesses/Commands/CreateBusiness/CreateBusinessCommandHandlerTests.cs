@@ -85,9 +85,8 @@ namespace Mype.Tests.Application.Businesses.Commands.CreateBusiness
         private readonly Mock<IClock>
             _clockMock = new();
 
-        private readonly IDefaultCategoryProvider
-            _defaultCategoryProvider =
-                new DefaultCategoryProvider();
+        private readonly DefaultCategoryProvider
+            _defaultCategoryProvider = new();
 
         private readonly CreateBusinessCommandHandler _handler;
 
@@ -685,7 +684,7 @@ namespace Mype.Tests.Application.Businesses.Commands.CreateBusiness
         private void CaptureCreatedEntities(
             Action<Business> captureBusiness,
             Action<BusinessMembership> captureMembership,
-            ICollection<Category> categories
+            List<Category> categories
         )
         {
             _businessRepositoryMock
@@ -810,7 +809,7 @@ namespace Mype.Tests.Application.Businesses.Commands.CreateBusiness
         }
 
         private void AssertDefaultCategories(
-            IReadOnlyCollection<Category> categories,
+            List<Category> categories,
             Guid businessId
         )
         {
