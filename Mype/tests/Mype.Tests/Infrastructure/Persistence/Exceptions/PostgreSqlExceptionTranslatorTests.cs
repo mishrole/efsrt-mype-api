@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Mype.Application.Common.Exceptions;
+using Mype.Infrastructure.Persistence.Constraints;
 using Mype.Infrastructure.Persistence.Exceptions;
 using Mype.Shared.Constants;
 using Npgsql;
@@ -17,7 +18,7 @@ namespace Mype.Tests.Infrastructure.Persistence.Exceptions
         {
             var exception = CreateDbUpdateException(
                 PostgresErrorCodes.UniqueViolation,
-                DatabaseConstraints.UsersNormalizedEmail
+                DatabaseConstraints.Users.NormalizedEmail
             );
 
             var result = _translator.Translate(exception);
@@ -30,7 +31,7 @@ namespace Mype.Tests.Infrastructure.Persistence.Exceptions
         {
             var exception = CreateDbUpdateException(
                 PostgresErrorCodes.UniqueViolation,
-                DatabaseConstraints.UsersNormalizedEmail
+                DatabaseConstraints.Users.NormalizedEmail
             );
 
             var result = _translator.Translate(exception);
@@ -60,9 +61,11 @@ namespace Mype.Tests.Infrastructure.Persistence.Exceptions
         [Fact]
         public void Translate_Should_Return_Original_Exception_When_Unique_Constraint_Is_Unknown()
         {
+            var unknownConstraint = "ux_unknown_constraint";
+
             var exception = CreateDbUpdateException(
                 PostgresErrorCodes.UniqueViolation,
-                DatabaseConstraints.UnknownConstraint
+                unknownConstraint
             );
 
             var result = _translator.Translate(exception);
@@ -75,7 +78,7 @@ namespace Mype.Tests.Infrastructure.Persistence.Exceptions
         {
             var exception = CreateDbUpdateException(
                 PostgresErrorCodes.ForeignKeyViolation,
-                DatabaseConstraints.UsersNormalizedEmail
+                DatabaseConstraints.Users.NormalizedEmail
             );
 
             var result = _translator.Translate(exception);

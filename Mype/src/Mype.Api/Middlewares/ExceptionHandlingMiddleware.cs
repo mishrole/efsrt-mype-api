@@ -58,7 +58,7 @@ namespace Mype.Api.Middlewares
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = response.StatusCode;
 
-            return context.Response.WriteAsync(JsonSerializer.Serialize(response, _jsonOptions));
+            return context.Response.WriteAsync(JsonSerializer.Serialize(response, _jsonOptions), context.RequestAborted);
         }
 
     }

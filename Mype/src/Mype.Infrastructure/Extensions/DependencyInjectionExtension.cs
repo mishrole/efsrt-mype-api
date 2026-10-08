@@ -1,9 +1,20 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Mype.Application.Businesses.Interfaces;
+using Mype.Application.BusinessMemberships.Interfaces;
+using Mype.Application.BusinessRoles.Interfaces;
+using Mype.Application.Categories.Interfaces;
 using Mype.Application.Common.Interfaces;
+using Mype.Application.Currencies.Interfaces;
 using Mype.Application.Users.Interfaces;
 using Mype.Infrastructure.Auth;
+using Mype.Infrastructure.Businesses.Repositories;
+using Mype.Infrastructure.BusinessMemberships.Repositories;
+using Mype.Infrastructure.BusinessRoles.Repositories;
+using Mype.Infrastructure.Categories;
+using Mype.Infrastructure.Categories.Repositories;
 using Mype.Infrastructure.Common;
+using Mype.Infrastructure.Currencies.Repositories;
 using Mype.Infrastructure.Persistence;
 using Mype.Infrastructure.Persistence.Exceptions;
 using Mype.Infrastructure.Users.Repositories;
@@ -23,6 +34,11 @@ namespace Mype.Infrastructure.Extensions
             services.AddAuth();
 
             services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<ICurrencyRepository, CurrencyRepository>();
+            services.AddScoped<IBusinessRoleRepository, BusinessRoleRepository>();
+            services.AddScoped<IBusinessRepository, BusinessRepository>();
+            services.AddScoped<IBusinessMembershipRepository, BusinessMembershipRepository>();
+            services.AddScoped<ICategoryRepository, CategoryRepository>();
 
             services.AddScoped<IUnitOfWork>(provider =>
                 provider.GetRequiredService<MypeDbContext>()
@@ -30,6 +46,7 @@ namespace Mype.Infrastructure.Extensions
 
             services.AddSingleton<IClock, SystemClock>();
             services.AddSingleton<IPersistenceExceptionTranslator, PostgreSqlExceptionTranslator>();
+            services.AddSingleton<IDefaultCategoryProvider, DefaultCategoryProvider>();
 
             return services;
         }

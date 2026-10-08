@@ -156,6 +156,52 @@ namespace Mype.Tests.Api.Common
         }
 
         [Fact]
+        public void FromApplicationError_Should_Return_UnprocessableEntity()
+        {
+            var error = new ApplicationError(
+                ErrorCodes.UnsupportedCurrency,
+                ErrorMessages.UnsupportedCurrency,
+                ApplicationErrorType.UnprocessableEntity
+            );
+
+            var result = HttpErrorMapper.FromApplicationError(
+                error,
+                TraceId
+            );
+
+            result.StatusCode.Should().Be(
+                StatusCodes.Status422UnprocessableEntity
+            );
+
+            result.Code.Should().Be(
+                ErrorCodes.UnsupportedCurrency
+            );
+        }
+
+        [Fact]
+        public void FromApplicationError_Should_Return_InternalServerError()
+        {
+            var error = new ApplicationError(
+                ErrorCodes.BusinessCreationFailed,
+                ErrorMessages.BusinessCreationFailed,
+                ApplicationErrorType.Internal
+            );
+
+            var result = HttpErrorMapper.FromApplicationError(
+                error,
+                TraceId
+            );
+
+            result.StatusCode.Should().Be(
+                StatusCodes.Status500InternalServerError
+            );
+
+            result.Code.Should().Be(
+                ErrorCodes.BusinessCreationFailed
+            );
+        }
+
+        [Fact]
         public void FromException_Should_Return_Safe_Internal_Error_When_Exception_Is_Unknown()
         {
             var exception = new Exception(

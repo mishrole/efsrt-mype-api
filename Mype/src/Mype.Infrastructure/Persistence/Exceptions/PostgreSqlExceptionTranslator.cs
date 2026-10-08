@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Mype.Application.Common.Exceptions;
+using Mype.Infrastructure.Persistence.Constraints;
 using Mype.Shared.Constants;
 using Npgsql;
 using System;
@@ -14,7 +15,7 @@ namespace Mype.Infrastructure.Persistence.Exceptions
             UniqueConstraintMappings = new()
             {
                 {
-                    DatabaseConstraints.UsersNormalizedEmail,
+                    DatabaseConstraints.Users.NormalizedEmail,
                     exception => new ApplicationErrorException(
                         ErrorCodes.EmailAlreadyRegistered,
                         ErrorMessages.EmailAlreadyRegistered,
