@@ -1,7 +1,12 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Mype.Application.Common.Interfaces;
+using Mype.Application.Users.Interfaces;
 using Mype.Infrastructure.Auth;
+using Mype.Infrastructure.Common;
 using Mype.Infrastructure.Persistence;
+using Mype.Infrastructure.Persistence.Exceptions;
+using Mype.Infrastructure.Users.Repositories;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Mype.Infrastructure.Extensions
@@ -17,10 +22,14 @@ namespace Mype.Infrastructure.Extensions
             services.AddPersistence(configuration);
             services.AddAuth();
 
-            // Example: services.AddTransient<IMyRepository, MyRepository>();
-            // Example: services.AddTransient<IMyService, MyService>();
-            // Example: services.AddSingleton<IMyProvider, MyProvider>();
-            // Example: services.AddScoped<IMyQuery, MyQuery>();
+            services.AddScoped<IUserRepository, UserRepository>();
+
+            services.AddScoped<IUnitOfWork>(provider =>
+                provider.GetRequiredService<MypeDbContext>()
+            );
+
+            services.AddSingleton<IClock, SystemClock>();
+            services.AddSingleton<IPersistenceExceptionTranslator, PostgreSqlExceptionTranslator>();
 
             return services;
         }

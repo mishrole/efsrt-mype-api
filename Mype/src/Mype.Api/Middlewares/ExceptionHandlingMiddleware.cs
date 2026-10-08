@@ -2,9 +2,9 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Mype.Shared.Models;
+using Mype.Api.Common;
+using Mype.Shared.Constants;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -39,33 +39,24 @@ namespace Mype.Api.Middlewares
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unhandled exception occurred");
+                _logger.LogError(ex, ErrorMessages.ExceptionHandlingMiddlewareError, ex.Message);
                 await HandleExceptionAsync(context, ex);
             }
         }
 
         private Task HandleExceptionAsync(HttpContext context, Exception exception)
         {
-            var statusCode = exception switch
-            {
-                ArgumentNullException => StatusCodes.Status400BadRequest,
-                ArgumentException => StatusCodes.Status400BadRequest,
-                UnauthorizedAccessException => StatusCodes.Status401Unauthorized,
-                KeyNotFoundException => StatusCodes.Status404NotFound,
-                InvalidOperationException => StatusCodes.Status409Conflict,
-                _ => StatusCodes.Status500InternalServerError
-            };
 
-            var response = new HttpStatusCodeInfo
-            {
-                StatusCode = statusCode,
-                Message = exception.Message,
-                Detail = _env.IsDevelopment() ? exception.StackTrace : null,
-                TraceId = context.TraceIdentifier
-            };
+            var response = HttpErrorMapper.FromException(
+                exception,
+                context.TraceIdentifier,
+                _env.IsDevelopment()
+                    ? exception.StackTrace
+                    : null
+            );
 
             context.Response.ContentType = "application/json";
-            context.Response.StatusCode = statusCode;
+            context.Response.StatusCode = response.StatusCode;
 
             return context.Response.WriteAsync(JsonSerializer.Serialize(response, _jsonOptions));
         }

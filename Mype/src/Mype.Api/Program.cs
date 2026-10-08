@@ -123,16 +123,16 @@ try
     app.MapHealthChecks("/health");
     app.AddEndpoints();
 
-    app.Run();
+    await app.RunAsync();
 
 }
 catch (Exception ex)
 {
-    Log.Fatal(ex, string.Format(ErrorMessages.StartupFailed, ex.GetType().ToString()));
+    Log.Fatal(ex, ErrorMessages.StartupFailed, ex.GetType().ToString());
 
-    throw;
+    Environment.ExitCode = 1;
 }
 finally
 {
-    Log.CloseAndFlush();
+    await Log.CloseAndFlushAsync();
 }

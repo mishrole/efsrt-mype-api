@@ -1,4 +1,4 @@
-﻿namespace Mype.Infrastructure.Auth
+﻿namespace Mype.Application.Common.Interfaces
 {
     public interface IPasswordHasherHelper
     {

@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using Mype.Application.Common.Interfaces;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Mype.Infrastructure.Auth
 {

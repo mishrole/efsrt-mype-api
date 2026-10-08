@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
+using Mype.Application.Common.Interfaces;
 using Mype.Shared.Constants;
 using System;
 using System.Collections.Generic;
