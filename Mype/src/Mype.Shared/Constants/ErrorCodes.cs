@@ -12,6 +12,8 @@
 
         public const string AccountUnavailable = "ACCOUNT_UNAVAILABLE";
 
+        public const string Unauthenticated = "UNAUTHENTICATED";
+
         #endregion
 
         #region Businesses

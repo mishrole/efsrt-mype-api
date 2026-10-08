@@ -9,7 +9,11 @@ namespace Mype.Api.Extensions
     {
         public static IApplicationBuilder AddMiddleware(this IApplicationBuilder app)
         {
-            return app.UseMiddleware<ExceptionHandlingMiddleware>();
+            app.UseMiddleware<ExceptionHandlingMiddleware>();
+
+            app.UseMiddleware<AuthenticationHandlingMiddleware>();
+
+            return app;
         }
     }
 }

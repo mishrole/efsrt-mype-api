@@ -15,6 +15,8 @@
         public const string InternalError = "Ocurrió un error interno.";
         public const string ValidationFailed = "Uno o más campos no son válidos.";
 
+        public const string Unauthenticated = "La autenticación es requerida o el token no es válido.";
+
         #region Auth
 
         public const string EmailAlreadyRegistered = "El correo electrónico ya se encuentra registrado.";
