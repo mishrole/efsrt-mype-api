@@ -860,7 +860,7 @@ namespace Mype.Tests.Application.Businesses.Commands.CreateBusiness
             CreateBusinessResult result,
             Business business,
             BusinessMembership membership,
-            IReadOnlyCollection<Category> categories
+            List<Category> categories
         )
         {
             result.BusinessId.Should().Be(
