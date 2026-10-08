@@ -2,6 +2,7 @@
 using Mype.Application.Users.Interfaces;
 using Mype.Domain.Users;
 using Mype.Infrastructure.Persistence;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -49,6 +50,19 @@ namespace Mype.Infrastructure.Users.Repositories
                 user,
                 cancellationToken
             );
+        }
+
+        public Task<User> GetByIdAsync(
+            Guid id,
+            CancellationToken cancellationToken
+        )
+        {
+            return _dbContext.Users
+                .AsNoTracking()
+                .SingleOrDefaultAsync(
+                    user => user.Id == id,
+                    cancellationToken
+                );
         }
     }
 }

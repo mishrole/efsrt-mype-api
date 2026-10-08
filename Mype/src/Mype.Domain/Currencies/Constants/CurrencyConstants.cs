@@ -2,7 +2,7 @@
 
 namespace Mype.Domain.Currencies.Constants
 {
-    public static class Currencies
+    public static class CurrencyConstants
     {
         public static readonly Guid PenId =
         Guid.Parse(

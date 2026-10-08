@@ -46,8 +46,8 @@ namespace Mype.Infrastructure.Persistence.Configurations
             builder.HasData(
                 new
                 {
-                    Id = Currencies.PenId,
-                    Code = Currencies.PenCode,
+                    Id = CurrencyConstants.PenId,
+                    Code = CurrencyConstants.PenCode,
                     Name = "Sol peruano",
                     Symbol = "S/",
                     DecimalPlaces = (short)2,

@@ -2,7 +2,7 @@
 
 namespace Mype.Domain.BusinessRoles.Constants
 {
-    public static class BusinessRoles
+    public static class BusinessRoleConstants
     {
         public static readonly Guid OwnerId =
             Guid.Parse(

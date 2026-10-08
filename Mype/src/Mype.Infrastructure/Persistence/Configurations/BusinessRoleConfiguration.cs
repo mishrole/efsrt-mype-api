@@ -62,27 +62,27 @@ namespace Mype.Infrastructure.Persistence.Configurations
             builder.HasData(
                 new
                 {
-                    Id = BusinessRoles.OwnerId,
-                    Code = BusinessRoles.OwnerCode,
+                    Id = BusinessRoleConstants.OwnerId,
+                    Code = BusinessRoleConstants.OwnerCode,
                     Name = "Propietario",
                     Description =
                         "Administra el negocio y sus miembros.",
                     IsSystem = true,
                     IsActive = true,
-                    CreatedAt = BusinessRoles.SeededAt,
-                    UpdatedAt = BusinessRoles.SeededAt
+                    CreatedAt = BusinessRoleConstants.SeededAt,
+                    UpdatedAt = BusinessRoleConstants.SeededAt
                 },
                 new
                 {
-                    Id = BusinessRoles.CollaboratorId,
-                    Code = BusinessRoles.CollaboratorCode,
+                    Id = BusinessRoleConstants.CollaboratorId,
+                    Code = BusinessRoleConstants.CollaboratorCode,
                     Name = "Colaborador",
                     Description =
                         "Participa en las operaciones del negocio.",
                     IsSystem = true,
                     IsActive = true,
-                    CreatedAt = BusinessRoles.SeededAt,
-                    UpdatedAt = BusinessRoles.SeededAt
+                    CreatedAt = BusinessRoleConstants.SeededAt,
+                    UpdatedAt = BusinessRoleConstants.SeededAt
                 }
             );
         }
