@@ -41,6 +41,8 @@
 
         public const string BusinessUnavailable = "El negocio no se encuentra disponible.";
 
+        public const string RucAlreadyRegistered = "El RUC ya se encuentra registrado.";
+
         #endregion
 
         #region Results

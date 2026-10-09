@@ -28,6 +28,8 @@
 
         public const string BusinessUnavailable = "BUSINESS_UNAVAILABLE";
 
+        public const string RucAlreadyRegistered = "RUC_ALREADY_REGISTERED";
+
         #endregion
     }
 }

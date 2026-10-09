@@ -29,5 +29,13 @@ namespace Mype.Application.Businesses.Commands.CreateBusiness
                     ErrorMessages.BusinessCreationFailed,
                     ApplicationErrorType.Internal
                 );
+
+        public static readonly ApplicationError
+            RucAlreadyRegistered =
+                new(
+                    ErrorCodes.RucAlreadyRegistered,
+                    ErrorMessages.RucAlreadyRegistered,
+                    ApplicationErrorType.Conflict
+                );
     }
 }

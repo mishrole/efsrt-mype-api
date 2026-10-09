@@ -22,6 +22,7 @@
             public const string Currency = "fk_businesses_currencies_currency_id";
             public const string CreatedByUser = "fk_businesses_users_created_by_user_id";
             public const string UpdatedByUser = "fk_businesses_users_updated_by_user_id";
+            public const string Ruc = "ux_businesses_ruc";
         }
 
         public static class BusinessMemberships
