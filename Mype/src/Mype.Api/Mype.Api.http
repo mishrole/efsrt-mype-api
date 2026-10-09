@@ -60,3 +60,21 @@ Accept: application/json
 GET {{Mype.Api_HostAddress}}/api/v1/businesses/00000000-0000-0000-0000-000000000001/context
 Authorization: Bearer {{AccessToken}}
 Accept: application/json
+
+###
+
+GET {{Mype.Api_HostAddress}}/api/v1/businesses/{{BusinessId}}/categories
+Authorization: Bearer {{AccessToken}}
+Accept: application/json
+
+###
+
+GET {{Mype.Api_HostAddress}}/api/v1/businesses/{{BusinessId}}/categories?type=1
+Authorization: Bearer {{AccessToken}}
+Accept: application/json
+
+###
+
+GET {{Mype.Api_HostAddress}}/api/v1/businesses/{{BusinessId}}/categories?type=2
+Authorization: Bearer {{AccessToken}}
+Accept: application/json
