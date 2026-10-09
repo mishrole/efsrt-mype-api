@@ -18,6 +18,7 @@ if (-not (Test-Path $addMigrationScript)) {
 Write-Host "Removing the latest migration..."
 
 dotnet ef migrations remove `
+    --force `
     --project $project `
     --startup-project $startupProject
 

@@ -42,5 +42,19 @@
             public const string CreatedByUser = "fk_categories_users_created_by_user_id";
             public const string UpdatedByUser = "fk_categories_users_updated_by_user_id";
         }
+
+        public static class Permissions
+        {
+            public const string Code = "ux_permissions_code";
+        }
+
+        public static class BusinessRolePermissions
+        {
+            public const string BusinessRole = "fk_business_role_permissions_business_roles_business_role_id";
+
+            public const string Permission = "fk_business_role_permissions_permissions_permission_id";
+
+            public const string PermissionIndex = "ix_business_role_permissions_permission_id";
+        }
     }
 }
