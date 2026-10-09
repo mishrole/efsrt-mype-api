@@ -45,6 +45,13 @@
 
         #endregion
 
+        #region Categories
+
+        public const string CategoryAccessForbidden = "CATEGORY_ACCESS_FORBIDDEN";
+
+        #endregion
+
+
         #region Results
 
         public const string SuccessfulResultWithoutValue = "Un resultado satisfactorio debe contener un valor.";
@@ -52,6 +59,7 @@
         public const string FailedResultWithoutError = "Un resultado fallido debe contener un error.";
 
         #endregion
+
 
     }
 }

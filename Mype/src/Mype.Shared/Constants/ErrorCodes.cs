@@ -31,5 +31,13 @@
         public const string RucAlreadyRegistered = "RUC_ALREADY_REGISTERED";
 
         #endregion
+
+        #region Categories
+
+        public const string
+            CategoryAccessForbidden = "CATEGORY_ACCESS_FORBIDDEN";
+
+        #endregion
+
     }
 }
