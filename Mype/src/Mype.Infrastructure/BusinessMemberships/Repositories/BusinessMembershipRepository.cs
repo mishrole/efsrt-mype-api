@@ -77,7 +77,7 @@ namespace Mype.Infrastructure.BusinessMemberships.Repositories
             ).ToArrayAsync(cancellationToken);
         }
 
-        public Task<BusinessContextProjection?>
+        public Task<BusinessContextProjection>
             GetContextByBusinessAndUserAsync(
                 Guid businessId,
                 Guid userId,

@@ -23,7 +23,7 @@ namespace Mype.Application.BusinessMemberships.Interfaces
             CancellationToken cancellationToken
         );
 
-        Task<BusinessContextProjection?>
+        Task<BusinessContextProjection>
             GetContextByBusinessAndUserAsync(
                 Guid businessId,
                 Guid userId,

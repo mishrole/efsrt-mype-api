@@ -21,7 +21,8 @@ namespace Mype.Infrastructure.Persistence
         public MypeDbContext(
             DbContextOptions<MypeDbContext> options,
             IPersistenceExceptionTranslator exceptionTranslator
-        ) : base(options) {
+        ) : base(options)
+        {
             _exceptionTranslator = exceptionTranslator;
         }
 

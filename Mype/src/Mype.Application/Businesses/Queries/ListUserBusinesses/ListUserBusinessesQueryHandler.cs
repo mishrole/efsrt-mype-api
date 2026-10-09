@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Mype.Application.Businesses.Queries.ListUserBusinesses
 {
-    public class ListUserBusinessesQueryHandler: IRequestHandler<ListUserBusinessesQuery, Result<IReadOnlyCollection<BusinessSummaryResult>>>
+    public class ListUserBusinessesQueryHandler : IRequestHandler<ListUserBusinessesQuery, Result<IReadOnlyCollection<BusinessSummaryResult>>>
     {
         private readonly
             IBusinessMembershipRepository

@@ -6,6 +6,7 @@ using Mype.Application.Common;
 using Mype.Application.Common.Exceptions;
 using Mype.Shared.Constants;
 using Mype.Shared.Models;
+using System;
 using System.IO;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -101,6 +102,51 @@ namespace Mype.Tests.Api.Extensions
             );
 
             response.TraceId.Should().Be(TraceId);
+        }
+
+        [Fact]
+        public void ToHttpResult_Should_Throw_When_Success_Result_Has_No_Value()
+        {
+            var result = Result<TestResult>.Success(null);
+
+            var action = () => result.ToHttpResult(
+                CreateHttpContext(),
+                _ => Results.Ok()
+            );
+
+            action.Should()
+                .Throw<InvalidOperationException>()
+                .WithMessage(
+                    ErrorMessages
+                        .SuccessfulResultWithoutValue
+                );
+        }
+
+        [Fact]
+        public void ToHttpResult_Should_Throw_When_Failure_Result_Has_No_Error()
+        {
+            var result = Result<TestResult>
+                .Success(
+                    new TestResult
+                    {
+                        Id = 1
+                    }
+                );
+
+            result.IsSuccess = false;
+            result.Error = null;
+
+            var action = () => result.ToHttpResult(
+                CreateHttpContext(),
+                _ => Results.Ok()
+            );
+
+            action.Should()
+                .Throw<InvalidOperationException>()
+                .WithMessage(
+                    ErrorMessages
+                        .FailedResultWithoutError
+                );
         }
 
         private static DefaultHttpContext CreateHttpContext()
