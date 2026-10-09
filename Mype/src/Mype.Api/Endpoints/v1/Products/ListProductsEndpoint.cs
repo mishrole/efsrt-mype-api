@@ -17,7 +17,7 @@ namespace Mype.Api.Endpoints.v1.Products
             [FromQuery] string search,
             [FromQuery] Guid? categoryId,
             [FromQuery] bool? isActive,
-            [FromQuery] bool availableForSale,
+            [FromQuery] bool? availableForSale,
             [FromServices] ISender sender,
             [FromServices]
                 IUserContextProvider
@@ -37,7 +37,7 @@ namespace Mype.Api.Endpoints.v1.Products
                     CategoryId = categoryId,
                     IsActive = isActive,
                     AvailableForSale =
-                        availableForSale
+                        availableForSale ?? false
                 };
 
             var result = await sender.Send(
