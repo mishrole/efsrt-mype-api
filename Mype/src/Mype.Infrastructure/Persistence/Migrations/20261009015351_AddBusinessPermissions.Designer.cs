@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Mype.Infrastructure.Persistence;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Mype.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(MypeDbContext))]
-    partial class MypeDbContextModelSnapshot : ModelSnapshot
+    [Migration("20261009015351_AddBusinessPermissions")]
+    partial class AddBusinessPermissions
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -398,11 +401,6 @@ namespace Mype.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("CurrencyId")
                         .HasDatabaseName("ix_businesses_currency_id");
-
-                    b.HasIndex("Ruc")
-                        .IsUnique()
-                        .HasDatabaseName("ux_businesses_ruc")
-                        .HasFilter("ruc IS NOT NULL");
 
                     b.HasIndex("UpdatedByUserId")
                         .HasDatabaseName("ix_businesses_updated_by_user_id");

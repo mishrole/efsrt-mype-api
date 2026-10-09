@@ -15,9 +15,9 @@
         public const string InternalError = "Ocurrió un error interno.";
         public const string ValidationFailed = "Uno o más campos no son válidos.";
 
-        public const string Unauthenticated = "La autenticación es requerida o el token no es válido.";
-
         #region Auth
+
+        public const string Unauthenticated = "La autenticación es requerida o el token no es válido.";
 
         public const string EmailAlreadyRegistered = "El correo electrónico ya se encuentra registrado.";
 
@@ -37,6 +37,21 @@
 
         public const string InvalidRuc = "El RUC no es válido.";
 
+        public const string BusinessAccessForbidden = "No tiene acceso al negocio solicitado.";
+
+        public const string BusinessUnavailable = "El negocio no se encuentra disponible.";
+
+        public const string RucAlreadyRegistered = "El RUC ya se encuentra registrado.";
+
         #endregion
+
+        #region Results
+
+        public const string SuccessfulResultWithoutValue = "Un resultado satisfactorio debe contener un valor.";
+
+        public const string FailedResultWithoutError = "Un resultado fallido debe contener un error.";
+
+        #endregion
+
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace Mype.Application.Common
 {
-    #nullable enable
+#nullable enable
     public class Result<T>
     {
         public bool IsSuccess { get; set; }

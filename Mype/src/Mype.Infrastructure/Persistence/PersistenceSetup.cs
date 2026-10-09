@@ -15,7 +15,7 @@ namespace Mype.Infrastructure.Persistence
             IConfiguration configuration
         )
         {
-            var connectionString = configuration[Env.ConnectionStringKey] 
+            var connectionString = configuration[Env.ConnectionStringKey]
                 ?? throw new InvalidOperationException(string.Format(ErrorMessages.VariableNotConfigured, Env.ConnectionStringKey));
 
             services.AddDbContext<MypeDbContext>(opt =>

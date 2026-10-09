@@ -27,7 +27,8 @@ namespace Mype.Infrastructure.Extensions
                 await context.Database.MigrateAsync();
 
                 logger.LogInformation(SuccessMessages.DatabaseMigrationSucceeded);
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 logger.LogCritical(ex, ErrorMessages.DatabaseMigrationFailed);
 

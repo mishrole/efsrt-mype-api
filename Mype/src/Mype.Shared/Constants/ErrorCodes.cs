@@ -24,6 +24,12 @@
 
         public const string BusinessCreationFailed = "BUSINESS_CREATION_FAILED";
 
+        public const string BusinessAccessForbidden = "BUSINESS_ACCESS_FORBIDDEN";
+
+        public const string BusinessUnavailable = "BUSINESS_UNAVAILABLE";
+
+        public const string RucAlreadyRegistered = "RUC_ALREADY_REGISTERED";
+
         #endregion
     }
 }

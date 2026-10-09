@@ -1,4 +1,5 @@
-﻿using Mype.Application.Businesses.Interfaces;
+﻿using Microsoft.EntityFrameworkCore;
+using Mype.Application.Businesses.Interfaces;
 using Mype.Domain.Businesses;
 using Mype.Infrastructure.Persistence;
 using System.Threading;
@@ -26,6 +27,19 @@ namespace Mype.Infrastructure.Businesses.Repositories
                 business,
                 cancellationToken
             );
+        }
+
+        public Task<bool> ExistsByRucAsync(
+            string ruc,
+            CancellationToken cancellationToken
+        )
+        {
+            return _dbContext.Businesses
+                .AsNoTracking()
+                .AnyAsync(
+                    business => business.Ruc == ruc,
+                    cancellationToken
+                );
         }
     }
 }

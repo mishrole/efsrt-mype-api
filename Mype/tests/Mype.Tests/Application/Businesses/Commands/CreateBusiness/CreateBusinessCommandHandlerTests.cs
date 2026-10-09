@@ -582,6 +582,145 @@ namespace Mype.Tests.Application.Businesses.Commands.CreateBusiness
             );
         }
 
+        [Fact]
+        public async Task Handle_Should_Return_RucAlreadyRegistered_When_Ruc_Exists()
+        {
+            SetupUser(
+                CreateActiveUser()
+            );
+
+            SetupCurrency(
+                CreateCurrency()
+            );
+
+            SetupOwnerRole(
+                CreateOwnerRole()
+            );
+
+            _businessRepositoryMock
+                .Setup(repository =>
+                    repository.ExistsByRucAsync(
+                        Ruc,
+                        It.IsAny<CancellationToken>()
+                    )
+                )
+                .ReturnsAsync(true);
+
+            var result = await _handler.Handle(
+                CreateCommand(),
+                CancellationToken.None
+            );
+
+            result.IsSuccess.Should().BeFalse();
+
+            result.Error.Should().BeSameAs(
+                CreateBusinessErrors
+                    .RucAlreadyRegistered
+            );
+
+            VerifyNothingWasPersisted();
+
+            _businessRepositoryMock.Verify(
+                repository =>
+                    repository.ExistsByRucAsync(
+                        Ruc,
+                        It.IsAny<CancellationToken>()
+                    ),
+                Times.Once
+            );
+        }
+
+        [Fact]
+        public async Task Handle_Should_Not_Query_Ruc_When_Ruc_Is_Not_Provided()
+        {
+            SetupSuccessfulDependencies(
+                CreateActiveUser(),
+                CreateCurrency(),
+                CreateOwnerRole()
+            );
+
+            var command = CreateCommand();
+
+            command.Ruc = null;
+            command.LegalName = null;
+
+            var result = await _handler.Handle(
+                command,
+                CancellationToken.None
+            );
+
+            result.IsSuccess.Should().BeTrue();
+
+            _businessRepositoryMock.Verify(
+                repository =>
+                    repository.ExistsByRucAsync(
+                        It.IsAny<string>(),
+                        It.IsAny<CancellationToken>()
+                    ),
+                Times.Never
+            );
+        }
+
+        [Fact]
+        public async Task Handle_Should_Normalize_Ruc_Before_Querying_And_Creating_Business()
+        {
+            SetupSuccessfulDependencies(
+                CreateActiveUser(),
+                CreateCurrency(),
+                CreateOwnerRole()
+            );
+
+            _businessRepositoryMock
+                .Setup(repository =>
+                    repository.ExistsByRucAsync(
+                        Ruc,
+                        It.IsAny<CancellationToken>()
+                    )
+                )
+                .ReturnsAsync(false);
+
+            Business createdBusiness = null;
+
+            _businessRepositoryMock
+                .Setup(repository =>
+                    repository.AddAsync(
+                        It.IsAny<Business>(),
+                        It.IsAny<CancellationToken>()
+                    )
+                )
+                .Callback<
+                    Business,
+                    CancellationToken
+                >(
+                    (business, _) =>
+                        createdBusiness = business
+                )
+                .Returns(Task.CompletedTask);
+
+            var command = CreateCommand();
+
+            command.Ruc = $"  {Ruc}  ";
+
+            var result = await _handler.Handle(
+                command,
+                CancellationToken.None
+            );
+
+            result.IsSuccess.Should().BeTrue();
+
+            createdBusiness.Should().NotBeNull();
+            createdBusiness.Ruc.Should().Be(Ruc);
+
+            _businessRepositoryMock.Verify(
+                repository =>
+                    repository.ExistsByRucAsync(
+                        Ruc,
+                        It.IsAny<CancellationToken>()
+                    ),
+                Times.Once
+            );
+        }
+
         private int DefaultCategoryCount =>
             _defaultCategoryProvider
                 .GetDefaultCategories()
@@ -596,6 +735,16 @@ namespace Mype.Tests.Application.Businesses.Commands.CreateBusiness
             SetupUser(user);
             SetupCurrency(currency);
             SetupOwnerRole(ownerRole);
+
+            _businessRepositoryMock
+            .Setup(repository =>
+                repository.ExistsByRucAsync(
+                    It.IsAny<string>(),
+                    It.IsAny<CancellationToken>()
+                )
+            )
+            .ReturnsAsync(false);
+
             SetupRepositoryAdds();
 
             _unitOfWorkMock

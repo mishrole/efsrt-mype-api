@@ -38,6 +38,11 @@ namespace Mype.Infrastructure.Persistence.Configurations
                     BusinessConstraints.RucLength
                 );
 
+            builder.HasIndex(x => x.Ruc)
+                .IsUnique()
+                .HasFilter("ruc IS NOT NULL")
+                .HasDatabaseName(DatabaseConstraints.Businesses.Ruc);
+
             builder.Property(business => business.CurrencyId)
                 .IsRequired();
 

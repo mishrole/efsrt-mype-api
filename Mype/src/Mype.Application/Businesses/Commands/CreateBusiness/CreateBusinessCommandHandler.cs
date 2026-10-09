@@ -106,12 +106,31 @@ namespace Mype.Application.Businesses.Commands.CreateBusiness
                 );
             }
 
+            var normalizedRuc = string.IsNullOrWhiteSpace(
+                request.Ruc
+            )
+                ? null
+                : request.Ruc.Trim();
+
+            if (
+                normalizedRuc != null &&
+                await _businessRepository.ExistsByRucAsync(
+                    normalizedRuc,
+                    cancellationToken
+                )
+            )
+            {
+                return Result<CreateBusinessResult>.Failure(
+                    CreateBusinessErrors.RucAlreadyRegistered
+                );
+            }
+
             var utcNow = _clock.UtcNow;
 
             var business = Business.Create(
                 request.DisplayName,
                 request.LegalName,
-                request.Ruc,
+                normalizedRuc,
                 currency.Id,
                 request.CurrentUserId,
                 utcNow

@@ -10,5 +10,10 @@ namespace Mype.Application.Businesses.Interfaces
             Business business,
             CancellationToken cancellationToken
         );
+
+        Task<bool> ExistsByRucAsync(
+            string ruc,
+            CancellationToken cancellationToken
+        );
     }
 }

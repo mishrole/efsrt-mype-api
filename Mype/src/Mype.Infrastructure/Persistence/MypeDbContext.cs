@@ -2,9 +2,11 @@
 using Mype.Application.Common.Interfaces;
 using Mype.Domain.Businesses;
 using Mype.Domain.BusinessMemberships;
+using Mype.Domain.BusinessRolePermissions;
 using Mype.Domain.BusinessRoles;
 using Mype.Domain.Categories;
 using Mype.Domain.Currencies;
+using Mype.Domain.Permissions;
 using Mype.Domain.Users;
 using Mype.Infrastructure.Persistence.Exceptions;
 using System.Threading;
@@ -19,7 +21,8 @@ namespace Mype.Infrastructure.Persistence
         public MypeDbContext(
             DbContextOptions<MypeDbContext> options,
             IPersistenceExceptionTranslator exceptionTranslator
-        ) : base(options) {
+        ) : base(options)
+        {
             _exceptionTranslator = exceptionTranslator;
         }
 
@@ -50,6 +53,8 @@ namespace Mype.Infrastructure.Persistence
         public DbSet<Business> Businesses => Set<Business>();
         public DbSet<BusinessMembership> BusinessMemberships => Set<BusinessMembership>();
         public DbSet<Category> Categories => Set<Category>();
+        public DbSet<Permission> Permissions => Set<Permission>();
+        public DbSet<BusinessRolePermission> BusinessRolePermissions => Set<BusinessRolePermission>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
