@@ -5,7 +5,10 @@ using Mype.Api.Endpoints.v1.Businesses;
 using Mype.Application.Auth.Commands.Login;
 using Mype.Application.Auth.Commands.RegisterUser;
 using Mype.Application.Businesses.Commands.CreateBusiness;
+using Mype.Application.Businesses.Queries.GetBusinessContext;
+using Mype.Application.Businesses.Queries.ListUserBusinesses;
 using Mype.Shared.Models;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Mype.Api
@@ -100,6 +103,49 @@ namespace Mype.Api
                 )
                 .Produces<HttpStatusCodeInfo>(
                     StatusCodes.Status422UnprocessableEntity
+                )
+                .Produces<HttpStatusCodeInfo>(
+                    StatusCodes.Status500InternalServerError
+                );
+
+            businessGroup
+                .MapGet(
+                    string.Empty,
+                    ListUserBusinessesEndpoint.DoAsync
+                )
+                .WithName("ListUserBusinesses")
+                .WithSummary("Listar los negocios del usuario autenticado")
+                .Produces<IReadOnlyCollection<BusinessSummaryResult>>(
+                    StatusCodes.Status200OK
+                )
+                .Produces<HttpStatusCodeInfo>(
+                    StatusCodes.Status401Unauthorized
+                )
+                .Produces<HttpStatusCodeInfo>(
+                    StatusCodes.Status500InternalServerError
+                );
+
+
+            businessGroup
+                .MapGet(
+                    "/{businessId:guid}/context",
+                    GetBusinessContextEndpoint.DoAsync
+                )
+                .WithName("GetBusinessContext")
+                .WithSummary(
+                    "Obtener el contexto autorizado de un negocio"
+                )
+                .Produces<BusinessContextResult>(
+                    StatusCodes.Status200OK
+                )
+                .Produces<HttpStatusCodeInfo>(
+                    StatusCodes.Status401Unauthorized
+                )
+                .Produces<HttpStatusCodeInfo>(
+                    StatusCodes.Status403Forbidden
+                )
+                .Produces<HttpStatusCodeInfo>(
+                    StatusCodes.Status409Conflict
                 )
                 .Produces<HttpStatusCodeInfo>(
                     StatusCodes.Status500InternalServerError
