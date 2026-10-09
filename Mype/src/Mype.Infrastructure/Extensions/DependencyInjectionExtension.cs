@@ -7,6 +7,7 @@ using Mype.Application.Categories.Interfaces;
 using Mype.Application.Common.Interfaces;
 using Mype.Application.Currencies.Interfaces;
 using Mype.Application.Permissions.Interfaces;
+using Mype.Application.Products.Interfaces;
 using Mype.Application.Users.Interfaces;
 using Mype.Infrastructure.Auth;
 using Mype.Infrastructure.Businesses.Repositories;
@@ -19,6 +20,7 @@ using Mype.Infrastructure.Currencies.Repositories;
 using Mype.Infrastructure.Permissions.Repositories;
 using Mype.Infrastructure.Persistence;
 using Mype.Infrastructure.Persistence.Exceptions;
+using Mype.Infrastructure.Products.Repositories;
 using Mype.Infrastructure.Users.Repositories;
 using System.Diagnostics.CodeAnalysis;
 
@@ -42,6 +44,7 @@ namespace Mype.Infrastructure.Extensions
             services.AddScoped<IBusinessMembershipRepository, BusinessMembershipRepository>();
             services.AddScoped<ICategoryRepository, CategoryRepository>();
             services.AddScoped<IPermissionRepository, PermissionRepository>();
+            services.AddScoped<IProductRepository, ProductRepository>();
 
             services.AddScoped<IUnitOfWork>(provider =>
                 provider.GetRequiredService<MypeDbContext>()

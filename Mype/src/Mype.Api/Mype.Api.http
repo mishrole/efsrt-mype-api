@@ -1,6 +1,8 @@
 @Mype.Api_HostAddress = http://localhost:5010
 @AccessToken = ACCESS_TOKEN
 @BusinessId = BUSINESS_ID
+@CategoryId = CATEGORY_ID
+@ProductId = PRODUCT_ID
 
 GET {{Mype.Api_HostAddress}}/health
 Accept: application/json
@@ -76,5 +78,55 @@ Accept: application/json
 ###
 
 GET {{Mype.Api_HostAddress}}/api/v1/businesses/{{BusinessId}}/categories?type=2
+Authorization: Bearer {{AccessToken}}
+Accept: application/json
+
+###
+
+POST {{Mype.Api_HostAddress}}/api/v1/businesses/{{BusinessId}}/products
+Authorization: Bearer {{AccessToken}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "Gaseosa 500 ml",
+  "categoryId": "{{CategoryId}}",
+  "salePrice": 3.50,
+  "unitCost": 2.20
+}
+
+###
+
+GET {{Mype.Api_HostAddress}}/api/v1/businesses/{{BusinessId}}/products
+Authorization: Bearer {{AccessToken}}
+Accept: application/json
+
+###
+
+GET {{Mype.Api_HostAddress}}/api/v1/businesses/{{BusinessId}}/products?isActive=true
+Authorization: Bearer {{AccessToken}}
+Accept: application/json
+
+###
+
+GET {{Mype.Api_HostAddress}}/api/v1/businesses/{{BusinessId}}/products?categoryId={{CategoryId}}
+Authorization: Bearer {{AccessToken}}
+Accept: application/json
+
+###
+
+GET {{Mype.Api_HostAddress}}/api/v1/businesses/{{BusinessId}}/products?search=gaseosa
+Authorization: Bearer {{AccessToken}}
+Accept: application/json
+
+###
+
+GET {{Mype.Api_HostAddress}}/api/v1/businesses/{{BusinessId}}/products?availableForSale=true
+Authorization: Bearer {{AccessToken}}
+Accept: application/json
+
+###
+
+GET {{Mype.Api_HostAddress}}/api/v1/businesses/{{BusinessId}}/products/{{ProductId}}
 Authorization: Bearer {{AccessToken}}
 Accept: application/json

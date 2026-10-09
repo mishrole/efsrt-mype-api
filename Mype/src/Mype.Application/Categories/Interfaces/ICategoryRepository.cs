@@ -14,10 +14,26 @@ namespace Mype.Application.Categories.Interfaces
             CancellationToken cancellationToken
         );
 
-        Task<IReadOnlyCollection<CategoryListItemProjection>> ListByBusinessAsync(
+        Task<
+            IReadOnlyCollection<
+                CategoryListItemProjection
+            >
+        > ListByBusinessAsync(
             Guid businessId,
             CategoryType? type,
             bool? isActive,
+            CancellationToken cancellationToken
+        );
+
+        Task<Category> GetByIdAndBusinessAsync(
+            Guid categoryId,
+            Guid businessId,
+            CancellationToken cancellationToken
+        );
+
+        Task<bool> ExistsByIdAndBusinessAsync(
+            Guid categoryId,
+            Guid businessId,
             CancellationToken cancellationToken
         );
     }
