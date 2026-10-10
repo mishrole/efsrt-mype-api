@@ -1,6 +1,6 @@
-﻿using FluentAssertions;
+﻿using System;
+using FluentAssertions;
 using Mype.Domain.FinancialMovements;
-using System;
 
 namespace Mype.Tests.Domain.FinancialMovements
 {
