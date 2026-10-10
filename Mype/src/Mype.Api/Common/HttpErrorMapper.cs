@@ -88,8 +88,7 @@ namespace Mype.Api.Common
                     ErrorMessages.ValidationFailed,
                     ApplicationErrorType.Validation,
                     traceId,
-                    detail,
-                    errors
+                    errors: errors
                 );
             }
 

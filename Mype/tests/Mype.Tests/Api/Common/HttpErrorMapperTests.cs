@@ -172,7 +172,7 @@ namespace Mype.Tests.Api.Common
                 .ContainSingle()
                 .Which.Should()
                 .Be(RequiredMessage);
-            result.Detail.Should().Be(Detail);
+            result.Detail.Should().BeNull();
         }
 
         [Fact]
