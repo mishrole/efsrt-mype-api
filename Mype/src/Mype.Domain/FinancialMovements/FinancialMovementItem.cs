@@ -121,7 +121,12 @@ namespace Mype.Domain.FinancialMovements
         )
         {
             EnsureActive();
-            ApplyExpense(categoryId, description);
+            var normalizedDescription = ValidateExpense(categoryId, description);
+            ValidateAmounts(quantity, unitAmount);
+            CategoryId = categoryId;
+            Description = normalizedDescription;
+            ProductId = null;
+            UnitCostSnapshot = null;
             ApplyAmounts(quantity, unitAmount);
             Touch(userId, utcNow);
         }
@@ -144,6 +149,15 @@ namespace Mype.Domain.FinancialMovements
 
         private void ApplyExpense(Guid categoryId, string description)
         {
+            var normalizedDescription = ValidateExpense(categoryId, description);
+            CategoryId = categoryId;
+            Description = normalizedDescription;
+            ProductId = null;
+            UnitCostSnapshot = null;
+        }
+
+        private static string ValidateExpense(Guid categoryId, string description)
+        {
             if (categoryId == Guid.Empty)
                 throw new FinancialMovementItemException(
                     FinancialMovementItemError.InvalidCategory
@@ -159,10 +173,19 @@ namespace Mype.Domain.FinancialMovements
                 throw new FinancialMovementItemException(
                     FinancialMovementItemError.DescriptionTooLong
                 );
-            CategoryId = categoryId;
-            Description = normalizedDescription;
-            ProductId = null;
-            UnitCostSnapshot = null;
+            return normalizedDescription;
+        }
+
+        private static void ValidateAmounts(decimal quantity, decimal unitAmount)
+        {
+            if (quantity <= 0m)
+                throw new FinancialMovementItemException(
+                    FinancialMovementItemError.InvalidQuantity
+                );
+            if (unitAmount < 0m)
+                throw new FinancialMovementItemException(
+                    FinancialMovementItemError.InvalidUnitAmount
+                );
         }
 
         private void ApplyAmounts(decimal quantity, decimal unitAmount)
