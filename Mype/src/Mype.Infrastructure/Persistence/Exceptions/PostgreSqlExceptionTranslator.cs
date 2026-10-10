@@ -22,6 +22,15 @@ namespace Mype.Infrastructure.Persistence.Exceptions
                         ApplicationErrorType.Conflict,
                         exception
                     )
+                },
+                {
+                    DatabaseConstraints.Products.BusinessName,
+                    exception => new ApplicationErrorException(
+                        ErrorCodes.ProductAlreadyExists,
+                        ErrorMessages.ProductAlreadyExists,
+                        ApplicationErrorType.Conflict,
+                        exception
+                    )
                 }
             };
 

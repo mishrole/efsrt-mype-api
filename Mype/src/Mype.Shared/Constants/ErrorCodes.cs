@@ -39,5 +39,23 @@
 
         #endregion
 
+        #region Products
+
+        public const string ProductAccessForbidden = "PRODUCT_ACCESS_FORBIDDEN";
+
+        public const string ProductAlreadyExists = "PRODUCT_ALREADY_EXISTS";
+
+        public const string ProductCreationFailed = "PRODUCT_CREATION_FAILED";
+
+        public const string ProductNotFound = "PRODUCT_NOT_FOUND";
+
+        public const string CategoryNotFound = "CATEGORY_NOT_FOUND";
+
+        public const string CategoryUnavailable = "CATEGORY_UNAVAILABLE";
+
+        public const string ProductCategoryMustBeSale = "PRODUCT_CATEGORY_MUST_BE_SALE";
+
+        #endregion
+
     }
 }

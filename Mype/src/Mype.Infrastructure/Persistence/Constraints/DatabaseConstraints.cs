@@ -44,6 +44,23 @@
             public const string UpdatedByUser = "fk_categories_users_updated_by_user_id";
         }
 
+        public static class Products
+        {
+            public const string BusinessName = "ux_products_business_name";
+
+            public const string BusinessActiveName = "ix_products_business_active_name";
+
+            public const string BusinessCategoryActive = "ix_products_business_category_active";
+
+            public const string Business = "fk_products_businesses_business_id";
+
+            public const string CategoryBusiness = "fk_products_categories_category_id_business_id";
+
+            public const string CreatedByUser = "fk_products_users_created_by_user_id";
+
+            public const string UpdatedByUser = "fk_products_users_updated_by_user_id";
+        }
+
         public static class Permissions
         {
             public const string Code = "ux_permissions_code";

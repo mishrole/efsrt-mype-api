@@ -473,15 +473,14 @@ namespace Mype.Infrastructure.Persistence.Migrations
                     b.HasKey("Id")
                         .HasName("pk_categories");
 
+                    b.HasAlternateKey("Id", "BusinessId")
+                        .HasName("ux_categories_id_business");
+
                     b.HasIndex("CreatedByUserId")
                         .HasDatabaseName("ix_categories_created_by_user_id");
 
                     b.HasIndex("UpdatedByUserId")
                         .HasDatabaseName("ix_categories_updated_by_user_id");
-
-                    b.HasIndex("Id", "BusinessId")
-                        .IsUnique()
-                        .HasDatabaseName("ux_categories_id_business");
 
                     b.HasIndex("BusinessId", "Type", "IsActive")
                         .HasDatabaseName("ix_categories_business_id_type_is_active");
@@ -840,6 +839,97 @@ namespace Mype.Infrastructure.Persistence.Migrations
                         });
                 });
 
+            modelBuilder.Entity("Mype.Domain.Products.Product", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<Guid>("BusinessId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("business_id");
+
+                    b.Property<Guid>("CategoryId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("category_id");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<Guid>("CreatedByUserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("created_by_user_id");
+
+                    b.Property<DateTimeOffset?>("DeactivatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deactivated_at");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_active");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(160)
+                        .HasColumnType("character varying(160)")
+                        .HasColumnName("name");
+
+                    b.Property<string>("NormalizedName")
+                        .IsRequired()
+                        .HasMaxLength(160)
+                        .HasColumnType("character varying(160)")
+                        .HasColumnName("normalized_name");
+
+                    b.Property<decimal>("SalePrice")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("sale_price");
+
+                    b.Property<decimal>("UnitCost")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("unit_cost");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid>("UpdatedByUserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("updated_by_user_id");
+
+                    b.Property<uint>("Version")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
+                    b.HasKey("Id")
+                        .HasName("pk_products");
+
+                    b.HasIndex("CreatedByUserId")
+                        .HasDatabaseName("ix_products_created_by_user_id");
+
+                    b.HasIndex("UpdatedByUserId")
+                        .HasDatabaseName("ix_products_updated_by_user_id");
+
+                    b.HasIndex("BusinessId", "NormalizedName")
+                        .IsUnique()
+                        .HasDatabaseName("ux_products_business_name");
+
+                    b.HasIndex("CategoryId", "BusinessId")
+                        .HasDatabaseName("ix_products_category_id_business_id");
+
+                    b.HasIndex("BusinessId", "CategoryId", "IsActive")
+                        .HasDatabaseName("ix_products_business_category_active");
+
+                    b.HasIndex("BusinessId", "IsActive", "NormalizedName")
+                        .HasDatabaseName("ix_products_business_active_name");
+
+                    b.ToTable("products", (string)null);
+                });
+
             modelBuilder.Entity("Mype.Domain.Users.User", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1007,6 +1097,38 @@ namespace Mype.Infrastructure.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("fk_categories_users_updated_by_user_id");
+                });
+
+            modelBuilder.Entity("Mype.Domain.Products.Product", b =>
+                {
+                    b.HasOne("Mype.Domain.Businesses.Business", null)
+                        .WithMany()
+                        .HasForeignKey("BusinessId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_products_businesses_business_id");
+
+                    b.HasOne("Mype.Domain.Users.User", null)
+                        .WithMany()
+                        .HasForeignKey("CreatedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_products_users_created_by_user_id");
+
+                    b.HasOne("Mype.Domain.Users.User", null)
+                        .WithMany()
+                        .HasForeignKey("UpdatedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_products_users_updated_by_user_id");
+
+                    b.HasOne("Mype.Domain.Categories.Category", null)
+                        .WithMany()
+                        .HasForeignKey("CategoryId", "BusinessId")
+                        .HasPrincipalKey("Id", "BusinessId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_products_categories_category_id_business_id");
                 });
 #pragma warning restore 612, 618
         }

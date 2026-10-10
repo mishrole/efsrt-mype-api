@@ -37,6 +37,11 @@ namespace Mype.Api.Middlewares
             {
                 await _next(context);
             }
+            catch (BadHttpRequestException exception)
+            {
+                _logger.LogWarning(exception, ErrorMessages.BadHttpRequestReceived);
+                await HandleExceptionAsync(context, exception);
+            }
             catch (Exception ex)
             {
                 _logger.LogError(ex, ErrorMessages.ExceptionHandlingMiddlewareError, ex.Message);
@@ -46,13 +51,12 @@ namespace Mype.Api.Middlewares
 
         private Task HandleExceptionAsync(HttpContext context, Exception exception)
         {
+            var detail = _env.IsDevelopment() ? exception.StackTrace : null;
 
             var response = HttpErrorMapper.FromException(
                 exception,
                 context.TraceIdentifier,
-                _env.IsDevelopment()
-                    ? exception.StackTrace
-                    : null
+                detail
             );
 
             context.Response.ContentType = "application/json";

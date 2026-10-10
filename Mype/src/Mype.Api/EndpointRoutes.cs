@@ -3,12 +3,16 @@ using Microsoft.AspNetCore.Http;
 using Mype.Api.Endpoints.v1.Auth;
 using Mype.Api.Endpoints.v1.Businesses;
 using Mype.Api.Endpoints.v1.Categories;
+using Mype.Api.Endpoints.v1.Products;
 using Mype.Application.Auth.Commands.Login;
 using Mype.Application.Auth.Commands.RegisterUser;
 using Mype.Application.Businesses.Commands.CreateBusiness;
 using Mype.Application.Businesses.Queries.GetBusinessContext;
 using Mype.Application.Businesses.Queries.ListUserBusinesses;
 using Mype.Application.Categories.Queries.ListCategories;
+using Mype.Application.Products.Commands.CreateProduct;
+using Mype.Application.Products.Queries.GetProductDetail;
+using Mype.Application.Products.Queries.ListProducts;
 using Mype.Shared.Models;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -180,6 +184,110 @@ namespace Mype.Api
                 )
                 .Produces<HttpStatusCodeInfo>(
                     StatusCodes.Status500InternalServerError
+                );
+
+            businessGroup
+                .MapPost(
+                    "/{businessId:guid}/products",
+                    CreateProductEndpoint.DoAsync
+                )
+                .WithName("CreateProduct")
+                .WithSummary(
+                    "Crear un producto"
+                )
+                .Produces<CreateProductResult>(
+                    StatusCodes.Status201Created
+                )
+                .Produces<HttpStatusCodeInfo>(
+                    StatusCodes.Status400BadRequest
+                )
+                .Produces<HttpStatusCodeInfo>(
+                    StatusCodes.Status401Unauthorized
+                )
+                .Produces<HttpStatusCodeInfo>(
+                    StatusCodes.Status403Forbidden
+                )
+                .Produces<HttpStatusCodeInfo>(
+                    StatusCodes.Status404NotFound
+                )
+                .Produces<HttpStatusCodeInfo>(
+                    StatusCodes.Status409Conflict
+                )
+                .Produces<HttpStatusCodeInfo>(
+                    StatusCodes
+                        .Status422UnprocessableEntity
+                )
+                .Produces<HttpStatusCodeInfo>(
+                    StatusCodes
+                        .Status500InternalServerError
+                );
+
+            businessGroup
+                .MapGet(
+                    "/{businessId:guid}/products",
+                    ListProductsEndpoint.DoAsync
+                )
+                .WithName("ListProducts")
+                .WithSummary(
+                    "Listar y buscar productos"
+                )
+                .Produces<
+                    IReadOnlyCollection<
+                        ProductListItemResult
+                    >
+                >(
+                    StatusCodes.Status200OK
+                )
+                .Produces<HttpStatusCodeInfo>(
+                    StatusCodes.Status400BadRequest
+                )
+                .Produces<HttpStatusCodeInfo>(
+                    StatusCodes.Status401Unauthorized
+                )
+                .Produces<HttpStatusCodeInfo>(
+                    StatusCodes.Status403Forbidden
+                )
+                .Produces<HttpStatusCodeInfo>(
+                    StatusCodes.Status404NotFound
+                )
+                .Produces<HttpStatusCodeInfo>(
+                    StatusCodes.Status409Conflict
+                )
+                .Produces<HttpStatusCodeInfo>(
+                    StatusCodes
+                        .Status500InternalServerError
+                );
+
+            businessGroup
+                .MapGet(
+                    "/{businessId:guid}/products/{productId:guid}",
+                    GetProductDetailEndpoint.DoAsync
+                )
+                .WithName("GetProductDetail")
+                .WithSummary(
+                    "Consultar un producto"
+                )
+                .Produces<ProductDetailResult>(
+                    StatusCodes.Status200OK
+                )
+                .Produces<HttpStatusCodeInfo>(
+                    StatusCodes.Status400BadRequest
+                )
+                .Produces<HttpStatusCodeInfo>(
+                    StatusCodes.Status401Unauthorized
+                )
+                .Produces<HttpStatusCodeInfo>(
+                    StatusCodes.Status403Forbidden
+                )
+                .Produces<HttpStatusCodeInfo>(
+                    StatusCodes.Status404NotFound
+                )
+                .Produces<HttpStatusCodeInfo>(
+                    StatusCodes.Status409Conflict
+                )
+                .Produces<HttpStatusCodeInfo>(
+                    StatusCodes
+                        .Status500InternalServerError
                 );
 
             #endregion

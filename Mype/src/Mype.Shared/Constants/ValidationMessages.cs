@@ -18,5 +18,10 @@
 
         public const string PasswordsDoNotMatch = "La confirmación de contraseña no coincide con la contraseña.";
 
+        public const string NonNegative = "{PropertyName} no puede ser negativo.";
+
+        public const string DecimalScale = "{PropertyName} admite como máximo {Scale} decimales.";
+
+        public const string DecimalPrecision = "{PropertyName} excede la precisión máxima permitida.";
     }
 }

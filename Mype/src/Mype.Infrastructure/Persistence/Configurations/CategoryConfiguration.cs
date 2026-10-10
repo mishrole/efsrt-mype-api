@@ -59,13 +59,14 @@ namespace Mype.Infrastructure.Persistence.Configurations
                     DatabaseConstraints.Categories.BusinessTypeName
                 );
 
-            builder.HasIndex(category => new
-            {
-                category.Id,
-                category.BusinessId
-            })
-                .IsUnique()
-                .HasDatabaseName(
+            builder.HasAlternateKey(category =>
+                new
+                {
+                    category.Id,
+                    category.BusinessId
+                }
+            )
+                .HasName(
                     DatabaseConstraints.Categories.IdBusiness
                 );
 

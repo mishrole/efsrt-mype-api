@@ -7,27 +7,12 @@ using Mype.Shared.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 
 namespace Mype.Api.Common
 {
     public static class HttpErrorMapper
     {
-        public static HttpStatusCodeInfo FromApplicationError(
-            string code,
-            string message,
-            ApplicationErrorType errorType,
-            string traceId
-        )
-        {
-            return new HttpStatusCodeInfo
-            {
-                Code = code,
-                StatusCode = GetStatusCode(errorType),
-                Message = message,
-                TraceId = traceId
-            };
-        }
-
         public static HttpStatusCodeInfo FromApplicationError(
             ApplicationError error,
             string traceId
@@ -39,6 +24,28 @@ namespace Mype.Api.Common
                 error.Type,
                 traceId
             );
+        }
+
+        public static HttpStatusCodeInfo FromApplicationError(
+            string code,
+            string message,
+            ApplicationErrorType errorType,
+            string traceId,
+            string detail = null,
+            Dictionary<string, string[]> errors = null
+        )
+        {
+            return new HttpStatusCodeInfo
+            {
+                Code = code,
+                StatusCode = GetStatusCode(
+                    errorType
+                ),
+                Message = message,
+                Detail = detail,
+                TraceId = traceId,
+                Errors = errors ?? []
+            };
         }
 
         public static HttpStatusCodeInfo FromException(
@@ -53,33 +60,52 @@ namespace Mype.Api.Common
                     applicationError.Code,
                     applicationError.Message,
                     applicationError.ErrorType,
-                    traceId
+                    traceId,
+                    detail
                 );
-
-                response.Detail = detail;
 
                 return response;
             }
 
             if (exception is ValidationException validationException)
             {
-                return new HttpStatusCodeInfo
-                {
-                    Code = ErrorCodes.ValidationError,
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    Message = ErrorMessages.ValidationFailed,
-                    Detail = detail,
-                    TraceId = traceId,
-                    Errors = validationException.Errors
-                        .GroupBy(error => error.PropertyName)
-                        .ToDictionary(
-                            group => group.Key,
-                            group => group
-                                .Select(error => error.ErrorMessage)
-                                .Distinct()
-                                .ToArray()
-                        )
-                };
+                var errors = validationException.Errors
+                    .GroupBy(error =>
+                        error.PropertyName
+                    )
+                    .ToDictionary(
+                        group => group.Key,
+                        group => group
+                            .Select(error =>
+                                error.ErrorMessage
+                            )
+                            .Distinct()
+                            .ToArray()
+                    );
+
+                return FromApplicationError(
+                    ErrorCodes.ValidationError,
+                    ErrorMessages.ValidationFailed,
+                    ApplicationErrorType.Validation,
+                    traceId,
+                    errors: errors
+                );
+            }
+
+            if (exception is BadHttpRequestException badHttpRequestException)
+            {
+                var errors =
+                    CreateBindingErrors(
+                        badHttpRequestException
+                    );
+
+                return FromApplicationError(
+                    ErrorCodes.ValidationError,
+                    ErrorMessages.ValidationFailed,
+                    ApplicationErrorType.Validation,
+                    traceId,
+                    errors: errors
+                );
             }
 
             var statusCode = exception switch
@@ -144,6 +170,49 @@ namespace Mype.Api.Common
 
                 _ =>
                     StatusCodes.Status500InternalServerError
+            };
+        }
+
+        private static Dictionary<string, string[]>
+            CreateBindingErrors(
+                BadHttpRequestException exception
+            )
+        {
+            if (
+                exception.InnerException is not
+                    JsonException jsonException ||
+                string.IsNullOrWhiteSpace(
+                    jsonException.Path
+                )
+            )
+            {
+                return [];
+            }
+
+            var propertyName = jsonException.Path
+                .TrimStart('$', '.');
+
+            if (
+                string.IsNullOrWhiteSpace(
+                    propertyName
+                )
+            )
+            {
+                return [];
+            }
+
+            return new Dictionary<string, string[]>
+            {
+                {
+                    propertyName,
+                    [
+                        ValidationMessages.Invalid
+                            .Replace(
+                                "{PropertyName}",
+                                propertyName
+                            )
+                    ]
+                }
             };
         }
     }

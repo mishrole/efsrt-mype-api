@@ -87,5 +87,40 @@ namespace Mype.Infrastructure.Categories.Repositories
                 )
                 .ToArrayAsync(cancellationToken);
         }
+
+        public async Task<Category> GetByIdAndBusinessAsync(
+            Guid categoryId,
+            Guid businessId,
+            CancellationToken cancellationToken
+        )
+        {
+            return await _dbContext.Categories
+                .AsNoTracking()
+                .SingleOrDefaultAsync(
+                    category =>
+                        category.Id == categoryId &&
+                        category.BusinessId ==
+                            businessId,
+                    cancellationToken
+                );
+        }
+
+        public async Task<bool>
+            ExistsByIdAndBusinessAsync(
+                Guid categoryId,
+                Guid businessId,
+                CancellationToken cancellationToken
+            )
+        {
+            return await _dbContext.Categories
+                .AsNoTracking()
+                .AnyAsync(
+                    category =>
+                        category.Id == categoryId &&
+                        category.BusinessId ==
+                            businessId,
+                    cancellationToken
+                );
+        }
     }
 }

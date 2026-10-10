@@ -14,6 +14,7 @@
 
         public const string InternalError = "Ocurrió un error interno.";
         public const string ValidationFailed = "Uno o más campos no son válidos.";
+        public const string BadHttpRequestReceived = "La solicitud HTTP no pudo ser procesada.";
 
         #region Auth
 
@@ -48,6 +49,32 @@
         #region Categories
 
         public const string CategoryAccessForbidden = "CATEGORY_ACCESS_FORBIDDEN";
+
+        #endregion
+
+        #region Products
+
+        public const string ProductAccessForbidden =
+            "No tiene permiso para realizar esta operación sobre los productos del negocio.";
+
+        public const string ProductAlreadyExists =
+            "Ya existe un producto con el mismo nombre en el negocio.";
+
+        public const string ProductCreationFailed =
+            "No fue posible crear el producto.";
+
+        public const string ProductNotFound =
+            "El producto solicitado no fue encontrado.";
+
+        public const string CategoryNotFound =
+            "La categoría solicitada no fue encontrada.";
+
+        public const string CategoryUnavailable =
+            "La categoría seleccionada no se encuentra disponible.";
+
+        public const string
+            ProductCategoryMustBeSale =
+                "Los productos solo pueden utilizar categorías de venta.";
 
         #endregion
 
