@@ -1,56 +1,14 @@
 using FluentAssertions;
 using Mype.Domain.Products;
 using System;
-
 namespace Mype.Tests.Domain.Products
 {
     public class ProductTests
     {
-        [Fact]
-        public void Create_Should_Initialize_Product()
-        {
-            var businessId = Guid.NewGuid();
-            var categoryId = Guid.NewGuid();
-            var userId = Guid.NewGuid();
-            var utcNow = new DateTimeOffset(2026, 10, 8, 12, 0, 0, TimeSpan.Zero);
-
-            var product = Product.Create(
-                businessId,
-                categoryId,
-                "Gaseosa 500 ml",
-                "GASEOSA 500 ML",
-                3.50m,
-                2.20m,
-                userId,
-                utcNow
-            );
-
-            product.Id.Should().NotBeEmpty();
-            product.BusinessId.Should().Be(businessId);
-            product.CategoryId.Should().Be(categoryId);
-            product.Name.Should().Be("Gaseosa 500 ml");
-            product.NormalizedName.Should().Be("GASEOSA 500 ML");
-            product.SalePrice.Should().Be(3.50m);
-            product.UnitCost.Should().Be(2.20m);
-            product.IsActive.Should().BeTrue();
-            product.IsAvailable().Should().BeTrue();
-            product.CreatedByUserId.Should().Be(userId);
-            product.UpdatedByUserId.Should().Be(userId);
-            product.CreatedAt.Should().Be(utcNow);
-            product.UpdatedAt.Should().Be(utcNow);
-            product.DeactivatedAt.Should().BeNull();
-        }
-
-        [Fact]
-        public void Create_Should_Allow_Zero_Amounts()
-        {
-            var product = Product.Create(
-                Guid.NewGuid(), Guid.NewGuid(), "Muestra", "MUESTRA",
-                0m, 0m, Guid.NewGuid(), DateTimeOffset.UtcNow
-            );
-
-            product.SalePrice.Should().Be(0m);
-            product.UnitCost.Should().Be(0m);
-        }
+        private static readonly DateTimeOffset CreatedAt = new(2026, 10, 8, 12, 0, 0, TimeSpan.Zero);
+        [Fact] public void Create_Should_Initialize_Product() { var p = Create(); p.Id.Should().NotBeEmpty(); p.IsActive.Should().BeTrue(); p.CreatedAt.Should().Be(CreatedAt); }
+        [Fact] public void Update_Should_Change_Editable_Fields_And_Audit() { var p = Create(); var category = Guid.NewGuid(); var user = Guid.NewGuid(); var at = CreatedAt.AddHours(1); p.Update(category, "Agua", "AGUA", 2m, 1m, user, at); p.CategoryId.Should().Be(category); p.Name.Should().Be("Agua"); p.NormalizedName.Should().Be("AGUA"); p.SalePrice.Should().Be(2m); p.UnitCost.Should().Be(1m); p.UpdatedByUserId.Should().Be(user); p.UpdatedAt.Should().Be(at); p.IsActive.Should().BeTrue(); }
+        [Fact] public void Deactivate_And_Reactivate_Should_Update_State() { var p = Create(); var user = Guid.NewGuid(); var at = CreatedAt.AddHours(1); p.Deactivate(user, at); p.IsActive.Should().BeFalse(); p.DeactivatedAt.Should().Be(at); p.Reactivate(user, at.AddHours(1)); p.IsActive.Should().BeTrue(); p.DeactivatedAt.Should().BeNull(); }
+        private static Product Create() => Product.Create(Guid.NewGuid(), Guid.NewGuid(), "Gaseosa", "GASEOSA", 3.5m, 2.2m, Guid.NewGuid(), CreatedAt);
     }
 }

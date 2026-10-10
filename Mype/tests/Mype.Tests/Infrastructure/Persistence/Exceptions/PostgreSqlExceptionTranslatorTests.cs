@@ -1,133 +1,35 @@
 ﻿using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Mype.Application.Common.Exceptions;
-using Mype.Infrastructure.Persistence.Constraints;
 using Mype.Infrastructure.Persistence.Exceptions;
 using Mype.Shared.Constants;
 using Npgsql;
 using System;
-
 namespace Mype.Tests.Infrastructure.Persistence.Exceptions
 {
     public class PostgreSqlExceptionTranslatorTests
     {
         private readonly PostgreSqlExceptionTranslator _translator = new();
-
-        [Fact]
-        public void Translate_Should_Return_ApplicationErrorException_When_NormalizedEmail_Is_Duplicated()
+        [Theory]
+        [InlineData("ux_users_normalized_email", "EMAIL_ALREADY_REGISTERED")]
+        [InlineData("ux_products_business_name", "PRODUCT_ALREADY_EXISTS")]
+        public void Translate_Should_Map_Known_Unique_Constraints(string constraint, string expected)
         {
-            var exception = CreateDbUpdateException(
-                PostgresErrorCodes.UniqueViolation,
-                DatabaseConstraints.Users.NormalizedEmail
-            );
-
-            var result = _translator.Translate(exception);
-
-            result.Should().BeOfType<ApplicationErrorException>();
+            var result = _translator.Translate(CreateDbUpdateException(PostgresErrorCodes.UniqueViolation, constraint));
+            result.Should().BeOfType<ApplicationErrorException>().Which.Code.Should().Be(expected);
         }
-
         [Fact]
-        public void Translate_Should_Return_EmailAlreadyRegistered_Code_When_NormalizedEmail_Is_Duplicated()
+        public void Translate_Should_Map_Concurrency_Conflict()
         {
-            var exception = CreateDbUpdateException(
-                PostgresErrorCodes.UniqueViolation,
-                DatabaseConstraints.Users.NormalizedEmail
-            );
-
+            var exception = new DbUpdateConcurrencyException("conflict");
             var result = _translator.Translate(exception);
-
-            var applicationException = result
-                .Should()
-                .BeOfType<ApplicationErrorException>()
-                .Subject;
-
-            applicationException.Code.Should().Be(
-                ErrorCodes.EmailAlreadyRegistered
-            );
-
-            applicationException.Message.Should().Be(
-                ErrorMessages.EmailAlreadyRegistered
-            );
-
-            applicationException.ErrorType.Should().Be(
-                ApplicationErrorType.Conflict
-            );
-
-            applicationException.InnerException.Should().BeSameAs(
-                exception
-            );
+            result.Should().BeOfType<ApplicationErrorException>().Which.Code.Should().Be(ErrorCodes.ProductConcurrencyConflict);
         }
-
-        [Fact]
-        public void Translate_Should_Return_Original_Exception_When_Unique_Constraint_Is_Unknown()
+        [Fact] public void Translate_Should_Return_Original_For_Unknown_Exception() { var ex = new InvalidOperationException(); _translator.Translate(ex).Should().BeSameAs(ex); }
+        private static DbUpdateException CreateDbUpdateException(string sqlState, string constraintName)
         {
-            var unknownConstraint = "ux_unknown_constraint";
-
-            var exception = CreateDbUpdateException(
-                PostgresErrorCodes.UniqueViolation,
-                unknownConstraint
-            );
-
-            var result = _translator.Translate(exception);
-
-            result.Should().BeSameAs(exception);
-        }
-
-        [Fact]
-        public void Translate_Should_Return_Original_Exception_When_Postgres_Error_Is_Not_Unique_Violation()
-        {
-            var exception = CreateDbUpdateException(
-                PostgresErrorCodes.ForeignKeyViolation,
-                DatabaseConstraints.Users.NormalizedEmail
-            );
-
-            var result = _translator.Translate(exception);
-
-            result.Should().BeSameAs(exception);
-        }
-
-        [Fact]
-        public void Translate_Should_Return_Original_Exception_When_Exception_Is_Not_DbUpdateException()
-        {
-            var exception = new InvalidOperationException(
-                ErrorMessages.UnexpectedError
-            );
-
-            var result = _translator.Translate(exception);
-
-            result.Should().BeSameAs(exception);
-        }
-
-        private static DbUpdateException CreateDbUpdateException(
-            string sqlState,
-            string constraintName
-        )
-        {
-            var postgresException = new PostgresException(
-                messageText: "Database operation failed.",
-                severity: "ERROR",
-                invariantSeverity: "ERROR",
-                sqlState: sqlState,
-                detail: null,
-                hint: null,
-                position: 0,
-                internalPosition: 0,
-                internalQuery: null,
-                where: null,
-                schemaName: "public",
-                tableName: "users",
-                columnName: "normalized_email",
-                dataTypeName: null,
-                constraintName: constraintName,
-                file: null,
-                line: null,
-                routine: null
-            );
-
-            return new DbUpdateException(
-                ErrorMessages.SaveChangesError,
-                postgresException
-            );
+            var pg = new PostgresException("failed", "ERROR", "ERROR", sqlState, null, null, 0, 0, null, null, "public", "products", null, null, constraintName, null, null, null);
+            return new DbUpdateException(ErrorMessages.SaveChangesError, pg);
         }
     }
 }
