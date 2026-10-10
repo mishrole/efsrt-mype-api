@@ -1,5 +1,5 @@
-using Mype.Domain.FinancialMovements;
 using System;
+using Mype.Domain.FinancialMovements;
 
 namespace Mype.Application.FinancialMovements.Models
 {

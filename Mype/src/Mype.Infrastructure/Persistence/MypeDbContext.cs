@@ -69,5 +69,3 @@ namespace Mype.Infrastructure.Persistence
         }
     }
 }
-
-

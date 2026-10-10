@@ -1,6 +1,6 @@
+using System;
 using FluentAssertions;
 using Mype.Domain.FinancialMovements;
-using System;
 
 namespace Mype.Tests.Domain.FinancialMovements
 {
@@ -15,7 +15,15 @@ namespace Mype.Tests.Domain.FinancialMovements
         [InlineData(FinancialMovementType.Expense)]
         public void CreateDraft_Should_Initialize_Movement(FinancialMovementType type)
         {
-            var movement = FinancialMovement.CreateDraft(BusinessId, type, new DateOnly(2026, 10, 10), "  Operación  ", "PEN", UserId, UtcNow);
+            var movement = FinancialMovement.CreateDraft(
+                BusinessId,
+                type,
+                new DateOnly(2026, 10, 10),
+                "  Operación  ",
+                "PEN",
+                UserId,
+                UtcNow
+            );
 
             movement.Id.Should().NotBeEmpty();
             movement.BusinessId.Should().Be(BusinessId);
@@ -44,18 +52,39 @@ namespace Mype.Tests.Domain.FinancialMovements
         [InlineData("   ")]
         public void CreateDraft_Should_Normalize_Empty_Description(string description)
         {
-            var movement = FinancialMovement.CreateDraft(BusinessId, FinancialMovementType.Sale, new DateOnly(2026, 10, 10), description, "PEN", UserId, UtcNow);
+            var movement = FinancialMovement.CreateDraft(
+                BusinessId,
+                FinancialMovementType.Sale,
+                new DateOnly(2026, 10, 10),
+                description,
+                "PEN",
+                UserId,
+                UtcNow
+            );
             movement.Description.Should().BeNull();
         }
 
         [Fact]
         public void UpdateDraftHeader_Should_Update_Only_Editable_Fields()
         {
-            var movement = FinancialMovement.CreateDraft(BusinessId, FinancialMovementType.Sale, new DateOnly(2026, 10, 10), "Inicial", "PEN", UserId, UtcNow);
+            var movement = FinancialMovement.CreateDraft(
+                BusinessId,
+                FinancialMovementType.Sale,
+                new DateOnly(2026, 10, 10),
+                "Inicial",
+                "PEN",
+                UserId,
+                UtcNow
+            );
             var actorId = Guid.NewGuid();
             var updatedAt = UtcNow.AddHours(1);
 
-            movement.UpdateDraftHeader(new DateOnly(2026, 10, 11), "  Actualizada  ", actorId, updatedAt);
+            movement.UpdateDraftHeader(
+                new DateOnly(2026, 10, 11),
+                "  Actualizada  ",
+                actorId,
+                updatedAt
+            );
 
             movement.MovementDate.Should().Be(new DateOnly(2026, 10, 11));
             movement.Description.Should().Be("Actualizada");

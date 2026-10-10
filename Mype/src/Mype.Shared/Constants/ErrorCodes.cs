@@ -68,14 +68,16 @@
         public const string ProductAlreadyActive = "PRODUCT_ALREADY_ACTIVE";
 
         #endregion
+
         #region FinancialMovements
+
         public const string MovementAccessForbidden = "MOVEMENT_ACCESS_FORBIDDEN";
         public const string MovementNotFound = "MOVEMENT_NOT_FOUND";
         public const string MovementNotEditable = "MOVEMENT_NOT_EDITABLE";
         public const string MovementConcurrencyConflict = "MOVEMENT_CONCURRENCY_CONFLICT";
         public const string MovementCreationFailed = "MOVEMENT_CREATION_FAILED";
         public const string MovementUpdateFailed = "MOVEMENT_UPDATE_FAILED";
+
         #endregion
     }
 }
-

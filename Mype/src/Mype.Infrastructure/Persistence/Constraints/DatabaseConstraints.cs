@@ -64,14 +64,18 @@
         public static class FinancialMovements
         {
             public const string IdBusiness = "ux_financial_movements_id_business";
-            public const string BusinessStatusUpdatedAt = "ix_financial_movements_business_status_updated_at";
+            public const string BusinessStatusUpdatedAt =
+                "ix_financial_movements_business_status_updated_at";
             public const string BusinessTypeDate = "ix_financial_movements_business_type_date";
             public const string Business = "fk_financial_movements_businesses_business_id";
             public const string CreatedByUser = "fk_financial_movements_users_created_by_user_id";
             public const string UpdatedByUser = "fk_financial_movements_users_updated_by_user_id";
-            public const string ConfirmedByUser = "fk_financial_movements_users_confirmed_by_user_id";
-            public const string CancelledByUser = "fk_financial_movements_users_cancelled_by_user_id";
+            public const string ConfirmedByUser =
+                "fk_financial_movements_users_confirmed_by_user_id";
+            public const string CancelledByUser =
+                "fk_financial_movements_users_cancelled_by_user_id";
         }
+
         public static class Permissions
         {
             public const string Code = "ux_permissions_code";
@@ -89,4 +93,3 @@
         }
     }
 }
-

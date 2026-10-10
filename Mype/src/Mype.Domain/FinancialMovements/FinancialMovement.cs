@@ -1,5 +1,5 @@
-using Mype.Domain.Common;
 using System;
+using Mype.Domain.Common;
 
 namespace Mype.Domain.FinancialMovements
 {
@@ -16,7 +16,8 @@ namespace Mype.Domain.FinancialMovements
             string currencyCode,
             Guid userId,
             DateTimeOffset utcNow
-        ) : base(id)
+        )
+            : base(id)
         {
             BusinessId = businessId;
             Type = type;

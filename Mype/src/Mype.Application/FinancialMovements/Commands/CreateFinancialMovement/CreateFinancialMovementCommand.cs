@@ -1,11 +1,12 @@
+using System;
 using MediatR;
 using Mype.Application.Common;
 using Mype.Domain.FinancialMovements;
-using System;
 
 namespace Mype.Application.FinancialMovements.Commands.CreateFinancialMovement
 {
-    public sealed class CreateFinancialMovementCommand : IRequest<Result<CreateFinancialMovementResult>>
+    public sealed class CreateFinancialMovementCommand
+        : IRequest<Result<CreateFinancialMovementResult>>
     {
         public Guid BusinessId { get; set; }
         public Guid CurrentUserId { get; set; }

@@ -1,10 +1,11 @@
+using System;
 using MediatR;
 using Mype.Application.Common;
-using System;
 
 namespace Mype.Application.FinancialMovements.Commands.UpdateFinancialMovementDraft
 {
-    public sealed class UpdateFinancialMovementDraftCommand : IRequest<Result<UpdateFinancialMovementDraftResult>>
+    public sealed class UpdateFinancialMovementDraftCommand
+        : IRequest<Result<UpdateFinancialMovementDraftResult>>
     {
         public Guid BusinessId { get; set; }
         public Guid MovementId { get; set; }

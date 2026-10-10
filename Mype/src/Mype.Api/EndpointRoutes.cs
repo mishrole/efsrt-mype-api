@@ -194,8 +194,12 @@ namespace Mype.Api
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status409Conflict)
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status422UnprocessableEntity)
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
+
             businessGroup
-                .MapPost("/{businessId:guid}/financial-movements", CreateFinancialMovementEndpoint.DoAsync)
+                .MapPost(
+                    "/{businessId:guid}/financial-movements",
+                    CreateFinancialMovementEndpoint.DoAsync
+                )
                 .WithName("CreateFinancialMovement")
                 .WithSummary("Crear un movimiento financiero en borrador")
                 .Produces<CreateFinancialMovementResult>(StatusCodes.Status201Created)
@@ -206,7 +210,10 @@ namespace Mype.Api
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
 
             businessGroup
-                .MapPut("/{businessId:guid}/financial-movements/{movementId:guid}", UpdateFinancialMovementDraftEndpoint.DoAsync)
+                .MapPut(
+                    "/{businessId:guid}/financial-movements/{movementId:guid}",
+                    UpdateFinancialMovementDraftEndpoint.DoAsync
+                )
                 .WithName("UpdateFinancialMovementDraft")
                 .WithSummary("Actualizar la cabecera de un borrador")
                 .Produces<UpdateFinancialMovementDraftResult>(StatusCodes.Status200OK)
@@ -218,7 +225,10 @@ namespace Mype.Api
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
 
             businessGroup
-                .MapGet("/{businessId:guid}/financial-movements/{movementId:guid}", GetFinancialMovementDraftEndpoint.DoAsync)
+                .MapGet(
+                    "/{businessId:guid}/financial-movements/{movementId:guid}",
+                    GetFinancialMovementDraftEndpoint.DoAsync
+                )
                 .WithName("GetFinancialMovementDraft")
                 .WithSummary("Consultar un borrador financiero")
                 .Produces<FinancialMovementDraftDetailResult>(StatusCodes.Status200OK)
@@ -229,23 +239,21 @@ namespace Mype.Api
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
 
             businessGroup
-                .MapGet("/{businessId:guid}/financial-movements", ListFinancialMovementDraftsEndpoint.DoAsync)
+                .MapGet(
+                    "/{businessId:guid}/financial-movements",
+                    ListFinancialMovementDraftsEndpoint.DoAsync
+                )
                 .WithName("ListFinancialMovementDrafts")
                 .WithSummary("Listar borradores financieros")
-                .Produces<IReadOnlyCollection<FinancialMovementDraftListItemResult>>(StatusCodes.Status200OK)
+                .Produces<IReadOnlyCollection<FinancialMovementDraftListItemResult>>(
+                    StatusCodes.Status200OK
+                )
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status401Unauthorized)
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status403Forbidden)
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status409Conflict)
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
 
             #endregion
-
         }
     }
 }
-
-
-
-
-
-

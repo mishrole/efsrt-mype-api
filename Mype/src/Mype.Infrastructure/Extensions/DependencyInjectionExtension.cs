@@ -61,6 +61,3 @@ namespace Mype.Infrastructure.Extensions
         }
     }
 }
-
-
-
