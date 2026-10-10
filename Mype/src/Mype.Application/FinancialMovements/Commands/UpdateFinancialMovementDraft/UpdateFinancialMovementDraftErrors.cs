@@ -33,7 +33,7 @@ namespace Mype.Application.FinancialMovements.Commands.UpdateFinancialMovementDr
             ApplicationErrorType.Conflict
         );
         public static readonly ApplicationError MovementConcurrencyConflict = new(
-            ErrorCodes.MovementConcurrencyConflict,
+            ErrorCodes.ConcurrencyConflict,
             ErrorMessages.MovementConcurrencyConflict,
             ApplicationErrorType.Conflict
         );

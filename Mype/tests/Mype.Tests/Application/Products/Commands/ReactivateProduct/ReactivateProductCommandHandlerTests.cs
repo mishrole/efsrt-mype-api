@@ -1,6 +1,3 @@
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using FluentAssertions;
 using Moq;
 using Mype.Application.BusinessMemberships.Interfaces;
@@ -17,6 +14,9 @@ using Mype.Domain.Categories;
 using Mype.Domain.Permissions.Constants;
 using Mype.Domain.Products;
 using Mype.Shared.Constants;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Mype.Tests.Application.Products.Commands.ReactivateProduct
 {
@@ -219,7 +219,7 @@ namespace Mype.Tests.Application.Products.Commands.ReactivateProduct
                 .Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()))
                 .ThrowsAsync(
                     new ApplicationErrorException(
-                        ErrorCodes.ProductConcurrencyConflict,
+                        ErrorCodes.ConcurrencyConflict,
                         "error",
                         ApplicationErrorType.Conflict
                     )

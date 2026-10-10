@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Mype.Application.Common.Exceptions;
-using Mype.Domain.FinancialMovements;
 using Mype.Infrastructure.Persistence.Constraints;
 using Mype.Shared.Constants;
 using Npgsql;
+using System;
+using System.Collections.Generic;
 
 namespace Mype.Infrastructure.Persistence.Exceptions
 {
@@ -41,8 +40,8 @@ namespace Mype.Infrastructure.Persistence.Exceptions
             if (exception is DbUpdateConcurrencyException)
             {
                 return new ApplicationErrorException(
-                    ErrorCodes.ProductConcurrencyConflict,
-                    ErrorMessages.ProductConcurrencyConflict,
+                    ErrorCodes.ConcurrencyConflict,
+                    ErrorMessages.ConcurrencyConflict,
                     ApplicationErrorType.Conflict,
                     exception
                 );

@@ -27,7 +27,7 @@ namespace Mype.Application.Products.Commands.UpdateProduct
             ApplicationErrorType.NotFound
         );
         public static readonly ApplicationError ProductConcurrencyConflict = new(
-            ErrorCodes.ProductConcurrencyConflict,
+            ErrorCodes.ConcurrencyConflict,
             ErrorMessages.ProductConcurrencyConflict,
             ApplicationErrorType.Conflict
         );

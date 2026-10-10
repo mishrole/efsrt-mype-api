@@ -1,6 +1,3 @@
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using FluentAssertions;
 using Moq;
 using Mype.Application.BusinessMemberships.Interfaces;
@@ -17,6 +14,9 @@ using Mype.Domain.Categories;
 using Mype.Domain.Permissions.Constants;
 using Mype.Domain.Products;
 using Mype.Shared.Constants;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Mype.Tests.Application.Products.Commands.UpdateProduct
 {
@@ -268,7 +268,7 @@ namespace Mype.Tests.Application.Products.Commands.UpdateProduct
 
         [Theory]
         [InlineData(ErrorCodes.ProductAlreadyExists)]
-        [InlineData(ErrorCodes.ProductConcurrencyConflict)]
+        [InlineData(ErrorCodes.ConcurrencyConflict)]
         public async Task Handle_Should_Map_Translated_Persistence_Errors(string code)
         {
             SetupSuccessfulUpdate();

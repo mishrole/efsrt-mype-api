@@ -19,6 +19,8 @@
         public const string ExceptionHandlingMiddlewareError =
             "Ocurrió una excepción no controlada: {ExceptionMessage}";
 
+        #region Common
+
         public const string UnexpectedError = "Ocurrió un error inesperado.";
 
         public const string SaveChangesError = "Ocurrió un error al guardar los cambios.";
@@ -28,6 +30,9 @@
         public const string ValidationFailed = "Uno o más campos no son válidos.";
 
         public const string BadHttpRequestReceived = "La solicitud HTTP no pudo ser procesada.";
+        public const string ConcurrencyConflict = "La información fue modificada por otro proceso.";
+
+        #endregion
 
         #region Auth
 
@@ -110,12 +115,12 @@
         #region FinancialMovements
 
         public const string MovementAccessForbidden =
-            "No tiene permiso para realizar esta operaciÃ³n sobre los movimientos del negocio.";
+            "No tiene permiso para realizar esta operación sobre los movimientos del negocio.";
         public const string MovementNotFound = "El movimiento solicitado no fue encontrado.";
         public const string MovementNotEditable =
-            "El movimiento ya no se encuentra disponible para ediciÃ³n.";
+            "El movimiento ya no se encuentra disponible para edición.";
         public const string MovementConcurrencyConflict =
-            "El movimiento fue modificado por otro proceso. Recargue los datos e intÃ©ntelo nuevamente.";
+            "El movimiento fue modificado por otro proceso. Recargue los datos e inténtelo nuevamente.";
         public const string MovementCreationFailed = "No fue posible crear el movimiento.";
         public const string MovementUpdateFailed = "No fue posible actualizar el movimiento.";
 
@@ -132,3 +137,4 @@
         #endregion
     }
 }
+
