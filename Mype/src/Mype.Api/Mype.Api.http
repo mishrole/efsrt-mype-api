@@ -3,6 +3,9 @@
 @BusinessId = BUSINESS_ID
 @CategoryId = CATEGORY_ID
 @ProductId = PRODUCT_ID
+@MovementId = MOVEMENT_ID
+@MovementVersion = 1
+@ProductVersion = 1
 
 GET {{Mype.Api_HostAddress}}/health
 Accept: application/json
@@ -130,6 +133,7 @@ Accept: application/json
 GET {{Mype.Api_HostAddress}}/api/v1/businesses/{{BusinessId}}/products/{{ProductId}}
 Authorization: Bearer {{AccessToken}}
 Accept: application/json
+
 ###
 
 PUT {{Mype.Api_HostAddress}}/api/v1/businesses/{{BusinessId}}/products/{{ProductId}}
@@ -142,7 +146,7 @@ Accept: application/json
   "categoryId": "{{CategoryId}}",
   "salePrice": 3.80,
   "unitCost": 2.35,
-  "version": 1
+  "version": {{ProductVersion}}
 }
 
 ###
@@ -153,7 +157,7 @@ Content-Type: application/json
 Accept: application/json
 
 {
-  "version": 1
+  "version": {{ProductVersion}}
 }
 
 ###
@@ -164,5 +168,43 @@ Content-Type: application/json
 Accept: application/json
 
 {
-  "version": 1
+  "version": {{ProductVersion}}
+}
+
+###
+
+POST {{Mype.Api_HostAddress}}/api/v1/businesses/{{BusinessId}}/financial-movements
+Authorization: Bearer {{AccessToken}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "type": 1,
+  "movementDate": "2026-10-10",
+  "description": "Venta del turno mañana"
+}
+
+###
+
+GET {{Mype.Api_HostAddress}}/api/v1/businesses/{{BusinessId}}/financial-movements
+Authorization: Bearer {{AccessToken}}
+Accept: application/json
+
+###
+
+GET {{Mype.Api_HostAddress}}/api/v1/businesses/{{BusinessId}}/financial-movements/{{MovementId}}
+Authorization: Bearer {{AccessToken}}
+Accept: application/json
+
+###
+
+PUT {{Mype.Api_HostAddress}}/api/v1/businesses/{{BusinessId}}/financial-movements/{{MovementId}}
+Authorization: Bearer {{AccessToken}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "movementDate": "2026-10-11",
+  "description": "Venta completa del turno mañana",
+  "version": {{MovementVersion}}
 }
