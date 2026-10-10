@@ -2,8 +2,13 @@
 {
     public static class ErrorCodes
     {
+        #region Common
+
         public const string InternalError = "INTERNAL_ERROR";
         public const string ValidationError = "VALIDATION_ERROR";
+        public const string ConcurrencyConflict = "CONCURRENCY_CONFLICT";
+
+        #endregion
 
         #region Auth
 
@@ -61,11 +66,19 @@
 
         public const string ProductCategoryUnavailable = "PRODUCT_CATEGORY_UNAVAILABLE";
 
-        public const string ProductConcurrencyConflict = "PRODUCT_CONCURRENCY_CONFLICT";
-
         public const string ProductAlreadyInactive = "PRODUCT_ALREADY_INACTIVE";
 
         public const string ProductAlreadyActive = "PRODUCT_ALREADY_ACTIVE";
+
+        #endregion
+
+        #region FinancialMovements
+
+        public const string MovementAccessForbidden = "MOVEMENT_ACCESS_FORBIDDEN";
+        public const string MovementNotFound = "MOVEMENT_NOT_FOUND";
+        public const string MovementNotEditable = "MOVEMENT_NOT_EDITABLE";
+        public const string MovementCreationFailed = "MOVEMENT_CREATION_FAILED";
+        public const string MovementUpdateFailed = "MOVEMENT_UPDATE_FAILED";
 
         #endregion
     }

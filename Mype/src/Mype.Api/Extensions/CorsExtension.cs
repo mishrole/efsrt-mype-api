@@ -1,10 +1,10 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Mype.Shared.Constants;
-using System;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 
 namespace Mype.Api.Extensions
 {

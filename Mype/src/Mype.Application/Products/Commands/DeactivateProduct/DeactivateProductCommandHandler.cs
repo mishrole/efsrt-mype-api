@@ -1,7 +1,3 @@
-using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using MediatR;
 using Mype.Application.BusinessMemberships.Interfaces;
 using Mype.Application.Categories.Interfaces;
@@ -15,6 +11,10 @@ using Mype.Domain.Businesses;
 using Mype.Domain.BusinessMemberships;
 using Mype.Domain.Permissions.Constants;
 using Mype.Shared.Constants;
+using System;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Mype.Application.Products.Commands.DeactivateProduct
 {
@@ -94,7 +94,7 @@ namespace Mype.Application.Products.Commands.DeactivateProduct
                 throw;
             }
             catch (ApplicationErrorException ex)
-                when (ex.Code == ErrorCodes.ProductConcurrencyConflict)
+                when (ex.Code == ErrorCodes.ConcurrencyConflict)
             {
                 return Failure(DeactivateProductErrors.ProductConcurrencyConflict);
             }

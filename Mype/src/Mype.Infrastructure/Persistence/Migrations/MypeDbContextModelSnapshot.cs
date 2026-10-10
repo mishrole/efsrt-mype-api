@@ -545,6 +545,119 @@ namespace Mype.Infrastructure.Persistence.Migrations
                         });
                 });
 
+            modelBuilder.Entity("Mype.Domain.FinancialMovements.FinancialMovement", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<Guid>("BusinessId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("business_id");
+
+                    b.Property<string>("CancellationReason")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("cancellation_reason");
+
+                    b.Property<DateTimeOffset?>("CancelledAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("cancelled_at");
+
+                    b.Property<Guid?>("CancelledByUserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("cancelled_by_user_id");
+
+                    b.Property<DateTimeOffset?>("ConfirmedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("confirmed_at");
+
+                    b.Property<Guid?>("ConfirmedByUserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("confirmed_by_user_id");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<Guid>("CreatedByUserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("created_by_user_id");
+
+                    b.Property<string>("CurrencyCode")
+                        .IsRequired()
+                        .HasMaxLength(3)
+                        .HasColumnType("character(3)")
+                        .HasColumnName("currency_code")
+                        .IsFixedLength();
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("description");
+
+                    b.Property<DateTimeOffset?>("DiscardedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("discarded_at");
+
+                    b.Property<DateOnly>("MovementDate")
+                        .HasColumnType("date")
+                        .HasColumnName("movement_date");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer")
+                        .HasColumnName("status");
+
+                    b.Property<decimal>("TotalAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)")
+                        .HasColumnName("total_amount");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("integer")
+                        .HasColumnName("type");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid>("UpdatedByUserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("updated_by_user_id");
+
+                    b.Property<uint>("Version")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
+                    b.HasKey("Id")
+                        .HasName("pk_financial_movements");
+
+                    b.HasAlternateKey("Id", "BusinessId")
+                        .HasName("ux_financial_movements_id_business");
+
+                    b.HasIndex("CancelledByUserId")
+                        .HasDatabaseName("ix_financial_movements_cancelled_by_user_id");
+
+                    b.HasIndex("ConfirmedByUserId")
+                        .HasDatabaseName("ix_financial_movements_confirmed_by_user_id");
+
+                    b.HasIndex("CreatedByUserId")
+                        .HasDatabaseName("ix_financial_movements_created_by_user_id");
+
+                    b.HasIndex("UpdatedByUserId")
+                        .HasDatabaseName("ix_financial_movements_updated_by_user_id");
+
+                    b.HasIndex("BusinessId", "Status", "UpdatedAt")
+                        .HasDatabaseName("ix_financial_movements_business_status_updated_at");
+
+                    b.HasIndex("BusinessId", "Type", "MovementDate")
+                        .HasDatabaseName("ix_financial_movements_business_type_date");
+
+                    b.ToTable("financial_movements", (string)null);
+                });
+
             modelBuilder.Entity("Mype.Domain.Permissions.Permission", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1097,6 +1210,42 @@ namespace Mype.Infrastructure.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("fk_categories_users_updated_by_user_id");
+                });
+
+            modelBuilder.Entity("Mype.Domain.FinancialMovements.FinancialMovement", b =>
+                {
+                    b.HasOne("Mype.Domain.Businesses.Business", null)
+                        .WithMany()
+                        .HasForeignKey("BusinessId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_financial_movements_businesses_business_id");
+
+                    b.HasOne("Mype.Domain.Users.User", null)
+                        .WithMany()
+                        .HasForeignKey("CancelledByUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_financial_movements_users_cancelled_by_user_id");
+
+                    b.HasOne("Mype.Domain.Users.User", null)
+                        .WithMany()
+                        .HasForeignKey("ConfirmedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_financial_movements_users_confirmed_by_user_id");
+
+                    b.HasOne("Mype.Domain.Users.User", null)
+                        .WithMany()
+                        .HasForeignKey("CreatedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_financial_movements_users_created_by_user_id");
+
+                    b.HasOne("Mype.Domain.Users.User", null)
+                        .WithMany()
+                        .HasForeignKey("UpdatedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_financial_movements_users_updated_by_user_id");
                 });
 
             modelBuilder.Entity("Mype.Domain.Products.Product", b =>
