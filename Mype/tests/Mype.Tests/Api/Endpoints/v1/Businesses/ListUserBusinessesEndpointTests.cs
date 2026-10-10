@@ -1,4 +1,9 @@
-﻿using FluentAssertions;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using FluentAssertions;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Moq;
@@ -7,46 +12,31 @@ using Mype.Api.Endpoints.v1.Businesses;
 using Mype.Application.Businesses.Queries.ListUserBusinesses;
 using Mype.Application.Common;
 using Mype.Domain.Businesses;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Mype.Tests.Api.Endpoints.v1.Businesses
 {
     public class ListUserBusinessesEndpointTests
     {
-        private const string DisplayName =
-            "Bodega Central";
+        private const string DisplayName = "Bodega Central";
 
-        private const string CurrencyCode =
-            "PEN";
+        private const string CurrencyCode = "PEN";
 
-        private const string RoleCode =
-            "OWNER";
+        private const string RoleCode = "OWNER";
 
-        private static readonly Guid CurrentUserId =
-            Guid.NewGuid();
+        private static readonly Guid CurrentUserId = Guid.NewGuid();
 
-        private static readonly Guid BusinessId =
-            Guid.NewGuid();
+        private static readonly Guid BusinessId = Guid.NewGuid();
 
-        private static readonly Guid MembershipId =
-            Guid.NewGuid();
+        private static readonly Guid MembershipId = Guid.NewGuid();
 
-        private readonly Mock<ISender> _senderMock =
-            new();
+        private readonly Mock<ISender> _senderMock = new();
 
-        private readonly Mock<IUserContextProvider>
-            _userContextProviderMock = new();
+        private readonly Mock<IUserContextProvider> _userContextProviderMock = new();
 
         public ListUserBusinessesEndpointTests()
         {
             _userContextProviderMock
-                .Setup(provider =>
-                    provider.GetCurrentUserId()
-                )
+                .Setup(provider => provider.GetCurrentUserId())
                 .Returns(CurrentUserId);
         }
 
@@ -54,77 +44,42 @@ namespace Mype.Tests.Api.Endpoints.v1.Businesses
         public async Task DoAsync_Should_Return_Ok_With_User_Businesses()
         {
             SetupSender(
-                Result<
-                    IReadOnlyCollection<
-                        BusinessSummaryResult
-                    >
-                >.Success(
-                    CreateBusinesses()
-                )
+                Result<IReadOnlyCollection<BusinessSummaryResult>>.Success(CreateBusinesses())
             );
 
-            var result =
-                await ListUserBusinessesEndpoint.DoAsync(
-                    _senderMock.Object,
-                    _userContextProviderMock.Object,
-                    CreateHttpContext(),
-                    CancellationToken.None
-                );
-
-            var statusResult = result
-                .Should()
-                .BeAssignableTo<
-                    IStatusCodeHttpResult
-                >()
-                .Subject;
-
-            statusResult.StatusCode.Should().Be(
-                StatusCodes.Status200OK
+            var result = await ListUserBusinessesEndpoint.DoAsync(
+                _senderMock.Object,
+                _userContextProviderMock.Object,
+                CreateHttpContext(),
+                CancellationToken.None
             );
 
-            var valueResult = result
-                .Should()
-                .BeAssignableTo<
-                    IValueHttpResult
-                >()
-                .Subject;
+            var statusResult = result.Should().BeAssignableTo<IStatusCodeHttpResult>().Subject;
 
-            var response = valueResult.Value
-                .Should()
-                .BeAssignableTo<
-                    IReadOnlyCollection<
-                        BusinessSummaryResult
-                    >
-                >()
+            statusResult.StatusCode.Should().Be(StatusCodes.Status200OK);
+
+            var valueResult = result.Should().BeAssignableTo<IValueHttpResult>().Subject;
+
+            var response = valueResult
+                .Value.Should()
+                .BeAssignableTo<IReadOnlyCollection<BusinessSummaryResult>>()
                 .Subject;
 
             response.Should().ContainSingle();
 
             var business = response.Single();
 
-            business.BusinessId.Should().Be(
-                BusinessId
-            );
+            business.BusinessId.Should().Be(BusinessId);
 
-            business.DisplayName.Should().Be(
-                DisplayName
-            );
+            business.DisplayName.Should().Be(DisplayName);
 
-            business.CurrencyCode.Should().Be(
-                CurrencyCode
-            );
+            business.CurrencyCode.Should().Be(CurrencyCode);
 
-            business.Status.Should().Be(
-                BusinessStatus.Active
-            );
+            business.Status.Should().Be(BusinessStatus.Active);
 
-            business.MembershipId.Should().Be(
-                MembershipId
-            );
+            business.MembershipId.Should().Be(MembershipId);
 
-            business.RoleCode.Should().Be(
-                RoleCode
-            );
+            business.RoleCode.Should().Be(RoleCode);
 
             VerifyQueryWasSent();
         }
@@ -133,50 +88,27 @@ namespace Mype.Tests.Api.Endpoints.v1.Businesses
         public async Task DoAsync_Should_Return_Ok_With_Empty_Collection()
         {
             SetupSender(
-                Result<
-                    IReadOnlyCollection<
-                        BusinessSummaryResult
-                    >
-                >.Success(
-                    Array.Empty<
-                        BusinessSummaryResult
-                    >()
+                Result<IReadOnlyCollection<BusinessSummaryResult>>.Success(
+                    Array.Empty<BusinessSummaryResult>()
                 )
             );
 
-            var result =
-                await ListUserBusinessesEndpoint.DoAsync(
-                    _senderMock.Object,
-                    _userContextProviderMock.Object,
-                    CreateHttpContext(),
-                    CancellationToken.None
-                );
-
-            var statusResult = result
-                .Should()
-                .BeAssignableTo<
-                    IStatusCodeHttpResult
-                >()
-                .Subject;
-
-            statusResult.StatusCode.Should().Be(
-                StatusCodes.Status200OK
+            var result = await ListUserBusinessesEndpoint.DoAsync(
+                _senderMock.Object,
+                _userContextProviderMock.Object,
+                CreateHttpContext(),
+                CancellationToken.None
             );
 
-            var valueResult = result
-                .Should()
-                .BeAssignableTo<
-                    IValueHttpResult
-                >()
-                .Subject;
+            var statusResult = result.Should().BeAssignableTo<IStatusCodeHttpResult>().Subject;
 
-            var response = valueResult.Value
-                .Should()
-                .BeAssignableTo<
-                    IReadOnlyCollection<
-                        BusinessSummaryResult
-                    >
-                >()
+            statusResult.StatusCode.Should().Be(StatusCodes.Status200OK);
+
+            var valueResult = result.Should().BeAssignableTo<IValueHttpResult>().Subject;
+
+            var response = valueResult
+                .Value.Should()
+                .BeAssignableTo<IReadOnlyCollection<BusinessSummaryResult>>()
                 .Subject;
 
             response.Should().BeEmpty();
@@ -188,14 +120,8 @@ namespace Mype.Tests.Api.Endpoints.v1.Businesses
         public async Task DoAsync_Should_Create_Query_With_Current_User()
         {
             SetupSender(
-                Result<
-                    IReadOnlyCollection<
-                        BusinessSummaryResult
-                    >
-                >.Success(
-                    Array.Empty<
-                        BusinessSummaryResult
-                    >()
+                Result<IReadOnlyCollection<BusinessSummaryResult>>.Success(
+                    Array.Empty<BusinessSummaryResult>()
                 )
             );
 
@@ -206,11 +132,7 @@ namespace Mype.Tests.Api.Endpoints.v1.Businesses
                 CancellationToken.None
             );
 
-            _userContextProviderMock.Verify(
-                provider =>
-                    provider.GetCurrentUserId(),
-                Times.Once
-            );
+            _userContextProviderMock.Verify(provider => provider.GetCurrentUserId(), Times.Once);
 
             VerifyQueryWasSent();
         }
@@ -218,21 +140,13 @@ namespace Mype.Tests.Api.Endpoints.v1.Businesses
         [Fact]
         public async Task DoAsync_Should_Forward_CancellationToken()
         {
-            using var cancellationTokenSource =
-                new CancellationTokenSource();
+            using var cancellationTokenSource = new CancellationTokenSource();
 
-            var cancellationToken =
-                cancellationTokenSource.Token;
+            var cancellationToken = cancellationTokenSource.Token;
 
             SetupSender(
-                Result<
-                    IReadOnlyCollection<
-                        BusinessSummaryResult
-                    >
-                >.Success(
-                    Array.Empty<
-                        BusinessSummaryResult
-                    >()
+                Result<IReadOnlyCollection<BusinessSummaryResult>>.Success(
+                    Array.Empty<BusinessSummaryResult>()
                 ),
                 cancellationToken
             );
@@ -245,63 +159,43 @@ namespace Mype.Tests.Api.Endpoints.v1.Businesses
             );
 
             _senderMock.Verify(
-                sender => sender.Send(
-                    It.IsAny<
-                        ListUserBusinessesQuery
-                    >(),
-                    cancellationToken
-                ),
+                sender => sender.Send(It.IsAny<ListUserBusinessesQuery>(), cancellationToken),
                 Times.Once
             );
         }
 
         private void SetupSender(
-            Result<
-                IReadOnlyCollection<
-                    BusinessSummaryResult
-                >
-            > result,
-            CancellationToken? cancellationToken =
-                null
+            Result<IReadOnlyCollection<BusinessSummaryResult>> result,
+            CancellationToken? cancellationToken = null
         )
         {
             _senderMock
-                .Setup(sender => sender.Send(
-                    It.IsAny<
-                        ListUserBusinessesQuery
-                    >(),
-                    cancellationToken.HasValue
-                        ? cancellationToken.Value
-                        : It.IsAny<
-                            CancellationToken
-                        >()
-                ))
+                .Setup(sender =>
+                    sender.Send(
+                        It.IsAny<ListUserBusinessesQuery>(),
+                        cancellationToken.HasValue
+                            ? cancellationToken.Value
+                            : It.IsAny<CancellationToken>()
+                    )
+                )
                 .ReturnsAsync(result);
         }
 
         private void VerifyQueryWasSent()
         {
             _senderMock.Verify(
-                sender => sender.Send(
-                    It.Is<
-                        ListUserBusinessesQuery
-                    >(
-                        query =>
-                            query.CurrentUserId ==
-                                CurrentUserId
+                sender =>
+                    sender.Send(
+                        It.Is<ListUserBusinessesQuery>(query =>
+                            query.CurrentUserId == CurrentUserId
+                        ),
+                        It.IsAny<CancellationToken>()
                     ),
-                    It.IsAny<
-                        CancellationToken
-                    >()
-                ),
                 Times.Once
             );
         }
 
-        private static
-            IReadOnlyCollection<
-                BusinessSummaryResult
-            > CreateBusinesses()
+        private static IReadOnlyCollection<BusinessSummaryResult> CreateBusinesses()
         {
             return
             [
@@ -312,12 +206,11 @@ namespace Mype.Tests.Api.Endpoints.v1.Businesses
                     BusinessStatus.Active,
                     MembershipId,
                     RoleCode
-                )
+                ),
             ];
         }
 
-        private static DefaultHttpContext
-            CreateHttpContext()
+        private static DefaultHttpContext CreateHttpContext()
         {
             return new DefaultHttpContext();
         }

@@ -1,4 +1,7 @@
-﻿using FluentAssertions;
+﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
+using FluentAssertions;
 using Moq;
 using Mype.Application.Auth.Commands.Login;
 using Mype.Application.Common.Interfaces;
@@ -6,9 +9,6 @@ using Mype.Application.Common.Models;
 using Mype.Application.Users.Interfaces;
 using Mype.Domain.Users;
 using Mype.Shared.Constants;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Mype.Tests.Application.Auth.Commands.Login
 {
@@ -24,14 +24,19 @@ namespace Mype.Tests.Application.Auth.Commands.Login
         private const string AccessToken = "access-token";
         private const string TokenType = AuthConstants.TokenType;
 
-        private static readonly DateTimeOffset CreatedAt =
-            new(2026, 10, 8, 12, 0, 0, TimeSpan.Zero);
+        private static readonly DateTimeOffset CreatedAt = new(
+            2026,
+            10,
+            8,
+            12,
+            0,
+            0,
+            TimeSpan.Zero
+        );
 
-        private static readonly DateTimeOffset IssuedAt =
-            CreatedAt.AddHours(1);
+        private static readonly DateTimeOffset IssuedAt = CreatedAt.AddHours(1);
 
-        private static readonly DateTimeOffset ExpiresAt =
-            IssuedAt.AddMinutes(60);
+        private static readonly DateTimeOffset ExpiresAt = IssuedAt.AddMinutes(60);
 
         private readonly Mock<IUserRepository> _userRepositoryMock = new();
         private readonly Mock<IPasswordHasherHelper> _passwordHasherMock = new();
@@ -47,24 +52,26 @@ namespace Mype.Tests.Application.Auth.Commands.Login
                 .Setup(normalizer => normalizer.Normalize(Email))
                 .Returns(NormalizedEmail);
 
-            _clockMock
-                .SetupGet(clock => clock.UtcNow)
-                .Returns(IssuedAt);
+            _clockMock.SetupGet(clock => clock.UtcNow).Returns(IssuedAt);
 
             _jwtTokenHelperMock
-                .Setup(helper => helper.GenerateToken(
-                    It.IsAny<Guid>(),
-                    It.IsAny<string>(),
-                    It.IsAny<string>(),
-                    It.IsAny<DateTimeOffset>()
-                ))
-                .Returns(new JwtTokenResult
-                {
-                    Value = AccessToken,
-                    TokenType = TokenType,
-                    IssuedAt = IssuedAt,
-                    ExpiresAt = ExpiresAt
-                });
+                .Setup(helper =>
+                    helper.GenerateToken(
+                        It.IsAny<Guid>(),
+                        It.IsAny<string>(),
+                        It.IsAny<string>(),
+                        It.IsAny<DateTimeOffset>()
+                    )
+                )
+                .Returns(
+                    new JwtTokenResult
+                    {
+                        Value = AccessToken,
+                        TokenType = TokenType,
+                        IssuedAt = IssuedAt,
+                        ExpiresAt = ExpiresAt,
+                    }
+                );
 
             _handler = new LoginCommandHandler(
                 _userRepositoryMock.Object,
@@ -84,10 +91,7 @@ namespace Mype.Tests.Application.Auth.Commands.Login
             SetupUserLookup(user);
             SetupPasswordVerification(Password, true);
 
-            var result = await _handler.Handle(
-                command,
-                CancellationToken.None
-            );
+            var result = await _handler.Handle(command, CancellationToken.None);
 
             result.IsSuccess.Should().BeTrue();
             result.Error.Should().BeNull();
@@ -103,20 +107,12 @@ namespace Mype.Tests.Application.Auth.Commands.Login
             result.Value.User.Status.Should().Be(UserStatus.Active);
 
             _passwordHasherMock.Verify(
-                hasher => hasher.VerifyPassword(
-                    PasswordHash,
-                    Password
-                ),
+                hasher => hasher.VerifyPassword(PasswordHash, Password),
                 Times.Once
             );
 
             _jwtTokenHelperMock.Verify(
-                helper => helper.GenerateToken(
-                    user.Id,
-                    OriginalEmail,
-                    DisplayName,
-                    IssuedAt
-                ),
+                helper => helper.GenerateToken(user.Id, OriginalEmail, DisplayName, IssuedAt),
                 Times.Once
             );
         }
@@ -130,21 +126,16 @@ namespace Mype.Tests.Application.Auth.Commands.Login
             SetupUserLookup(user);
             SetupPasswordVerification(Password, true);
 
-            await _handler.Handle(
-                command,
-                CancellationToken.None
-            );
+            await _handler.Handle(command, CancellationToken.None);
 
-            _emailNormalizerMock.Verify(
-                normalizer => normalizer.Normalize(Email),
-                Times.Once
-            );
+            _emailNormalizerMock.Verify(normalizer => normalizer.Normalize(Email), Times.Once);
 
             _userRepositoryMock.Verify(
-                repository => repository.GetByNormalizedEmailAsync(
-                    NormalizedEmail,
-                    It.IsAny<CancellationToken>()
-                ),
+                repository =>
+                    repository.GetByNormalizedEmailAsync(
+                        NormalizedEmail,
+                        It.IsAny<CancellationToken>()
+                    ),
                 Times.Once
             );
         }
@@ -156,36 +147,27 @@ namespace Mype.Tests.Application.Auth.Commands.Login
 
             SetupUserLookup(null);
 
-            var result = await _handler.Handle(
-                command,
-                CancellationToken.None
-            );
+            var result = await _handler.Handle(command, CancellationToken.None);
 
             result.IsSuccess.Should().BeFalse();
             result.Value.Should().BeNull();
-            result.Error.Should().BeSameAs(
-                LoginErrors.InvalidCredentials
-            );
+            result.Error.Should().BeSameAs(LoginErrors.InvalidCredentials);
 
-            result.Error.Code.Should().Be(
-                ErrorCodes.InvalidCredentials
-            );
+            result.Error.Code.Should().Be(ErrorCodes.InvalidCredentials);
 
             _passwordHasherMock.Verify(
-                hasher => hasher.VerifyPassword(
-                    It.IsAny<string>(),
-                    It.IsAny<string>()
-                ),
+                hasher => hasher.VerifyPassword(It.IsAny<string>(), It.IsAny<string>()),
                 Times.Never
             );
 
             _jwtTokenHelperMock.Verify(
-                helper => helper.GenerateToken(
-                    It.IsAny<Guid>(),
-                    It.IsAny<string>(),
-                    It.IsAny<string>(),
-                    It.IsAny<DateTimeOffset>()
-                ),
+                helper =>
+                    helper.GenerateToken(
+                        It.IsAny<Guid>(),
+                        It.IsAny<string>(),
+                        It.IsAny<string>(),
+                        It.IsAny<DateTimeOffset>()
+                    ),
                 Times.Never
             );
         }
@@ -195,35 +177,27 @@ namespace Mype.Tests.Application.Auth.Commands.Login
         {
             var user = CreateUser();
 
-            var command = CreateCommand(
-                InvalidPassword
-            );
+            var command = CreateCommand(InvalidPassword);
 
             SetupUserLookup(user);
             SetupPasswordVerification(InvalidPassword, false);
 
-            var result = await _handler.Handle(
-                command,
-                CancellationToken.None
-            );
+            var result = await _handler.Handle(command, CancellationToken.None);
 
             result.IsSuccess.Should().BeFalse();
             result.Value.Should().BeNull();
-            result.Error.Should().BeSameAs(
-                LoginErrors.InvalidCredentials
-            );
+            result.Error.Should().BeSameAs(LoginErrors.InvalidCredentials);
 
-            result.Error.Code.Should().Be(
-                ErrorCodes.InvalidCredentials
-            );
+            result.Error.Code.Should().Be(ErrorCodes.InvalidCredentials);
 
             _jwtTokenHelperMock.Verify(
-                helper => helper.GenerateToken(
-                    It.IsAny<Guid>(),
-                    It.IsAny<string>(),
-                    It.IsAny<string>(),
-                    It.IsAny<DateTimeOffset>()
-                ),
+                helper =>
+                    helper.GenerateToken(
+                        It.IsAny<Guid>(),
+                        It.IsAny<string>(),
+                        It.IsAny<string>(),
+                        It.IsAny<DateTimeOffset>()
+                    ),
                 Times.Never
             );
         }
@@ -233,37 +207,29 @@ namespace Mype.Tests.Application.Auth.Commands.Login
         {
             var user = CreateUser();
 
-            user.Deactivate(
-                CreatedAt.AddMinutes(30)
-            );
+            user.Deactivate(CreatedAt.AddMinutes(30));
 
             var command = CreateCommand();
 
             SetupUserLookup(user);
             SetupPasswordVerification(Password, true);
 
-            var result = await _handler.Handle(
-                command,
-                CancellationToken.None
-            );
+            var result = await _handler.Handle(command, CancellationToken.None);
 
             result.IsSuccess.Should().BeFalse();
             result.Value.Should().BeNull();
-            result.Error.Should().BeSameAs(
-                LoginErrors.AccountUnavailable
-            );
+            result.Error.Should().BeSameAs(LoginErrors.AccountUnavailable);
 
-            result.Error.Code.Should().Be(
-                ErrorCodes.AccountUnavailable
-            );
+            result.Error.Code.Should().Be(ErrorCodes.AccountUnavailable);
 
             _jwtTokenHelperMock.Verify(
-                helper => helper.GenerateToken(
-                    It.IsAny<Guid>(),
-                    It.IsAny<string>(),
-                    It.IsAny<string>(),
-                    It.IsAny<DateTimeOffset>()
-                ),
+                helper =>
+                    helper.GenerateToken(
+                        It.IsAny<Guid>(),
+                        It.IsAny<string>(),
+                        It.IsAny<string>(),
+                        It.IsAny<DateTimeOffset>()
+                    ),
                 Times.Never
             );
         }
@@ -279,20 +245,12 @@ namespace Mype.Tests.Application.Auth.Commands.Login
             SetupUserLookup(user);
             SetupPasswordVerification(Password, true);
 
-            var result = await _handler.Handle(
-                command,
-                CancellationToken.None
-            );
+            var result = await _handler.Handle(command, CancellationToken.None);
 
             result.IsSuccess.Should().BeTrue();
 
             _jwtTokenHelperMock.Verify(
-                helper => helper.GenerateToken(
-                    user.Id,
-                    OriginalEmail,
-                    DisplayName,
-                    IssuedAt
-                ),
+                helper => helper.GenerateToken(user.Id, OriginalEmail, DisplayName, IssuedAt),
                 Times.Once
             );
         }
@@ -309,28 +267,16 @@ namespace Mype.Tests.Application.Auth.Commands.Login
                 .ReturnsAsync(user);
         }
 
-        private void SetupPasswordVerification(
-            string providedPassword,
-            bool isValid
-        )
+        private void SetupPasswordVerification(string providedPassword, bool isValid)
         {
             _passwordHasherMock
-                .Setup(hasher => hasher.VerifyPassword(
-                    PasswordHash,
-                    providedPassword
-                ))
+                .Setup(hasher => hasher.VerifyPassword(PasswordHash, providedPassword))
                 .Returns(isValid);
         }
 
-        private static LoginCommand CreateCommand(
-            string password = Password
-        )
+        private static LoginCommand CreateCommand(string password = Password)
         {
-            return new LoginCommand
-            {
-                Email = Email,
-                Password = password
-            };
+            return new LoginCommand { Email = Email, Password = password };
         }
 
         private static User CreateUser()

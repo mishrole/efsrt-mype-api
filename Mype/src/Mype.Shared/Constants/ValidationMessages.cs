@@ -4,9 +4,11 @@
     {
         public const string Required = "{PropertyName} es obligatorio.";
 
-        public const string MaximumLength = "{PropertyName} no debe exceder {MaxLength} caracteres.";
+        public const string MaximumLength =
+            "{PropertyName} no debe exceder {MaxLength} caracteres.";
 
-        public const string MinimumLength = "{PropertyName} debe contener al menos {MinLength} caracteres.";
+        public const string MinimumLength =
+            "{PropertyName} debe contener al menos {MinLength} caracteres.";
 
         public const string Invalid = "{PropertyName} no es válido.";
 
@@ -16,12 +18,14 @@
 
         public const string MustMatch = "{PropertyName} debe coincidir con {ComparisonProperty}.";
 
-        public const string PasswordsDoNotMatch = "La confirmación de contraseña no coincide con la contraseña.";
+        public const string PasswordsDoNotMatch =
+            "La confirmación de contraseña no coincide con la contraseña.";
 
         public const string NonNegative = "{PropertyName} no puede ser negativo.";
 
         public const string DecimalScale = "{PropertyName} admite como máximo {Scale} decimales.";
 
-        public const string DecimalPrecision = "{PropertyName} excede la precisión máxima permitida.";
+        public const string DecimalPrecision =
+            "{PropertyName} excede la precisión máxima permitida.";
     }
 }

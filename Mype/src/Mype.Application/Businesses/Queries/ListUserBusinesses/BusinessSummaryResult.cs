@@ -1,5 +1,5 @@
-﻿using Mype.Domain.Businesses;
-using System;
+﻿using System;
+using Mype.Domain.Businesses;
 
 namespace Mype.Application.Businesses.Queries.ListUserBusinesses
 {

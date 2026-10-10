@@ -1,13 +1,11 @@
-﻿using Mype.Domain.Common;
-using System;
+﻿using System;
+using Mype.Domain.Common;
 
 namespace Mype.Domain.Currencies
 {
     public class Currency : ReferenceEntity
     {
-        private Currency()
-        {
-        }
+        private Currency() { }
 
         private Currency(
             Guid id,
@@ -16,12 +14,8 @@ namespace Mype.Domain.Currencies
             string symbol,
             short decimalPlaces,
             bool isActive
-        ) : base(
-            id,
-            code,
-            name,
-            isActive
         )
+            : base(id, code, name, isActive)
         {
             Symbol = symbol;
             DecimalPlaces = decimalPlaces;
@@ -39,14 +33,7 @@ namespace Mype.Domain.Currencies
             short decimalPlaces
         )
         {
-            return new Currency(
-                id,
-                code,
-                name,
-                symbol,
-                decimalPlaces,
-                true
-            );
+            return new Currency(id, code, name, symbol, decimalPlaces, true);
         }
     }
 }

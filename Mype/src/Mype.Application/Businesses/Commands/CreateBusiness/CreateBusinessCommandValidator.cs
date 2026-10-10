@@ -6,46 +6,33 @@ using Mype.Shared.Constants;
 
 namespace Mype.Application.Businesses.Commands.CreateBusiness
 {
-    public class CreateBusinessCommandValidator
-        : AbstractValidator<CreateBusinessCommand>
+    public class CreateBusinessCommandValidator : AbstractValidator<CreateBusinessCommand>
     {
         public CreateBusinessCommandValidator()
         {
             RuleFor(command => command.DisplayName)
                 .NotEmpty()
                 .WithMessage(ValidationMessages.Required)
-                .MaximumLength(
-                    BusinessConstraints.DisplayNameMaxLength
-                )
+                .MaximumLength(BusinessConstraints.DisplayNameMaxLength)
                 .WithMessage(ValidationMessages.MaximumLength)
                 .WithName("Nombre del negocio");
 
             RuleFor(command => command.LegalName)
-                .MaximumLength(
-                    BusinessConstraints.LegalNameMaxLength
-                )
+                .MaximumLength(BusinessConstraints.LegalNameMaxLength)
                 .WithMessage(ValidationMessages.MaximumLength)
-                .When(command =>
-                    !string.IsNullOrWhiteSpace(
-                        command.LegalName
-                    )
-                )
+                .When(command => !string.IsNullOrWhiteSpace(command.LegalName))
                 .WithName("Razón social");
 
             RuleFor(command => command.Ruc)
                 .Must(RucValidator.IsValid)
                 .WithMessage(ErrorMessages.InvalidRuc)
-                .When(command =>
-                    !string.IsNullOrWhiteSpace(command.Ruc)
-                )
+                .When(command => !string.IsNullOrWhiteSpace(command.Ruc))
                 .WithName("RUC");
 
             RuleFor(command => command.CurrencyCode)
                 .NotEmpty()
                 .WithMessage(ValidationMessages.Required)
-                .Length(
-                    CurrencyConstraints.CodeMaxLength
-                )
+                .Length(CurrencyConstraints.CodeMaxLength)
                 .WithMessage(ValidationMessages.Invalid)
                 .WithName("Moneda");
 

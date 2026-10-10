@@ -1,18 +1,12 @@
-﻿using MediatR;
-using Mype.Application.Common;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using MediatR;
+using Mype.Application.Common;
 
 namespace Mype.Application.Products.Queries.ListProducts
 {
     public sealed class ListProductsQuery
-        : IRequest<
-            Result<
-                IReadOnlyCollection<
-                    ProductListItemResult
-                >
-            >
-        >
+        : IRequest<Result<IReadOnlyCollection<ProductListItemResult>>>
     {
         public Guid BusinessId { get; set; }
 

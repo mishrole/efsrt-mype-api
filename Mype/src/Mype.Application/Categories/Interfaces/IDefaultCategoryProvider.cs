@@ -1,5 +1,5 @@
-﻿using Mype.Application.Categories.Models;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using Mype.Application.Categories.Models;
 
 namespace Mype.Application.Categories.Interfaces
 {

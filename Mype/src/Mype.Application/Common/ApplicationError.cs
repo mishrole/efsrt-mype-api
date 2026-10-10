@@ -2,9 +2,5 @@
 
 namespace Mype.Application.Common
 {
-    public sealed record ApplicationError(
-        string Code,
-        string Message,
-        ApplicationErrorType Type
-    );
+    public sealed record ApplicationError(string Code, string Message, ApplicationErrorType Type);
 }

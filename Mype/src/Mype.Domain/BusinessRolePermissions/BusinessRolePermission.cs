@@ -4,9 +4,7 @@ namespace Mype.Domain.BusinessRolePermissions
 {
     public class BusinessRolePermission
     {
-        private BusinessRolePermission()
-        {
-        }
+        private BusinessRolePermission() { }
 
         private BusinessRolePermission(
             Guid businessRoleId,
@@ -31,11 +29,7 @@ namespace Mype.Domain.BusinessRolePermissions
             DateTimeOffset utcNow
         )
         {
-            return new BusinessRolePermission(
-                businessRoleId,
-                permissionId,
-                utcNow
-            );
+            return new BusinessRolePermission(businessRoleId, permissionId, utcNow);
         }
     }
 }

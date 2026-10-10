@@ -1,13 +1,11 @@
-﻿using Mype.Domain.Common;
-using System;
+﻿using System;
+using Mype.Domain.Common;
 
 namespace Mype.Domain.Categories
 {
     public class Category : Entity
     {
-        private Category()
-        {
-        }
+        private Category() { }
 
         private Category(
             Guid id,
@@ -18,7 +16,8 @@ namespace Mype.Domain.Categories
             bool isDefault,
             Guid userId,
             DateTimeOffset utcNow
-        ) : base(id)
+        )
+            : base(id)
         {
             BusinessId = businessId;
             Type = type;
@@ -36,11 +35,9 @@ namespace Mype.Domain.Categories
 
         public CategoryType Type { get; private set; }
 
-        public string Name { get; private set; } =
-            string.Empty;
+        public string Name { get; private set; } = string.Empty;
 
-        public string NormalizedName { get; private set; } =
-            string.Empty;
+        public string NormalizedName { get; private set; } = string.Empty;
 
         public bool IsDefault { get; private set; }
 
@@ -54,10 +51,7 @@ namespace Mype.Domain.Categories
 
         public uint Version { get; private set; }
 
-        public void Deactivate(
-            Guid currentUserId,
-            DateTimeOffset utcNow
-        )
+        public void Deactivate(Guid currentUserId, DateTimeOffset utcNow)
         {
             IsActive = false;
             DeactivatedAt = utcNow;

@@ -1,4 +1,8 @@
-﻿using FluentAssertions;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using FluentAssertions;
 using Moq;
 using Mype.Application.BusinessMemberships.Interfaces;
 using Mype.Application.BusinessMemberships.Models;
@@ -11,13 +15,8 @@ using Mype.Domain.Businesses;
 using Mype.Domain.BusinessMemberships;
 using Mype.Domain.Categories;
 using Mype.Domain.Permissions.Constants;
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 
-namespace Mype.Tests.Application.Categories.Queries
-    .ListCategories
+namespace Mype.Tests.Application.Categories.Queries.ListCategories
 {
     public class ListCategoriesQueryHandlerTests
     {
@@ -43,83 +42,60 @@ namespace Mype.Tests.Application.Categories.Queries
 
         private static readonly Guid ExpenseCategoryId = Guid.NewGuid();
 
-        private readonly Mock<
-            IBusinessMembershipRepository
-        > _membershipRepositoryMock = new();
+        private readonly Mock<IBusinessMembershipRepository> _membershipRepositoryMock = new();
 
-        private readonly Mock<
-            IPermissionRepository
-        > _permissionRepositoryMock = new();
+        private readonly Mock<IPermissionRepository> _permissionRepositoryMock = new();
 
-        private readonly Mock<
-            ICategoryRepository
-        > _categoryRepositoryMock = new();
+        private readonly Mock<ICategoryRepository> _categoryRepositoryMock = new();
 
-        private readonly ListCategoriesQueryHandler
-            _handler;
+        private readonly ListCategoriesQueryHandler _handler;
 
         public ListCategoriesQueryHandlerTests()
         {
-            _handler =
-                new ListCategoriesQueryHandler(
-                    _membershipRepositoryMock.Object,
-                    _permissionRepositoryMock.Object,
-                    _categoryRepositoryMock.Object
-                );
+            _handler = new ListCategoriesQueryHandler(
+                _membershipRepositoryMock.Object,
+                _permissionRepositoryMock.Object,
+                _categoryRepositoryMock.Object
+            );
         }
 
         [Fact]
         public async Task Handle_Should_Return_Categories_When_Access_Is_Valid()
         {
-            SetupContext(
-                CreateContext()
-            );
+            SetupContext(CreateContext());
 
-            SetupPermissions(
-                SystemPermissions.CategoryRead.Code
-            );
+            SetupPermissions(SystemPermissions.CategoryRead.Code);
 
-            SetupCategories(
-                CreateCategories()
-            );
+            SetupCategories(CreateCategories());
 
-            var result = await _handler.Handle(
-                CreateQuery(),
-                CancellationToken.None
-            );
+            var result = await _handler.Handle(CreateQuery(), CancellationToken.None);
 
             result.IsSuccess.Should().BeTrue();
             result.Error.Should().BeNull();
             result.Value.Should().NotBeNull();
             result.Value.Should().HaveCount(2);
 
-            result.Value.Should().Contain(
-                category =>
-                    category.Id ==
-                        SaleCategoryId &&
-                    category.BusinessId ==
-                        BusinessId &&
-                    category.Name ==
-                        SaleCategoryName &&
-                    category.Type ==
-                        CategoryType.Sale &&
-                    category.IsDefault &&
-                    category.IsActive
-            );
+            result
+                .Value.Should()
+                .Contain(category =>
+                    category.Id == SaleCategoryId
+                    && category.BusinessId == BusinessId
+                    && category.Name == SaleCategoryName
+                    && category.Type == CategoryType.Sale
+                    && category.IsDefault
+                    && category.IsActive
+                );
 
-            result.Value.Should().Contain(
-                category =>
-                    category.Id ==
-                        ExpenseCategoryId &&
-                    category.BusinessId ==
-                        BusinessId &&
-                    category.Name ==
-                        ExpenseCategoryName &&
-                    category.Type ==
-                        CategoryType.Expense &&
-                    category.IsDefault &&
-                    category.IsActive
-            );
+            result
+                .Value.Should()
+                .Contain(category =>
+                    category.Id == ExpenseCategoryId
+                    && category.BusinessId == BusinessId
+                    && category.Name == ExpenseCategoryName
+                    && category.Type == CategoryType.Expense
+                    && category.IsDefault
+                    && category.IsActive
+                );
 
             VerifyContextWasQueried();
             VerifyPermissionsWereQueried();
@@ -129,24 +105,13 @@ namespace Mype.Tests.Application.Categories.Queries
         [Fact]
         public async Task Handle_Should_Return_Empty_Collection_When_No_Categories_Match()
         {
-            SetupContext(
-                CreateContext()
-            );
+            SetupContext(CreateContext());
 
-            SetupPermissions(
-                SystemPermissions.CategoryRead.Code
-            );
+            SetupPermissions(SystemPermissions.CategoryRead.Code);
 
-            SetupCategories(
-                Array.Empty<
-                    CategoryListItemProjection
-                >()
-            );
+            SetupCategories(Array.Empty<CategoryListItemProjection>());
 
-            var result = await _handler.Handle(
-                CreateQuery(),
-                CancellationToken.None
-            );
+            var result = await _handler.Handle(CreateQuery(), CancellationToken.None);
 
             result.IsSuccess.Should().BeTrue();
             result.Error.Should().BeNull();
@@ -159,28 +124,16 @@ namespace Mype.Tests.Application.Categories.Queries
         [Fact]
         public async Task Handle_Should_Forward_Type_Filter()
         {
-            SetupContext(
-                CreateContext()
-            );
+            SetupContext(CreateContext());
 
-            SetupPermissions(
-                SystemPermissions.CategoryRead.Code
-            );
+            SetupPermissions(SystemPermissions.CategoryRead.Code);
 
             var query = CreateQuery();
             query.Type = CategoryType.Sale;
 
-            SetupCategories(
-                Array.Empty<
-                    CategoryListItemProjection
-                >(),
-                type: CategoryType.Sale
-            );
+            SetupCategories(Array.Empty<CategoryListItemProjection>(), type: CategoryType.Sale);
 
-            await _handler.Handle(
-                query,
-                CancellationToken.None
-            );
+            await _handler.Handle(query, CancellationToken.None);
 
             _categoryRepositoryMock.Verify(
                 repository =>
@@ -188,9 +141,7 @@ namespace Mype.Tests.Application.Categories.Queries
                         BusinessId,
                         CategoryType.Sale,
                         null,
-                        It.IsAny<
-                            CancellationToken
-                        >()
+                        It.IsAny<CancellationToken>()
                     ),
                 Times.Once
             );
@@ -199,28 +150,16 @@ namespace Mype.Tests.Application.Categories.Queries
         [Fact]
         public async Task Handle_Should_Forward_IsActive_Filter()
         {
-            SetupContext(
-                CreateContext()
-            );
+            SetupContext(CreateContext());
 
-            SetupPermissions(
-                SystemPermissions.CategoryRead.Code
-            );
+            SetupPermissions(SystemPermissions.CategoryRead.Code);
 
             var query = CreateQuery();
             query.IsActive = false;
 
-            SetupCategories(
-                Array.Empty<
-                    CategoryListItemProjection
-                >(),
-                isActive: false
-            );
+            SetupCategories(Array.Empty<CategoryListItemProjection>(), isActive: false);
 
-            await _handler.Handle(
-                query,
-                CancellationToken.None
-            );
+            await _handler.Handle(query, CancellationToken.None);
 
             _categoryRepositoryMock.Verify(
                 repository =>
@@ -228,9 +167,7 @@ namespace Mype.Tests.Application.Categories.Queries
                         BusinessId,
                         null,
                         false,
-                        It.IsAny<
-                            CancellationToken
-                        >()
+                        It.IsAny<CancellationToken>()
                     ),
                 Times.Once
             );
@@ -239,30 +176,17 @@ namespace Mype.Tests.Application.Categories.Queries
         [Fact]
         public async Task Handle_Should_Forward_Both_Filters()
         {
-            SetupContext(
-                CreateContext()
-            );
+            SetupContext(CreateContext());
 
-            SetupPermissions(
-                SystemPermissions.CategoryRead.Code
-            );
+            SetupPermissions(SystemPermissions.CategoryRead.Code);
 
             var query = CreateQuery();
             query.Type = CategoryType.Expense;
             query.IsActive = true;
 
-            SetupCategories(
-                Array.Empty<
-                    CategoryListItemProjection
-                >(),
-                CategoryType.Expense,
-                true
-            );
+            SetupCategories(Array.Empty<CategoryListItemProjection>(), CategoryType.Expense, true);
 
-            await _handler.Handle(
-                query,
-                CancellationToken.None
-            );
+            await _handler.Handle(query, CancellationToken.None);
 
             _categoryRepositoryMock.Verify(
                 repository =>
@@ -270,9 +194,7 @@ namespace Mype.Tests.Application.Categories.Queries
                         BusinessId,
                         CategoryType.Expense,
                         true,
-                        It.IsAny<
-                            CancellationToken
-                        >()
+                        It.IsAny<CancellationToken>()
                     ),
                 Times.Once
             );
@@ -283,16 +205,9 @@ namespace Mype.Tests.Application.Categories.Queries
         {
             SetupContext(null);
 
-            var result = await _handler.Handle(
-                CreateQuery(),
-                CancellationToken.None
-            );
+            var result = await _handler.Handle(CreateQuery(), CancellationToken.None);
 
-            AssertFailure(
-                result,
-                ListCategoriesErrors
-                    .BusinessAccessForbidden
-            );
+            AssertFailure(result, ListCategoriesErrors.BusinessAccessForbidden);
 
             VerifyPermissionsWereNotQueried();
             VerifyCategoriesWereNotQueried();
@@ -301,24 +216,11 @@ namespace Mype.Tests.Application.Categories.Queries
         [Fact]
         public async Task Handle_Should_Return_BusinessAccessForbidden_When_Membership_Is_Inactive()
         {
-            SetupContext(
-                CreateContext(
-                    membershipStatus:
-                        BusinessMembershipStatus
-                            .Inactive
-                )
-            );
+            SetupContext(CreateContext(membershipStatus: BusinessMembershipStatus.Inactive));
 
-            var result = await _handler.Handle(
-                CreateQuery(),
-                CancellationToken.None
-            );
+            var result = await _handler.Handle(CreateQuery(), CancellationToken.None);
 
-            AssertFailure(
-                result,
-                ListCategoriesErrors
-                    .BusinessAccessForbidden
-            );
+            AssertFailure(result, ListCategoriesErrors.BusinessAccessForbidden);
 
             VerifyPermissionsWereNotQueried();
             VerifyCategoriesWereNotQueried();
@@ -327,22 +229,11 @@ namespace Mype.Tests.Application.Categories.Queries
         [Fact]
         public async Task Handle_Should_Return_BusinessAccessForbidden_When_Role_Is_Inactive()
         {
-            SetupContext(
-                CreateContext(
-                    roleIsActive: false
-                )
-            );
+            SetupContext(CreateContext(roleIsActive: false));
 
-            var result = await _handler.Handle(
-                CreateQuery(),
-                CancellationToken.None
-            );
+            var result = await _handler.Handle(CreateQuery(), CancellationToken.None);
 
-            AssertFailure(
-                result,
-                ListCategoriesErrors
-                    .BusinessAccessForbidden
-            );
+            AssertFailure(result, ListCategoriesErrors.BusinessAccessForbidden);
 
             VerifyPermissionsWereNotQueried();
             VerifyCategoriesWereNotQueried();
@@ -351,23 +242,11 @@ namespace Mype.Tests.Application.Categories.Queries
         [Fact]
         public async Task Handle_Should_Return_BusinessUnavailable_When_Business_Is_Inactive()
         {
-            SetupContext(
-                CreateContext(
-                    businessStatus:
-                        BusinessStatus.Inactive
-                )
-            );
+            SetupContext(CreateContext(businessStatus: BusinessStatus.Inactive));
 
-            var result = await _handler.Handle(
-                CreateQuery(),
-                CancellationToken.None
-            );
+            var result = await _handler.Handle(CreateQuery(), CancellationToken.None);
 
-            AssertFailure(
-                result,
-                ListCategoriesErrors
-                    .BusinessUnavailable
-            );
+            AssertFailure(result, ListCategoriesErrors.BusinessUnavailable);
 
             VerifyPermissionsWereNotQueried();
             VerifyCategoriesWereNotQueried();
@@ -378,28 +257,16 @@ namespace Mype.Tests.Application.Categories.Queries
         {
             SetupContext(
                 CreateContext(
-                    businessStatus:
-                        BusinessStatus.Inactive,
-                    membershipStatus:
-                        BusinessMembershipStatus
-                            .Inactive
+                    businessStatus: BusinessStatus.Inactive,
+                    membershipStatus: BusinessMembershipStatus.Inactive
                 )
             );
 
-            var result = await _handler.Handle(
-                CreateQuery(),
-                CancellationToken.None
-            );
+            var result = await _handler.Handle(CreateQuery(), CancellationToken.None);
 
-            result.Error.Should().BeSameAs(
-                ListCategoriesErrors
-                    .BusinessAccessForbidden
-            );
+            result.Error.Should().BeSameAs(ListCategoriesErrors.BusinessAccessForbidden);
 
-            result.Error.Should().NotBeSameAs(
-                ListCategoriesErrors
-                    .BusinessUnavailable
-            );
+            result.Error.Should().NotBeSameAs(ListCategoriesErrors.BusinessUnavailable);
 
             VerifyPermissionsWereNotQueried();
             VerifyCategoriesWereNotQueried();
@@ -408,24 +275,13 @@ namespace Mype.Tests.Application.Categories.Queries
         [Fact]
         public async Task Handle_Should_Return_CategoryAccessForbidden_When_CategoryRead_Is_Missing()
         {
-            SetupContext(
-                CreateContext()
-            );
+            SetupContext(CreateContext());
 
-            SetupPermissions(
-                SystemPermissions.BusinessRead.Code
-            );
+            SetupPermissions(SystemPermissions.BusinessRead.Code);
 
-            var result = await _handler.Handle(
-                CreateQuery(),
-                CancellationToken.None
-            );
+            var result = await _handler.Handle(CreateQuery(), CancellationToken.None);
 
-            AssertFailure(
-                result,
-                ListCategoriesErrors
-                    .CategoryAccessForbidden
-            );
+            AssertFailure(result, ListCategoriesErrors.CategoryAccessForbidden);
 
             VerifyPermissionsWereQueried();
             VerifyCategoriesWereNotQueried();
@@ -434,24 +290,13 @@ namespace Mype.Tests.Application.Categories.Queries
         [Fact]
         public async Task Handle_Should_Allow_CategoryRead_Without_Direct_Role_Code_Check()
         {
-            SetupContext(
-                CreateContext(
-                    roleCode: "CUSTOM_ROLE"
-                )
-            );
+            SetupContext(CreateContext(roleCode: "CUSTOM_ROLE"));
 
-            SetupPermissions(
-                SystemPermissions.CategoryRead.Code
-            );
+            SetupPermissions(SystemPermissions.CategoryRead.Code);
 
-            SetupCategories(
-                CreateCategories()
-            );
+            SetupCategories(CreateCategories());
 
-            var result = await _handler.Handle(
-                CreateQuery(),
-                CancellationToken.None
-            );
+            var result = await _handler.Handle(CreateQuery(), CancellationToken.None);
 
             result.IsSuccess.Should().BeTrue();
             result.Value.Should().HaveCount(2);
@@ -462,133 +307,80 @@ namespace Mype.Tests.Application.Categories.Queries
         [Fact]
         public async Task Handle_Should_Forward_CancellationToken_To_All_Repositories()
         {
-            using var cancellationTokenSource =
-                new CancellationTokenSource();
+            using var cancellationTokenSource = new CancellationTokenSource();
 
-            var cancellationToken =
-                cancellationTokenSource.Token;
+            var cancellationToken = cancellationTokenSource.Token;
 
             _membershipRepositoryMock
                 .Setup(repository =>
-                    repository
-                        .GetContextByBusinessAndUserAsync(
-                            BusinessId,
-                            CurrentUserId,
-                            cancellationToken
-                        )
-                )
-                .ReturnsAsync(
-                    CreateContext()
-                );
-
-            _permissionRepositoryMock
-                .Setup(repository =>
-                    repository
-                        .ListActiveCodesByRoleIdAsync(
-                            RoleId,
-                            cancellationToken
-                        )
-                )
-                .ReturnsAsync(
-                    new[]
-                    {
-                        SystemPermissions
-                            .CategoryRead.Code
-                    }
-                );
-
-            _categoryRepositoryMock
-                .Setup(repository =>
-                    repository.ListByBusinessAsync(
+                    repository.GetContextByBusinessAndUserAsync(
                         BusinessId,
-                        null,
-                        null,
+                        CurrentUserId,
                         cancellationToken
                     )
                 )
-                .ReturnsAsync(
-                    Array.Empty<
-                        CategoryListItemProjection
-                    >()
-                );
+                .ReturnsAsync(CreateContext());
 
-            await _handler.Handle(
-                CreateQuery(),
-                cancellationToken
-            );
+            _permissionRepositoryMock
+                .Setup(repository =>
+                    repository.ListActiveCodesByRoleIdAsync(RoleId, cancellationToken)
+                )
+                .ReturnsAsync(new[] { SystemPermissions.CategoryRead.Code });
+
+            _categoryRepositoryMock
+                .Setup(repository =>
+                    repository.ListByBusinessAsync(BusinessId, null, null, cancellationToken)
+                )
+                .ReturnsAsync(Array.Empty<CategoryListItemProjection>());
+
+            await _handler.Handle(CreateQuery(), cancellationToken);
 
             _membershipRepositoryMock.Verify(
                 repository =>
-                    repository
-                        .GetContextByBusinessAndUserAsync(
-                            BusinessId,
-                            CurrentUserId,
-                            cancellationToken
-                        ),
+                    repository.GetContextByBusinessAndUserAsync(
+                        BusinessId,
+                        CurrentUserId,
+                        cancellationToken
+                    ),
                 Times.Once
             );
 
             _permissionRepositoryMock.Verify(
-                repository =>
-                    repository
-                        .ListActiveCodesByRoleIdAsync(
-                            RoleId,
-                            cancellationToken
-                        ),
+                repository => repository.ListActiveCodesByRoleIdAsync(RoleId, cancellationToken),
                 Times.Once
             );
 
             _categoryRepositoryMock.Verify(
                 repository =>
-                    repository.ListByBusinessAsync(
-                        BusinessId,
-                        null,
-                        null,
-                        cancellationToken
-                    ),
+                    repository.ListByBusinessAsync(BusinessId, null, null, cancellationToken),
                 Times.Once
             );
         }
 
-        private void SetupContext(
-            BusinessContextProjection context
-        )
+        private void SetupContext(BusinessContextProjection context)
         {
             _membershipRepositoryMock
                 .Setup(repository =>
-                    repository
-                        .GetContextByBusinessAndUserAsync(
-                            BusinessId,
-                            CurrentUserId,
-                            It.IsAny<
-                                CancellationToken
-                            >()
-                        )
+                    repository.GetContextByBusinessAndUserAsync(
+                        BusinessId,
+                        CurrentUserId,
+                        It.IsAny<CancellationToken>()
+                    )
                 )
                 .ReturnsAsync(context);
         }
 
-        private void SetupPermissions(
-            params string[] permissions
-        )
+        private void SetupPermissions(params string[] permissions)
         {
             _permissionRepositoryMock
                 .Setup(repository =>
-                    repository
-                        .ListActiveCodesByRoleIdAsync(
-                            RoleId,
-                            It.IsAny<
-                                CancellationToken
-                            >()
-                        )
+                    repository.ListActiveCodesByRoleIdAsync(RoleId, It.IsAny<CancellationToken>())
                 )
                 .ReturnsAsync(permissions);
         }
 
         private void SetupCategories(
-            IReadOnlyCollection<
-                CategoryListItemProjection
-            > categories,
+            IReadOnlyCollection<CategoryListItemProjection> categories,
             CategoryType? type = null,
             bool? isActive = null
         )
@@ -599,9 +391,7 @@ namespace Mype.Tests.Application.Categories.Queries
                         BusinessId,
                         type,
                         isActive,
-                        It.IsAny<
-                            CancellationToken
-                        >()
+                        It.IsAny<CancellationToken>()
                     )
                 )
                 .ReturnsAsync(categories);
@@ -611,14 +401,11 @@ namespace Mype.Tests.Application.Categories.Queries
         {
             _membershipRepositoryMock.Verify(
                 repository =>
-                    repository
-                        .GetContextByBusinessAndUserAsync(
-                            BusinessId,
-                            CurrentUserId,
-                            It.IsAny<
-                                CancellationToken
-                            >()
-                        ),
+                    repository.GetContextByBusinessAndUserAsync(
+                        BusinessId,
+                        CurrentUserId,
+                        It.IsAny<CancellationToken>()
+                    ),
                 Times.Once
             );
         }
@@ -627,13 +414,7 @@ namespace Mype.Tests.Application.Categories.Queries
         {
             _permissionRepositoryMock.Verify(
                 repository =>
-                    repository
-                        .ListActiveCodesByRoleIdAsync(
-                            RoleId,
-                            It.IsAny<
-                                CancellationToken
-                            >()
-                        ),
+                    repository.ListActiveCodesByRoleIdAsync(RoleId, It.IsAny<CancellationToken>()),
                 Times.Once
             );
         }
@@ -642,13 +423,10 @@ namespace Mype.Tests.Application.Categories.Queries
         {
             _permissionRepositoryMock.Verify(
                 repository =>
-                    repository
-                        .ListActiveCodesByRoleIdAsync(
-                            It.IsAny<Guid>(),
-                            It.IsAny<
-                                CancellationToken
-                            >()
-                        ),
+                    repository.ListActiveCodesByRoleIdAsync(
+                        It.IsAny<Guid>(),
+                        It.IsAny<CancellationToken>()
+                    ),
                 Times.Never
             );
         }
@@ -661,9 +439,7 @@ namespace Mype.Tests.Application.Categories.Queries
                         BusinessId,
                         null,
                         null,
-                        It.IsAny<
-                            CancellationToken
-                        >()
+                        It.IsAny<CancellationToken>()
                     ),
                 Times.Once
             );
@@ -677,43 +453,32 @@ namespace Mype.Tests.Application.Categories.Queries
                         It.IsAny<Guid>(),
                         It.IsAny<CategoryType?>(),
                         It.IsAny<bool?>(),
-                        It.IsAny<
-                            CancellationToken
-                        >()
+                        It.IsAny<CancellationToken>()
                     ),
                 Times.Never
             );
         }
 
         private static void AssertFailure(
-            Result<
-                IReadOnlyCollection<
-                    CategoryListItemResult
-                >
-            > result,
+            Result<IReadOnlyCollection<CategoryListItemResult>> result,
             ApplicationError expectedError
         )
         {
             result.IsSuccess.Should().BeFalse();
             result.Value.Should().BeNull();
-            result.Error.Should().BeSameAs(
-                expectedError
-            );
+            result.Error.Should().BeSameAs(expectedError);
         }
 
-        private static ListCategoriesQuery
-            CreateQuery()
+        private static ListCategoriesQuery CreateQuery()
         {
             return new ListCategoriesQuery
             {
                 BusinessId = BusinessId,
-                CurrentUserId = CurrentUserId
+                CurrentUserId = CurrentUserId,
             };
         }
 
-        private static IReadOnlyCollection<
-            CategoryListItemProjection
-        > CreateCategories()
+        private static IReadOnlyCollection<CategoryListItemProjection> CreateCategories()
         {
             return
             [
@@ -732,21 +497,16 @@ namespace Mype.Tests.Application.Categories.Queries
                     CategoryType.Expense,
                     true,
                     true
-                )
+                ),
             ];
         }
 
-        private static BusinessContextProjection
-            CreateContext(
-                BusinessStatus businessStatus =
-                    BusinessStatus.Active,
-                BusinessMembershipStatus
-                    membershipStatus =
-                        BusinessMembershipStatus
-                            .Active,
-                bool roleIsActive = true,
-                string roleCode = RoleCode
-            )
+        private static BusinessContextProjection CreateContext(
+            BusinessStatus businessStatus = BusinessStatus.Active,
+            BusinessMembershipStatus membershipStatus = BusinessMembershipStatus.Active,
+            bool roleIsActive = true,
+            string roleCode = RoleCode
+        )
         {
             return new BusinessContextProjection(
                 BusinessId,

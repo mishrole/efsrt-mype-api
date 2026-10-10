@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using System.Diagnostics.CodeAnalysis;
+using Microsoft.AspNetCore.Builder;
 using Mype.Api.Middlewares;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Mype.Api.Extensions
 {

@@ -7,10 +7,9 @@ namespace Mype.Application.Permissions.Interfaces
 {
     public interface IPermissionRepository
     {
-        Task<IReadOnlyCollection<string>>
-            ListActiveCodesByRoleIdAsync(
-                Guid roleId,
-                CancellationToken cancellationToken
-            );
+        Task<IReadOnlyCollection<string>> ListActiveCodesByRoleIdAsync(
+            Guid roleId,
+            CancellationToken cancellationToken
+        );
     }
 }

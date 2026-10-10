@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using System.Diagnostics.CodeAnalysis;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Mype.Application.Businesses.Interfaces;
 using Mype.Application.BusinessMemberships.Interfaces;
@@ -22,7 +23,6 @@ using Mype.Infrastructure.Persistence;
 using Mype.Infrastructure.Persistence.Exceptions;
 using Mype.Infrastructure.Products.Repositories;
 using Mype.Infrastructure.Users.Repositories;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Mype.Infrastructure.Extensions
 {

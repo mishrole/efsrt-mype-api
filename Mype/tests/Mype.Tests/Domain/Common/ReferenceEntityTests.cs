@@ -1,6 +1,6 @@
+using System;
 using FluentAssertions;
 using Mype.Domain.Common;
-using System;
 
 namespace Mype.Tests.Domain.Common
 {
@@ -11,12 +11,7 @@ namespace Mype.Tests.Domain.Common
         {
             var id = Guid.NewGuid();
 
-            var entity = new TestReferenceEntity(
-                id,
-                "CODE",
-                "Nombre",
-                true
-            );
+            var entity = new TestReferenceEntity(id, "CODE", "Nombre", true);
 
             entity.Id.Should().Be(id);
             entity.Code.Should().Be("CODE");
@@ -35,26 +30,12 @@ namespace Mype.Tests.Domain.Common
             entity.IsActive.Should().BeFalse();
         }
 
-        private sealed class TestReferenceEntity
-            : ReferenceEntity
+        private sealed class TestReferenceEntity : ReferenceEntity
         {
-            public TestReferenceEntity()
-            {
-            }
+            public TestReferenceEntity() { }
 
-            public TestReferenceEntity(
-                Guid id,
-                string code,
-                string name,
-                bool isActive
-            ) : base(
-                id,
-                code,
-                name,
-                isActive
-            )
-            {
-            }
+            public TestReferenceEntity(Guid id, string code, string name, bool isActive)
+                : base(id, code, name, isActive) { }
         }
     }
 }

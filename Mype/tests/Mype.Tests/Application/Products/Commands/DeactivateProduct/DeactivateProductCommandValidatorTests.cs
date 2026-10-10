@@ -1,7 +1,7 @@
-using FluentAssertions;
-using Mype.Application.Products.Commands.DeactivateProduct;
 using System;
 using System.Threading.Tasks;
+using FluentAssertions;
+using Mype.Application.Products.Commands.DeactivateProduct;
 
 namespace Mype.Tests.Application.Products.Commands.DeactivateProduct
 {
@@ -25,9 +25,15 @@ namespace Mype.Tests.Application.Products.Commands.DeactivateProduct
 
             var result = await _validator.ValidateAsync(command);
 
-            result.Errors.Should().Contain(error => error.PropertyName == nameof(command.BusinessId));
-            result.Errors.Should().Contain(error => error.PropertyName == nameof(command.ProductId));
-            result.Errors.Should().Contain(error => error.PropertyName == nameof(command.CurrentUserId));
+            result
+                .Errors.Should()
+                .Contain(error => error.PropertyName == nameof(command.BusinessId));
+            result
+                .Errors.Should()
+                .Contain(error => error.PropertyName == nameof(command.ProductId));
+            result
+                .Errors.Should()
+                .Contain(error => error.PropertyName == nameof(command.CurrentUserId));
             result.Errors.Should().Contain(error => error.PropertyName == nameof(command.Version));
         }
 
@@ -38,7 +44,7 @@ namespace Mype.Tests.Application.Products.Commands.DeactivateProduct
                 BusinessId = Guid.NewGuid(),
                 ProductId = Guid.NewGuid(),
                 CurrentUserId = Guid.NewGuid(),
-                Version = 1
+                Version = 1,
             };
         }
     }

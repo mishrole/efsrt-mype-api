@@ -1,7 +1,7 @@
+using System;
 using MediatR;
 using Mype.Application.Common;
 using Mype.Application.Products.Commands.Common;
-using System;
 
 namespace Mype.Application.Products.Commands.DeactivateProduct
 {

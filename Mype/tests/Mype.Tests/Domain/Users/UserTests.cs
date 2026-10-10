@@ -1,6 +1,6 @@
-﻿using FluentAssertions;
+﻿using System;
+using FluentAssertions;
 using Mype.Domain.Users;
-using System;
 
 namespace Mype.Tests.Domain.Users
 {
@@ -11,7 +11,15 @@ namespace Mype.Tests.Domain.Users
         private const string PasswordHash = "password-hash";
         private const string DisplayName = "Test User";
 
-        private static readonly DateTimeOffset CreatedAt = new(2026, 10, 6, 12, 0, 0, TimeSpan.Zero);
+        private static readonly DateTimeOffset CreatedAt = new(
+            2026,
+            10,
+            6,
+            12,
+            0,
+            0,
+            TimeSpan.Zero
+        );
 
         [Fact]
         public void Create_Should_Initialize_User()
@@ -62,13 +70,7 @@ namespace Mype.Tests.Domain.Users
 
         private static User CreateUser()
         {
-            return User.Create(
-                Email,
-                NormalizedEmail,
-                PasswordHash,
-                DisplayName,
-                CreatedAt
-            );
+            return User.Create(Email, NormalizedEmail, PasswordHash, DisplayName, CreatedAt);
         }
     }
 }

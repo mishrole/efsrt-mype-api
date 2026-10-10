@@ -1,5 +1,5 @@
-﻿using Mype.Domain.Categories;
-using System;
+﻿using System;
+using Mype.Domain.Categories;
 
 namespace Mype.Application.Products.Models
 {

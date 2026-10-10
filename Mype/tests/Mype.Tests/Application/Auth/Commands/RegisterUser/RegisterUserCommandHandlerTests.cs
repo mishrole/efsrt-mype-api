@@ -1,4 +1,7 @@
-﻿using FluentAssertions;
+﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
+using FluentAssertions;
 using Moq;
 using Mype.Application.Auth.Commands.RegisterUser;
 using Mype.Application.Common.Exceptions;
@@ -6,9 +9,6 @@ using Mype.Application.Common.Interfaces;
 using Mype.Application.Users.Interfaces;
 using Mype.Domain.Users;
 using Mype.Shared.Constants;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Mype.Tests.Application.Auth.Commands.RegisterUser
 {
@@ -22,8 +22,7 @@ namespace Mype.Tests.Application.Auth.Commands.RegisterUser
         private const string DisplayName = "Test User";
         private const UserStatus Status = UserStatus.Active;
 
-        private static readonly DateTimeOffset UtcNow =
-        new(2026, 10, 6, 12, 0, 0, TimeSpan.Zero);
+        private static readonly DateTimeOffset UtcNow = new(2026, 10, 6, 12, 0, 0, TimeSpan.Zero);
 
         private readonly Mock<IUserRepository> _userRepositoryMock = new();
         private readonly Mock<IPasswordHasherHelper> _passwordHasherMock = new();
@@ -36,24 +35,18 @@ namespace Mype.Tests.Application.Auth.Commands.RegisterUser
         public RegisterUserCommandHandlerTests()
         {
             _emailNormalizerMock
-            .Setup(normalizer => normalizer.Normalize(TrimmedEmail))
-            .Returns(NormalizedEmail);
+                .Setup(normalizer => normalizer.Normalize(TrimmedEmail))
+                .Returns(NormalizedEmail);
 
             _passwordHasherMock
-            .Setup(hasher => hasher.HashPassword(Password))
-            .Returns(PasswordHash);
+                .Setup(hasher => hasher.HashPassword(Password))
+                .Returns(PasswordHash);
 
-            _clockMock
-            .SetupGet(clock => clock.UtcNow)
-            .Returns(UtcNow);
+            _clockMock.SetupGet(clock => clock.UtcNow).Returns(UtcNow);
 
             _unitOfWorkMock
-            .Setup(unitOfWork =>
-            unitOfWork.SaveChangesAsync(
-                It.IsAny<CancellationToken>()
-            )
-            )
-            .ReturnsAsync(1);
+                .Setup(unitOfWork => unitOfWork.SaveChangesAsync(It.IsAny<CancellationToken>()))
+                .ReturnsAsync(1);
 
             _handler = new RegisterUserCommandHandler(
                 _userRepositoryMock.Object,
@@ -70,18 +63,15 @@ namespace Mype.Tests.Application.Auth.Commands.RegisterUser
             var command = CreateCommand();
 
             _userRepositoryMock
-            .Setup(repository =>
-            repository.ExistsByNormalizedEmailAsync(
-                NormalizedEmail,
-                It.IsAny<CancellationToken>()
-            )
-            )
-            .ReturnsAsync(false);
+                .Setup(repository =>
+                    repository.ExistsByNormalizedEmailAsync(
+                        NormalizedEmail,
+                        It.IsAny<CancellationToken>()
+                    )
+                )
+                .ReturnsAsync(false);
 
-            var result = await _handler.Handle(
-                command,
-                CancellationToken.None
-            );
+            var result = await _handler.Handle(command, CancellationToken.None);
 
             result.IsSuccess.Should().BeTrue();
             result.Error.Should().BeNull();
@@ -93,29 +83,24 @@ namespace Mype.Tests.Application.Auth.Commands.RegisterUser
             result.Value.CreatedAt.Should().Be(UtcNow);
 
             _userRepositoryMock.Verify(
-            repository => repository.AddAsync(
-                It.Is<User>(user =>
-                user.Email == TrimmedEmail &&
-                user.NormalizedEmail == NormalizedEmail &&
-                user.PasswordHash == PasswordHash &&
-                user.DisplayName == DisplayName
-            ),
-            It.IsAny<CancellationToken>()
-            ),
-            Times.Once
-            );
-
-            _passwordHasherMock.Verify(
-                hasher => hasher.HashPassword(Password),
+                repository =>
+                    repository.AddAsync(
+                        It.Is<User>(user =>
+                            user.Email == TrimmedEmail
+                            && user.NormalizedEmail == NormalizedEmail
+                            && user.PasswordHash == PasswordHash
+                            && user.DisplayName == DisplayName
+                        ),
+                        It.IsAny<CancellationToken>()
+                    ),
                 Times.Once
             );
 
+            _passwordHasherMock.Verify(hasher => hasher.HashPassword(Password), Times.Once);
+
             _unitOfWorkMock.Verify(
-                unitOfWork =>
-                unitOfWork.SaveChangesAsync(
-                It.IsAny<CancellationToken>()
-            ),
-            Times.Once
+                unitOfWork => unitOfWork.SaveChangesAsync(It.IsAny<CancellationToken>()),
+                Times.Once
             );
         }
 
@@ -125,18 +110,15 @@ namespace Mype.Tests.Application.Auth.Commands.RegisterUser
             var command = CreateCommand();
 
             _userRepositoryMock
-            .Setup(repository =>
-            repository.ExistsByNormalizedEmailAsync(
-                NormalizedEmail,
-                It.IsAny<CancellationToken>()
-            )
-            )
-            .ReturnsAsync(false);
+                .Setup(repository =>
+                    repository.ExistsByNormalizedEmailAsync(
+                        NormalizedEmail,
+                        It.IsAny<CancellationToken>()
+                    )
+                )
+                .ReturnsAsync(false);
 
-            await _handler.Handle(
-                command,
-                CancellationToken.None
-            );
+            await _handler.Handle(command, CancellationToken.None);
 
             _emailNormalizerMock.Verify(
                 normalizer => normalizer.Normalize(TrimmedEmail),
@@ -144,12 +126,12 @@ namespace Mype.Tests.Application.Auth.Commands.RegisterUser
             );
 
             _userRepositoryMock.Verify(
-            repository =>
-            repository.ExistsByNormalizedEmailAsync(
-                NormalizedEmail,
-                It.IsAny<CancellationToken>()
-            ),
-            Times.Once
+                repository =>
+                    repository.ExistsByNormalizedEmailAsync(
+                        NormalizedEmail,
+                        It.IsAny<CancellationToken>()
+                    ),
+                Times.Once
             );
         }
 
@@ -159,57 +141,41 @@ namespace Mype.Tests.Application.Auth.Commands.RegisterUser
             var command = CreateCommand();
 
             _userRepositoryMock
-            .Setup(repository =>
-                repository.ExistsByNormalizedEmailAsync(
-                NormalizedEmail,
-                It.IsAny<CancellationToken>()
+                .Setup(repository =>
+                    repository.ExistsByNormalizedEmailAsync(
+                        NormalizedEmail,
+                        It.IsAny<CancellationToken>()
+                    )
                 )
-            )
-            .ReturnsAsync(true);
+                .ReturnsAsync(true);
 
-            var result = await _handler.Handle(
-                command,
-                CancellationToken.None
-            );
+            var result = await _handler.Handle(command, CancellationToken.None);
 
             result.IsSuccess.Should().BeFalse();
 
             result.Error.Should().NotBeNull();
 
-            result.Error.Code.Should().Be(
-                ErrorCodes.EmailAlreadyRegistered
-            );
+            result.Error.Code.Should().Be(ErrorCodes.EmailAlreadyRegistered);
 
-            result.Error.Message.Should().Be(
-                ErrorMessages.EmailAlreadyRegistered
-            );
+            result.Error.Message.Should().Be(ErrorMessages.EmailAlreadyRegistered);
 
-            result.Error.Type.Should().Be(
-                ApplicationErrorType.Conflict
-            );
+            result.Error.Type.Should().Be(ApplicationErrorType.Conflict);
 
             result.Value.Should().BeNull();
 
             _passwordHasherMock.Verify(
-            hasher => hasher.HashPassword(
-                It.IsAny<string>()
-            ),
-            Times.Never
+                hasher => hasher.HashPassword(It.IsAny<string>()),
+                Times.Never
             );
 
             _userRepositoryMock.Verify(
-            repository => repository.AddAsync(
-                It.IsAny<User>(),
-                It.IsAny<CancellationToken>()
-            ),
-            Times.Never
+                repository => repository.AddAsync(It.IsAny<User>(), It.IsAny<CancellationToken>()),
+                Times.Never
             );
 
-            _unitOfWorkMock.Verify(unitOfWork =>
-            unitOfWork.SaveChangesAsync(
-                It.IsAny<CancellationToken>()
-            ),
-            Times.Never
+            _unitOfWorkMock.Verify(
+                unitOfWork => unitOfWork.SaveChangesAsync(It.IsAny<CancellationToken>()),
+                Times.Never
             );
         }
 
@@ -220,7 +186,7 @@ namespace Mype.Tests.Application.Auth.Commands.RegisterUser
                 DisplayName = DisplayName,
                 Email = Email,
                 Password = Password,
-                PasswordConfirmation = Password
+                PasswordConfirmation = Password,
             };
         }
     }

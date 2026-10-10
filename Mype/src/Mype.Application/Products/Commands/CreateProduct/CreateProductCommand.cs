@@ -1,13 +1,10 @@
-﻿using MediatR;
+﻿using System;
+using MediatR;
 using Mype.Application.Common;
-using System;
 
 namespace Mype.Application.Products.Commands.CreateProduct
 {
-    public sealed class CreateProductCommand
-        : IRequest<
-            Result<CreateProductResult>
-        >
+    public sealed class CreateProductCommand : IRequest<Result<CreateProductResult>>
     {
         public Guid BusinessId { get; set; }
 
@@ -15,8 +12,7 @@ namespace Mype.Application.Products.Commands.CreateProduct
 
         public Guid CategoryId { get; set; }
 
-        public string Name { get; set; } =
-            string.Empty;
+        public string Name { get; set; } = string.Empty;
 
         public decimal SalePrice { get; set; }
 

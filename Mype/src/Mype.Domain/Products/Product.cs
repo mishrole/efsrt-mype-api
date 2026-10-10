@@ -1,13 +1,11 @@
-﻿using Mype.Domain.Common;
-using System;
+﻿using System;
+using Mype.Domain.Common;
 
 namespace Mype.Domain.Products
 {
     public class Product : Entity
     {
-        private Product()
-        {
-        }
+        private Product() { }
 
         private Product(
             Guid id,
@@ -19,7 +17,8 @@ namespace Mype.Domain.Products
             decimal unitCost,
             Guid userId,
             DateTimeOffset utcNow
-        ) : base(id)
+        )
+            : base(id)
         {
             BusinessId = businessId;
             CategoryId = categoryId;
@@ -38,11 +37,9 @@ namespace Mype.Domain.Products
 
         public Guid CategoryId { get; private set; }
 
-        public string Name { get; private set; } =
-            string.Empty;
+        public string Name { get; private set; } = string.Empty;
 
-        public string NormalizedName { get; private set; } =
-            string.Empty;
+        public string NormalizedName { get; private set; } = string.Empty;
 
         public decimal SalePrice { get; private set; }
 
@@ -54,11 +51,7 @@ namespace Mype.Domain.Products
 
         public Guid UpdatedByUserId { get; private set; }
 
-        public DateTimeOffset? DeactivatedAt
-        {
-            get;
-            private set;
-        }
+        public DateTimeOffset? DeactivatedAt { get; private set; }
 
         public uint Version { get; private set; }
 
@@ -86,10 +79,7 @@ namespace Mype.Domain.Products
             UpdatedAt = utcNow;
         }
 
-        public void Deactivate(
-            Guid currentUserId,
-            DateTimeOffset utcNow
-        )
+        public void Deactivate(Guid currentUserId, DateTimeOffset utcNow)
         {
             IsActive = false;
             DeactivatedAt = utcNow;
@@ -97,10 +87,7 @@ namespace Mype.Domain.Products
             UpdatedAt = utcNow;
         }
 
-        public void Reactivate(
-            Guid currentUserId,
-            DateTimeOffset utcNow
-        )
+        public void Reactivate(Guid currentUserId, DateTimeOffset utcNow)
         {
             IsActive = true;
             DeactivatedAt = null;

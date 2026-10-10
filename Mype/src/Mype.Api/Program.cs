@@ -1,3 +1,5 @@
+using System;
+using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
@@ -14,8 +16,6 @@ using Mype.Shared.Constants;
 using Scalar.AspNetCore;
 using Serilog;
 using Serilog.Events;
-using System;
-using System.Text;
 
 try
 {
@@ -26,20 +26,27 @@ try
         .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Warning)
         .Enrich.FromLogContext()
         .Enrich.WithProperty("Service", "Mype.Api")
-        .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Service} | CorrelationId={CorrelationId} | {Message:lj}{NewLine}{Exception}")
+        .WriteTo.Console(
+            outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Service} | CorrelationId={CorrelationId} | {Message:lj}{NewLine}{Exception}"
+        )
         .CreateLogger();
 
     var builder = WebApplication.CreateBuilder(args);
 
     // Logging
-    builder.Host.UseSerilog((ctx, services, config) => config
-    .ReadFrom.Configuration(ctx.Configuration)
-    .ReadFrom.Services(services)
-    .Enrich.FromLogContext()
-    .Enrich.WithProperty("Service", "Mype.Api")
-    .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Service} | CorrelationId={CorrelationId} | {Message:lj}{NewLine}{Exception}"));
+    builder.Host.UseSerilog(
+        (ctx, services, config) =>
+            config
+                .ReadFrom.Configuration(ctx.Configuration)
+                .ReadFrom.Services(services)
+                .Enrich.FromLogContext()
+                .Enrich.WithProperty("Service", "Mype.Api")
+                .WriteTo.Console(
+                    outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Service} | CorrelationId={CorrelationId} | {Message:lj}{NewLine}{Exception}"
+                )
+    );
 
-    // Load environment variables from .env file in development (local)   
+    // Load environment variables from .env file in development (local)
     if (builder.Environment.IsDevelopment())
     {
         Bootstrap.LoadEnvironmentVariables(builder.Environment.ContentRootPath);
@@ -54,7 +61,8 @@ try
     builder.Services.AddCors(builder.Configuration, builder.Environment);
 
     // Authentication
-    builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    builder
+        .Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         .AddJwtBearer(options =>
         {
             options.TokenValidationParameters = new TokenValidationParameters
@@ -67,12 +75,16 @@ try
                 ValidAudience = builder.Configuration[Env.JwtAudienceStringKey],
                 IssuerSigningKey = new SymmetricSecurityKey(
                     Encoding.UTF8.GetBytes(
-                        builder.Configuration[Env.JwtSecretKeyStringKey] ?? throw new InvalidOperationException(
-                            string.Format(ErrorMessages.VariableNotConfigured, Env.JwtSecretKeyStringKey)
-                        )
+                        builder.Configuration[Env.JwtSecretKeyStringKey]
+                            ?? throw new InvalidOperationException(
+                                string.Format(
+                                    ErrorMessages.VariableNotConfigured,
+                                    Env.JwtSecretKeyStringKey
+                                )
+                            )
                     )
                 ),
-                ClockSkew = TimeSpan.Zero
+                ClockSkew = TimeSpan.Zero,
             };
         });
 
@@ -90,9 +102,7 @@ try
     builder.Services.AddOpenApi();
 
     // Add health checks
-    builder.Services
-        .AddHealthChecks()
-        .AddDbContextCheck<MypeDbContext>();
+    builder.Services.AddHealthChecks().AddDbContextCheck<MypeDbContext>();
 
     var app = builder.Build();
 
@@ -111,7 +121,9 @@ try
         // Enable Scalar API Reference
         app.MapScalarApiReference(options =>
         {
-            options.WithTitle("Mype API").WithDefaultHttpClient(ScalarTarget.CSharp, ScalarClient.HttpClient);
+            options
+                .WithTitle("Mype API")
+                .WithDefaultHttpClient(ScalarTarget.CSharp, ScalarClient.HttpClient);
         });
     }
 
@@ -124,7 +136,6 @@ try
     app.AddEndpoints();
 
     await app.RunAsync();
-
 }
 catch (Exception ex)
 {

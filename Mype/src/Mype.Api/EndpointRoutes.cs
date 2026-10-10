@@ -31,54 +31,28 @@ namespace Mype.Api
 
             #region Auth
 
-            var authGroup = versionOneGroup
-                .MapGroup("/auth")
-                .WithTags("Auth");
+            var authGroup = versionOneGroup.MapGroup("/auth").WithTags("Auth");
 
             authGroup
-                .MapPost(
-                    "/register",
-                    RegisterUserEndpoint.DoAsync
-                )
+                .MapPost("/register", RegisterUserEndpoint.DoAsync)
                 .AllowAnonymous()
                 .WithName("RegisterUser")
                 .WithSummary("Registrar usuario")
-                .Produces<RegisterUserResult>(
-                    StatusCodes.Status201Created
-                )
-                .Produces<HttpStatusCodeInfo>(
-                    StatusCodes.Status400BadRequest
-                )
-                .Produces<HttpStatusCodeInfo>(
-                    StatusCodes.Status409Conflict
-                )
-                .Produces<HttpStatusCodeInfo>(
-                    StatusCodes.Status500InternalServerError
-                );
+                .Produces<RegisterUserResult>(StatusCodes.Status201Created)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status400BadRequest)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status409Conflict)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
 
             authGroup
-                .MapPost(
-                    "/login",
-                    LoginEndpoint.DoAsync
-                )
+                .MapPost("/login", LoginEndpoint.DoAsync)
                 .AllowAnonymous()
                 .WithName("Login")
-                .WithSummary("Iniciar sesión")
-                .Produces<LoginResult>(
-                    StatusCodes.Status200OK
-                )
-                .Produces<HttpStatusCodeInfo>(
-                    StatusCodes.Status400BadRequest
-                )
-                .Produces<HttpStatusCodeInfo>(
-                    StatusCodes.Status401Unauthorized
-                )
-                .Produces<HttpStatusCodeInfo>(
-                    StatusCodes.Status403Forbidden
-                )
-                .Produces<HttpStatusCodeInfo>(
-                    StatusCodes.Status500InternalServerError
-                );
+                .WithSummary("Iniciar sesiï¿½n")
+                .Produces<LoginResult>(StatusCodes.Status200OK)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status400BadRequest)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status401Unauthorized)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status403Forbidden)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
 
             #endregion
 
@@ -90,174 +64,69 @@ namespace Mype.Api
                 .RequireAuthorization();
 
             businessGroup
-                .MapPost(
-                    string.Empty,
-                    CreateBusinessEndpoint.DoAsync
-                )
+                .MapPost(string.Empty, CreateBusinessEndpoint.DoAsync)
                 .WithName("CreateBusiness")
                 .WithSummary("Crear un negocio")
-                .Produces<CreateBusinessResult>(
-                    StatusCodes.Status201Created
-                )
-                .Produces<HttpStatusCodeInfo>(
-                    StatusCodes.Status400BadRequest
-                )
-                .Produces<HttpStatusCodeInfo>(
-                    StatusCodes.Status401Unauthorized
-                )
-                .Produces<HttpStatusCodeInfo>(
-                    StatusCodes.Status403Forbidden
-                )
-                .Produces<HttpStatusCodeInfo>(
-                    StatusCodes.Status422UnprocessableEntity
-                )
-                .Produces<HttpStatusCodeInfo>(
-                    StatusCodes.Status500InternalServerError
-                );
+                .Produces<CreateBusinessResult>(StatusCodes.Status201Created)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status400BadRequest)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status401Unauthorized)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status403Forbidden)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status422UnprocessableEntity)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
 
             businessGroup
-                .MapGet(
-                    string.Empty,
-                    ListUserBusinessesEndpoint.DoAsync
-                )
+                .MapGet(string.Empty, ListUserBusinessesEndpoint.DoAsync)
                 .WithName("ListUserBusinesses")
                 .WithSummary("Listar los negocios del usuario autenticado")
-                .Produces<IReadOnlyCollection<BusinessSummaryResult>>(
-                    StatusCodes.Status200OK
-                )
-                .Produces<HttpStatusCodeInfo>(
-                    StatusCodes.Status401Unauthorized
-                )
-                .Produces<HttpStatusCodeInfo>(
-                    StatusCodes.Status500InternalServerError
-                );
-
+                .Produces<IReadOnlyCollection<BusinessSummaryResult>>(StatusCodes.Status200OK)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status401Unauthorized)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
 
             businessGroup
-                .MapGet(
-                    "/{businessId:guid}/context",
-                    GetBusinessContextEndpoint.DoAsync
-                )
+                .MapGet("/{businessId:guid}/context", GetBusinessContextEndpoint.DoAsync)
                 .WithName("GetBusinessContext")
-                .WithSummary(
-                    "Obtener el contexto autorizado de un negocio"
-                )
-                .Produces<BusinessContextResult>(
-                    StatusCodes.Status200OK
-                )
-                .Produces<HttpStatusCodeInfo>(
-                    StatusCodes.Status401Unauthorized
-                )
-                .Produces<HttpStatusCodeInfo>(
-                    StatusCodes.Status403Forbidden
-                )
-                .Produces<HttpStatusCodeInfo>(
-                    StatusCodes.Status409Conflict
-                )
-                .Produces<HttpStatusCodeInfo>(
-                    StatusCodes.Status500InternalServerError
-                );
-
+                .WithSummary("Obtener el contexto autorizado de un negocio")
+                .Produces<BusinessContextResult>(StatusCodes.Status200OK)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status401Unauthorized)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status403Forbidden)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status409Conflict)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
 
             businessGroup
-                .MapGet(
-                    "/{businessId:guid}/categories",
-                    ListCategoriesEndpoint.DoAsync
-                )
+                .MapGet("/{businessId:guid}/categories", ListCategoriesEndpoint.DoAsync)
                 .WithName("ListCategories")
-                .WithSummary(
-                    "Consultar categorías del negocio"
-                )
-                .Produces<IReadOnlyCollection<CategoryListItemResult>>(
-                    StatusCodes.Status200OK
-                )
-                .Produces<HttpStatusCodeInfo>(
-                    StatusCodes.Status400BadRequest
-                )
-                .Produces<HttpStatusCodeInfo>(
-                    StatusCodes.Status401Unauthorized
-                )
-                .Produces<HttpStatusCodeInfo>(
-                    StatusCodes.Status403Forbidden
-                )
-                .Produces<HttpStatusCodeInfo>(
-                    StatusCodes.Status409Conflict
-                )
-                .Produces<HttpStatusCodeInfo>(
-                    StatusCodes.Status500InternalServerError
-                );
+                .WithSummary("Consultar categorï¿½as del negocio")
+                .Produces<IReadOnlyCollection<CategoryListItemResult>>(StatusCodes.Status200OK)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status400BadRequest)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status401Unauthorized)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status403Forbidden)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status409Conflict)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
 
             businessGroup
-                .MapPost(
-                    "/{businessId:guid}/products",
-                    CreateProductEndpoint.DoAsync
-                )
+                .MapPost("/{businessId:guid}/products", CreateProductEndpoint.DoAsync)
                 .WithName("CreateProduct")
-                .WithSummary(
-                    "Crear un producto"
-                )
-                .Produces<CreateProductResult>(
-                    StatusCodes.Status201Created
-                )
-                .Produces<HttpStatusCodeInfo>(
-                    StatusCodes.Status400BadRequest
-                )
-                .Produces<HttpStatusCodeInfo>(
-                    StatusCodes.Status401Unauthorized
-                )
-                .Produces<HttpStatusCodeInfo>(
-                    StatusCodes.Status403Forbidden
-                )
-                .Produces<HttpStatusCodeInfo>(
-                    StatusCodes.Status404NotFound
-                )
-                .Produces<HttpStatusCodeInfo>(
-                    StatusCodes.Status409Conflict
-                )
-                .Produces<HttpStatusCodeInfo>(
-                    StatusCodes
-                        .Status422UnprocessableEntity
-                )
-                .Produces<HttpStatusCodeInfo>(
-                    StatusCodes
-                        .Status500InternalServerError
-                );
+                .WithSummary("Crear un producto")
+                .Produces<CreateProductResult>(StatusCodes.Status201Created)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status400BadRequest)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status401Unauthorized)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status403Forbidden)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status404NotFound)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status409Conflict)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status422UnprocessableEntity)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
 
             businessGroup
-                .MapGet(
-                    "/{businessId:guid}/products",
-                    ListProductsEndpoint.DoAsync
-                )
+                .MapGet("/{businessId:guid}/products", ListProductsEndpoint.DoAsync)
                 .WithName("ListProducts")
-                .WithSummary(
-                    "Listar y buscar productos"
-                )
-                .Produces<
-                    IReadOnlyCollection<
-                        ProductListItemResult
-                    >
-                >(
-                    StatusCodes.Status200OK
-                )
-                .Produces<HttpStatusCodeInfo>(
-                    StatusCodes.Status400BadRequest
-                )
-                .Produces<HttpStatusCodeInfo>(
-                    StatusCodes.Status401Unauthorized
-                )
-                .Produces<HttpStatusCodeInfo>(
-                    StatusCodes.Status403Forbidden
-                )
-                .Produces<HttpStatusCodeInfo>(
-                    StatusCodes.Status404NotFound
-                )
-                .Produces<HttpStatusCodeInfo>(
-                    StatusCodes.Status409Conflict
-                )
-                .Produces<HttpStatusCodeInfo>(
-                    StatusCodes
-                        .Status500InternalServerError
-                );
+                .WithSummary("Listar y buscar productos")
+                .Produces<IReadOnlyCollection<ProductListItemResult>>(StatusCodes.Status200OK)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status400BadRequest)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status401Unauthorized)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status403Forbidden)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status404NotFound)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status409Conflict)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
 
             businessGroup
                 .MapGet(
@@ -265,34 +134,20 @@ namespace Mype.Api
                     GetProductDetailEndpoint.DoAsync
                 )
                 .WithName("GetProductDetail")
-                .WithSummary(
-                    "Consultar un producto"
-                )
-                .Produces<ProductDetailResult>(
-                    StatusCodes.Status200OK
-                )
-                .Produces<HttpStatusCodeInfo>(
-                    StatusCodes.Status400BadRequest
-                )
-                .Produces<HttpStatusCodeInfo>(
-                    StatusCodes.Status401Unauthorized
-                )
-                .Produces<HttpStatusCodeInfo>(
-                    StatusCodes.Status403Forbidden
-                )
-                .Produces<HttpStatusCodeInfo>(
-                    StatusCodes.Status404NotFound
-                )
-                .Produces<HttpStatusCodeInfo>(
-                    StatusCodes.Status409Conflict
-                )
-                .Produces<HttpStatusCodeInfo>(
-                    StatusCodes
-                        .Status500InternalServerError
-                );
+                .WithSummary("Consultar un producto")
+                .Produces<ProductDetailResult>(StatusCodes.Status200OK)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status400BadRequest)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status401Unauthorized)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status403Forbidden)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status404NotFound)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status409Conflict)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
 
             businessGroup
-                .MapPut("/{businessId:guid}/products/{productId:guid}", UpdateProductEndpoint.DoAsync)
+                .MapPut(
+                    "/{businessId:guid}/products/{productId:guid}",
+                    UpdateProductEndpoint.DoAsync
+                )
                 .WithName("UpdateProduct")
                 .WithSummary("Actualizar un producto")
                 .Produces<ProductMaintenanceResult>(StatusCodes.Status200OK)
@@ -305,7 +160,10 @@ namespace Mype.Api
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
 
             businessGroup
-                .MapPatch("/{businessId:guid}/products/{productId:guid}/deactivate", DeactivateProductEndpoint.DoAsync)
+                .MapPatch(
+                    "/{businessId:guid}/products/{productId:guid}/deactivate",
+                    DeactivateProductEndpoint.DoAsync
+                )
                 .WithName("DeactivateProduct")
                 .WithSummary("Desactivar un producto")
                 .Produces<ProductMaintenanceResult>(StatusCodes.Status200OK)
@@ -317,7 +175,10 @@ namespace Mype.Api
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
 
             businessGroup
-                .MapPatch("/{businessId:guid}/products/{productId:guid}/reactivate", ReactivateProductEndpoint.DoAsync)
+                .MapPatch(
+                    "/{businessId:guid}/products/{productId:guid}/reactivate",
+                    ReactivateProductEndpoint.DoAsync
+                )
                 .WithName("ReactivateProduct")
                 .WithSummary("Reactivar un producto")
                 .Produces<ProductMaintenanceResult>(StatusCodes.Status200OK)
@@ -332,4 +193,3 @@ namespace Mype.Api
         }
     }
 }
-

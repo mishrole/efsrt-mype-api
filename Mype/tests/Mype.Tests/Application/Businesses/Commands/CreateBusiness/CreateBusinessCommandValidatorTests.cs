@@ -1,9 +1,9 @@
-﻿using FluentValidation.TestHelper;
+﻿using System;
+using System.Threading.Tasks;
+using FluentValidation.TestHelper;
 using Mype.Application.Businesses.Commands.CreateBusiness;
 using Mype.Domain.Businesses.Constraints;
 using Mype.Domain.Currencies.Constraints;
-using System;
-using System.Threading.Tasks;
 
 namespace Mype.Tests.Application.Businesses.Commands.CreateBusiness
 {
@@ -17,17 +17,14 @@ namespace Mype.Tests.Application.Businesses.Commands.CreateBusiness
 
         private const string ValidCurrencyCode = "PEN";
 
-        private readonly CreateBusinessCommandValidator
-            _validator = new();
+        private readonly CreateBusinessCommandValidator _validator = new();
 
         [Fact]
         public async Task Validate_Should_Not_Have_Errors_When_Command_Is_Valid()
         {
             var command = CreateValidCommand();
 
-            var result = await _validator.TestValidateAsync(
-                command
-            );
+            var result = await _validator.TestValidateAsync(command);
 
             result.ShouldNotHaveAnyValidationErrors();
         }
@@ -40,9 +37,7 @@ namespace Mype.Tests.Application.Businesses.Commands.CreateBusiness
             command.LegalName = null;
             command.Ruc = null;
 
-            var result = await _validator.TestValidateAsync(
-                command
-            );
+            var result = await _validator.TestValidateAsync(command);
 
             result.ShouldNotHaveAnyValidationErrors();
         }
@@ -51,21 +46,15 @@ namespace Mype.Tests.Application.Businesses.Commands.CreateBusiness
         [InlineData(null)]
         [InlineData("")]
         [InlineData("   ")]
-        public async Task Validate_Should_Have_Error_When_DisplayName_Is_Empty(
-            string displayName
-        )
+        public async Task Validate_Should_Have_Error_When_DisplayName_Is_Empty(string displayName)
         {
             var command = CreateValidCommand();
 
             command.DisplayName = displayName;
 
-            var result = await _validator.TestValidateAsync(
-                command
-            );
+            var result = await _validator.TestValidateAsync(command);
 
-            result.ShouldHaveValidationErrorFor(
-                current => current.DisplayName
-            );
+            result.ShouldHaveValidationErrorFor(current => current.DisplayName);
         }
 
         [Fact]
@@ -73,18 +62,11 @@ namespace Mype.Tests.Application.Businesses.Commands.CreateBusiness
         {
             var command = CreateValidCommand();
 
-            command.DisplayName = new string(
-                'a',
-                BusinessConstraints.DisplayNameMaxLength + 1
-            );
+            command.DisplayName = new string('a', BusinessConstraints.DisplayNameMaxLength + 1);
 
-            var result = await _validator.TestValidateAsync(
-                command
-            );
+            var result = await _validator.TestValidateAsync(command);
 
-            result.ShouldHaveValidationErrorFor(
-                current => current.DisplayName
-            );
+            result.ShouldHaveValidationErrorFor(current => current.DisplayName);
         }
 
         [Fact]
@@ -92,18 +74,11 @@ namespace Mype.Tests.Application.Businesses.Commands.CreateBusiness
         {
             var command = CreateValidCommand();
 
-            command.LegalName = new string(
-                'a',
-                BusinessConstraints.LegalNameMaxLength + 1
-            );
+            command.LegalName = new string('a', BusinessConstraints.LegalNameMaxLength + 1);
 
-            var result = await _validator.TestValidateAsync(
-                command
-            );
+            var result = await _validator.TestValidateAsync(command);
 
-            result.ShouldHaveValidationErrorFor(
-                current => current.LegalName
-            );
+            result.ShouldHaveValidationErrorFor(current => current.LegalName);
         }
 
         [Theory]
@@ -111,42 +86,30 @@ namespace Mype.Tests.Application.Businesses.Commands.CreateBusiness
         [InlineData("201234567890")]
         [InlineData("2012345678A")]
         [InlineData("20123456780")]
-        public async Task Validate_Should_Have_Error_When_Ruc_Is_Invalid(
-            string ruc
-        )
+        public async Task Validate_Should_Have_Error_When_Ruc_Is_Invalid(string ruc)
         {
             var command = CreateValidCommand();
 
             command.Ruc = ruc;
 
-            var result = await _validator.TestValidateAsync(
-                command
-            );
+            var result = await _validator.TestValidateAsync(command);
 
-            result.ShouldHaveValidationErrorFor(
-                current => current.Ruc
-            );
+            result.ShouldHaveValidationErrorFor(current => current.Ruc);
         }
 
         [Theory]
         [InlineData(null)]
         [InlineData("")]
         [InlineData("   ")]
-        public async Task Validate_Should_Have_Error_When_CurrencyCode_Is_Empty(
-            string currencyCode
-        )
+        public async Task Validate_Should_Have_Error_When_CurrencyCode_Is_Empty(string currencyCode)
         {
             var command = CreateValidCommand();
 
             command.CurrencyCode = currencyCode;
 
-            var result = await _validator.TestValidateAsync(
-                command
-            );
+            var result = await _validator.TestValidateAsync(command);
 
-            result.ShouldHaveValidationErrorFor(
-                current => current.CurrencyCode
-            );
+            result.ShouldHaveValidationErrorFor(current => current.CurrencyCode);
         }
 
         [Theory]
@@ -160,13 +123,9 @@ namespace Mype.Tests.Application.Businesses.Commands.CreateBusiness
 
             command.CurrencyCode = currencyCode;
 
-            var result = await _validator.TestValidateAsync(
-                command
-            );
+            var result = await _validator.TestValidateAsync(command);
 
-            result.ShouldHaveValidationErrorFor(
-                current => current.CurrencyCode
-            );
+            result.ShouldHaveValidationErrorFor(current => current.CurrencyCode);
         }
 
         [Fact]
@@ -174,18 +133,11 @@ namespace Mype.Tests.Application.Businesses.Commands.CreateBusiness
         {
             var command = CreateValidCommand();
 
-            command.CurrencyCode = new string(
-                'A',
-                CurrencyConstraints.CodeMaxLength
-            );
+            command.CurrencyCode = new string('A', CurrencyConstraints.CodeMaxLength);
 
-            var result = await _validator.TestValidateAsync(
-                command
-            );
+            var result = await _validator.TestValidateAsync(command);
 
-            result.ShouldNotHaveValidationErrorFor(
-                current => current.CurrencyCode
-            );
+            result.ShouldNotHaveValidationErrorFor(current => current.CurrencyCode);
         }
 
         [Fact]
@@ -195,17 +147,12 @@ namespace Mype.Tests.Application.Businesses.Commands.CreateBusiness
 
             command.CurrentUserId = Guid.Empty;
 
-            var result = await _validator.TestValidateAsync(
-                command
-            );
+            var result = await _validator.TestValidateAsync(command);
 
-            result.ShouldHaveValidationErrorFor(
-                current => current.CurrentUserId
-            );
+            result.ShouldHaveValidationErrorFor(current => current.CurrentUserId);
         }
 
-        private static CreateBusinessCommand
-            CreateValidCommand()
+        private static CreateBusinessCommand CreateValidCommand()
         {
             return new CreateBusinessCommand
             {
@@ -213,7 +160,7 @@ namespace Mype.Tests.Application.Businesses.Commands.CreateBusiness
                 LegalName = ValidLegalName,
                 Ruc = ValidRuc,
                 CurrencyCode = ValidCurrencyCode,
-                CurrentUserId = Guid.NewGuid()
+                CurrentUserId = Guid.NewGuid(),
             };
         }
     }

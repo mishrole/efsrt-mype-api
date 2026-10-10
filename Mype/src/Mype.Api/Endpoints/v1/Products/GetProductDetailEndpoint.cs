@@ -1,12 +1,12 @@
-﻿using MediatR;
+﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
+using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Mype.Api.Context;
 using Mype.Api.Extensions;
 using Mype.Application.Products.Queries.GetProductDetail;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Mype.Api.Endpoints.v1.Products
 {
@@ -16,33 +16,21 @@ namespace Mype.Api.Endpoints.v1.Products
             Guid businessId,
             Guid productId,
             [FromServices] ISender sender,
-            [FromServices]
-                IUserContextProvider
-                userContextProvider,
+            [FromServices] IUserContextProvider userContextProvider,
             HttpContext context,
             CancellationToken cancellationToken
         )
         {
-            var query =
-                new GetProductDetailQuery
-                {
-                    BusinessId = businessId,
-                    ProductId = productId,
-                    CurrentUserId =
-                        userContextProvider
-                            .GetCurrentUserId()
-                };
+            var query = new GetProductDetailQuery
+            {
+                BusinessId = businessId,
+                ProductId = productId,
+                CurrentUserId = userContextProvider.GetCurrentUserId(),
+            };
 
-            var result = await sender.Send(
-                query,
-                cancellationToken
-            );
+            var result = await sender.Send(query, cancellationToken);
 
-            return result.ToHttpResult(
-                context,
-                response =>
-                    TypedResults.Ok(response)
-            );
+            return result.ToHttpResult(context, response => TypedResults.Ok(response));
         }
     }
 }

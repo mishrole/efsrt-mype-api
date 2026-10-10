@@ -6,11 +6,10 @@ namespace Mype.Application.Auth.Commands.RegisterUser
 {
     public static class RegisterUserErrors
     {
-        public static readonly ApplicationError EmailAlreadyRegistered =
-            new(
-                ErrorCodes.EmailAlreadyRegistered,
-                ErrorMessages.EmailAlreadyRegistered,
-                ApplicationErrorType.Conflict
-            );
+        public static readonly ApplicationError EmailAlreadyRegistered = new(
+            ErrorCodes.EmailAlreadyRegistered,
+            ErrorMessages.EmailAlreadyRegistered,
+            ApplicationErrorType.Conflict
+        );
     }
 }

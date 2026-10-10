@@ -14,48 +14,50 @@ namespace Mype.Infrastructure.Persistence.Configurations
 
             builder.HasKey(x => x.Id);
 
-            builder.Property(x => x.Id)
-            .ValueGeneratedNever();
+            builder.Property(x => x.Id).ValueGeneratedNever();
 
-            builder.Property(x => x.Email)
-            .HasMaxLength(UserConstraints.EmailMaxLength)
-            .IsRequired();
+            builder
+                .Property(x => x.Email)
+                .HasMaxLength(UserConstraints.EmailMaxLength)
+                .IsRequired();
 
-            builder.Property(x => x.NormalizedEmail)
-            .HasMaxLength(UserConstraints.EmailMaxLength)
-            .IsRequired();
+            builder
+                .Property(x => x.NormalizedEmail)
+                .HasMaxLength(UserConstraints.EmailMaxLength)
+                .IsRequired();
 
-            builder.HasIndex(x => x.NormalizedEmail)
-            .IsUnique()
-            .HasDatabaseName(DatabaseConstraints.Users.NormalizedEmail);
+            builder
+                .HasIndex(x => x.NormalizedEmail)
+                .IsUnique()
+                .HasDatabaseName(DatabaseConstraints.Users.NormalizedEmail);
 
-            builder.Property(x => x.PasswordHash)
-            .HasMaxLength(UserConstraints.PasswordHashMaxLength)
-            .IsRequired();
+            builder
+                .Property(x => x.PasswordHash)
+                .HasMaxLength(UserConstraints.PasswordHashMaxLength)
+                .IsRequired();
 
-            builder.Property(x => x.DisplayName)
-            .HasMaxLength(UserConstraints.DisplayNameMaxLength)
-            .IsRequired();
+            builder
+                .Property(x => x.DisplayName)
+                .HasMaxLength(UserConstraints.DisplayNameMaxLength)
+                .IsRequired();
 
-            builder.Property(x => x.EmailVerified)
-            .IsRequired();
+            builder.Property(x => x.EmailVerified).IsRequired();
 
-            builder.Property(x => x.Status)
-            .IsRequired();
+            builder.Property(x => x.Status).IsRequired();
 
-            builder.Property(x => x.DeactivatedAt)
-            .HasColumnType("timestamp with time zone");
+            builder.Property(x => x.DeactivatedAt).HasColumnType("timestamp with time zone");
 
-            builder.Property(x => x.CreatedAt)
-            .HasColumnType("timestamp with time zone")
-            .IsRequired();
+            builder
+                .Property(x => x.CreatedAt)
+                .HasColumnType("timestamp with time zone")
+                .IsRequired();
 
-            builder.Property(x => x.UpdatedAt)
-            .HasColumnType("timestamp with time zone")
-            .IsRequired();
+            builder
+                .Property(x => x.UpdatedAt)
+                .HasColumnType("timestamp with time zone")
+                .IsRequired();
 
-            builder.Property(x => x.Version)
-            .IsRowVersion();
+            builder.Property(x => x.Version).IsRowVersion();
         }
     }
 }

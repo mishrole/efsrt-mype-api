@@ -1,11 +1,10 @@
-﻿using MediatR;
+﻿using System;
+using MediatR;
 using Mype.Application.Common;
-using System;
 
 namespace Mype.Application.Businesses.Commands.CreateBusiness
 {
-    public class CreateBusinessCommand
-        : IRequest<Result<CreateBusinessResult>>
+    public class CreateBusinessCommand : IRequest<Result<CreateBusinessResult>>
     {
         public string DisplayName { get; set; } = string.Empty;
 

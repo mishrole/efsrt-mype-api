@@ -1,10 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using Mype.Application.Users.Interfaces;
 using Mype.Domain.Users;
 using Mype.Infrastructure.Persistence;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Mype.Infrastructure.Users.Repositories
 {
@@ -33,36 +33,24 @@ namespace Mype.Infrastructure.Users.Repositories
             CancellationToken cancellationToken
         )
         {
-            return _dbContext.Users
-                .AsNoTracking()
+            return _dbContext
+                .Users.AsNoTracking()
                 .SingleOrDefaultAsync(
                     user => user.NormalizedEmail == normalizedEmail,
                     cancellationToken
                 );
         }
 
-        public async Task AddAsync(
-            User user,
-            CancellationToken cancellationToken
-        )
+        public async Task AddAsync(User user, CancellationToken cancellationToken)
         {
-            await _dbContext.Users.AddAsync(
-                user,
-                cancellationToken
-            );
+            await _dbContext.Users.AddAsync(user, cancellationToken);
         }
 
-        public Task<User> GetByIdAsync(
-            Guid id,
-            CancellationToken cancellationToken
-        )
+        public Task<User> GetByIdAsync(Guid id, CancellationToken cancellationToken)
         {
-            return _dbContext.Users
-                .AsNoTracking()
-                .SingleOrDefaultAsync(
-                    user => user.Id == id,
-                    cancellationToken
-                );
+            return _dbContext
+                .Users.AsNoTracking()
+                .SingleOrDefaultAsync(user => user.Id == id, cancellationToken);
         }
     }
 }

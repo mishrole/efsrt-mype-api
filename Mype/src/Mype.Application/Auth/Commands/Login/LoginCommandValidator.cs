@@ -4,8 +4,7 @@ using Mype.Shared.Constants;
 
 namespace Mype.Application.Auth.Commands.Login
 {
-    public class LoginCommandValidator
-        : AbstractValidator<LoginCommand>
+    public class LoginCommandValidator : AbstractValidator<LoginCommand>
     {
         public LoginCommandValidator()
         {

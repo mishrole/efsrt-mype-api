@@ -15,10 +15,8 @@ namespace Mype.Application.Businesses.Commands.CreateBusiness
 
         public string RoleCode { get; set; } = string.Empty;
 
-        public IReadOnlyCollection<CategoryResult>
-            DefaultCategories
-        { get; set; } =
-                Array.Empty<CategoryResult>();
+        public IReadOnlyCollection<CategoryResult> DefaultCategories { get; set; } =
+            Array.Empty<CategoryResult>();
 
         public uint Version { get; set; }
     }

@@ -1,3 +1,7 @@
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using FluentAssertions;
 using MediatR;
 using Microsoft.AspNetCore.Http;
@@ -6,10 +10,6 @@ using Mype.Api.Context;
 using Mype.Api.Endpoints.v1.Products;
 using Mype.Application.Common;
 using Mype.Application.Products.Queries.ListProducts;
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Mype.Tests.Api.Endpoints.v1.Products
 {
@@ -23,62 +23,51 @@ namespace Mype.Tests.Api.Endpoints.v1.Products
             var categoryId = Guid.NewGuid();
 
             var senderMock = new Mock<ISender>();
-            var userContextProviderMock =
-                new Mock<IUserContextProvider>();
+            var userContextProviderMock = new Mock<IUserContextProvider>();
 
-            userContextProviderMock
-                .Setup(provider =>
-                    provider.GetCurrentUserId()
-                )
-                .Returns(userId);
+            userContextProviderMock.Setup(provider => provider.GetCurrentUserId()).Returns(userId);
 
             senderMock
-                .Setup(sender => sender.Send(
-                    It.IsAny<ListProductsQuery>(),
-                    It.IsAny<CancellationToken>()
-                ))
+                .Setup(sender =>
+                    sender.Send(It.IsAny<ListProductsQuery>(), It.IsAny<CancellationToken>())
+                )
                 .ReturnsAsync(
-                    Result<
-                        IReadOnlyCollection<
-                            ProductListItemResult
-                        >
-                    >.Success(
-                        Array.Empty<
-                            ProductListItemResult
-                        >()
+                    Result<IReadOnlyCollection<ProductListItemResult>>.Success(
+                        Array.Empty<ProductListItemResult>()
                     )
                 );
 
-            var result =
-                await ListProductsEndpoint.DoAsync(
-                    businessId,
-                    "gaseosa",
-                    categoryId,
-                    true,
-                    true,
-                    senderMock.Object,
-                    userContextProviderMock.Object,
-                    new DefaultHttpContext(),
-                    CancellationToken.None
-                );
+            var result = await ListProductsEndpoint.DoAsync(
+                businessId,
+                "gaseosa",
+                categoryId,
+                true,
+                true,
+                senderMock.Object,
+                userContextProviderMock.Object,
+                new DefaultHttpContext(),
+                CancellationToken.None
+            );
 
-            result.Should()
+            result
+                .Should()
                 .BeAssignableTo<IStatusCodeHttpResult>()
                 .Which.StatusCode.Should()
                 .Be(StatusCodes.Status200OK);
 
             senderMock.Verify(
-                sender => sender.Send(
-                    It.Is<ListProductsQuery>(query =>
-                        query.BusinessId == businessId &&
-                        query.CurrentUserId == userId &&
-                        query.Search == "gaseosa" &&
-                        query.CategoryId == categoryId &&
-                        query.IsActive == true &&
-                        query.AvailableForSale
+                sender =>
+                    sender.Send(
+                        It.Is<ListProductsQuery>(query =>
+                            query.BusinessId == businessId
+                            && query.CurrentUserId == userId
+                            && query.Search == "gaseosa"
+                            && query.CategoryId == categoryId
+                            && query.IsActive == true
+                            && query.AvailableForSale
+                        ),
+                        It.IsAny<CancellationToken>()
                     ),
-                    It.IsAny<CancellationToken>()
-                ),
                 Times.Once
             );
         }
@@ -91,61 +80,48 @@ namespace Mype.Tests.Api.Endpoints.v1.Products
 
             var senderMock = new Mock<ISender>();
 
-            var userContextProviderMock =
-                new Mock<IUserContextProvider>();
+            var userContextProviderMock = new Mock<IUserContextProvider>();
 
-            userContextProviderMock
-                .Setup(provider =>
-                    provider.GetCurrentUserId()
-                )
-                .Returns(userId);
+            userContextProviderMock.Setup(provider => provider.GetCurrentUserId()).Returns(userId);
 
             senderMock
-                .Setup(sender => sender.Send(
-                    It.IsAny<ListProductsQuery>(),
-                    It.IsAny<CancellationToken>()
-                ))
+                .Setup(sender =>
+                    sender.Send(It.IsAny<ListProductsQuery>(), It.IsAny<CancellationToken>())
+                )
                 .ReturnsAsync(
-                    Result<
-                        IReadOnlyCollection<
-                            ProductListItemResult
-                        >
-                    >.Success(
-                        Array.Empty<
-                            ProductListItemResult
-                        >()
+                    Result<IReadOnlyCollection<ProductListItemResult>>.Success(
+                        Array.Empty<ProductListItemResult>()
                     )
                 );
 
-            var result =
-                await ListProductsEndpoint.DoAsync(
-                    businessId,
-                    null,
-                    null,
-                    null,
-                    null,
-                    senderMock.Object,
-                    userContextProviderMock.Object,
-                    new DefaultHttpContext(),
-                    CancellationToken.None
-                );
+            var result = await ListProductsEndpoint.DoAsync(
+                businessId,
+                null,
+                null,
+                null,
+                null,
+                senderMock.Object,
+                userContextProviderMock.Object,
+                new DefaultHttpContext(),
+                CancellationToken.None
+            );
 
-            result.Should()
+            result
+                .Should()
                 .BeAssignableTo<IStatusCodeHttpResult>()
                 .Which.StatusCode.Should()
                 .Be(StatusCodes.Status200OK);
 
             senderMock.Verify(
-                sender => sender.Send(
-                    It.Is<ListProductsQuery>(query =>
-                        query.BusinessId ==
-                            businessId &&
-                        query.CurrentUserId ==
-                            userId &&
-                        !query.AvailableForSale
+                sender =>
+                    sender.Send(
+                        It.Is<ListProductsQuery>(query =>
+                            query.BusinessId == businessId
+                            && query.CurrentUserId == userId
+                            && !query.AvailableForSale
+                        ),
+                        It.IsAny<CancellationToken>()
                     ),
-                    It.IsAny<CancellationToken>()
-                ),
                 Times.Once
             );
         }

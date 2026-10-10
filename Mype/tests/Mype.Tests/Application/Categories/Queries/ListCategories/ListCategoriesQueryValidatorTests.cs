@@ -1,11 +1,10 @@
-﻿using FluentAssertions;
+﻿using System;
+using System.Threading.Tasks;
+using FluentAssertions;
 using Mype.Application.Categories.Queries.ListCategories;
 using Mype.Domain.Categories;
-using System;
-using System.Threading.Tasks;
 
-namespace Mype.Tests.Application.Categories.Queries
-    .ListCategories
+namespace Mype.Tests.Application.Categories.Queries.ListCategories
 {
     public class ListCategoriesQueryValidatorTests
     {
@@ -18,9 +17,7 @@ namespace Mype.Tests.Application.Categories.Queries
         [Fact]
         public async Task Validate_Should_Succeed_When_Query_Has_No_Filters()
         {
-            var result = await _validator.ValidateAsync(
-                CreateQuery()
-            );
+            var result = await _validator.ValidateAsync(CreateQuery());
 
             result.IsValid.Should().BeTrue();
             result.Errors.Should().BeEmpty();
@@ -29,16 +26,12 @@ namespace Mype.Tests.Application.Categories.Queries
         [Theory]
         [InlineData(CategoryType.Sale)]
         [InlineData(CategoryType.Expense)]
-        public async Task Validate_Should_Succeed_When_Type_Is_Supported(
-            CategoryType type
-        )
+        public async Task Validate_Should_Succeed_When_Type_Is_Supported(CategoryType type)
         {
             var query = CreateQuery();
             query.Type = type;
 
-            var result = await _validator.ValidateAsync(
-                query
-            );
+            var result = await _validator.ValidateAsync(query);
 
             result.IsValid.Should().BeTrue();
             result.Errors.Should().BeEmpty();
@@ -47,16 +40,12 @@ namespace Mype.Tests.Application.Categories.Queries
         [Theory]
         [InlineData(true)]
         [InlineData(false)]
-        public async Task Validate_Should_Succeed_When_IsActive_Is_Provided(
-            bool isActive
-        )
+        public async Task Validate_Should_Succeed_When_IsActive_Is_Provided(bool isActive)
         {
             var query = CreateQuery();
             query.IsActive = isActive;
 
-            var result = await _validator.ValidateAsync(
-                query
-            );
+            var result = await _validator.ValidateAsync(query);
 
             result.IsValid.Should().BeTrue();
             result.Errors.Should().BeEmpty();
@@ -69,9 +58,7 @@ namespace Mype.Tests.Application.Categories.Queries
             query.Type = CategoryType.Sale;
             query.IsActive = true;
 
-            var result = await _validator.ValidateAsync(
-                query
-            );
+            var result = await _validator.ValidateAsync(query);
 
             result.IsValid.Should().BeTrue();
             result.Errors.Should().BeEmpty();
@@ -83,20 +70,13 @@ namespace Mype.Tests.Application.Categories.Queries
             var query = CreateQuery();
             query.BusinessId = Guid.Empty;
 
-            var result = await _validator.ValidateAsync(
-                query
-            );
+            var result = await _validator.ValidateAsync(query);
 
             result.IsValid.Should().BeFalse();
 
-            result.Errors.Should().Contain(
-                error =>
-                    error.PropertyName ==
-                    nameof(
-                        ListCategoriesQuery
-                            .BusinessId
-                    )
-            );
+            result
+                .Errors.Should()
+                .Contain(error => error.PropertyName == nameof(ListCategoriesQuery.BusinessId));
         }
 
         [Fact]
@@ -105,20 +85,13 @@ namespace Mype.Tests.Application.Categories.Queries
             var query = CreateQuery();
             query.CurrentUserId = Guid.Empty;
 
-            var result = await _validator.ValidateAsync(
-                query
-            );
+            var result = await _validator.ValidateAsync(query);
 
             result.IsValid.Should().BeFalse();
 
-            result.Errors.Should().Contain(
-                error =>
-                    error.PropertyName ==
-                    nameof(
-                        ListCategoriesQuery
-                            .CurrentUserId
-                    )
-            );
+            result
+                .Errors.Should()
+                .Contain(error => error.PropertyName == nameof(ListCategoriesQuery.CurrentUserId));
         }
 
         [Fact]
@@ -127,19 +100,13 @@ namespace Mype.Tests.Application.Categories.Queries
             var query = CreateQuery();
             query.Type = (CategoryType)999;
 
-            var result = await _validator.ValidateAsync(
-                query
-            );
+            var result = await _validator.ValidateAsync(query);
 
             result.IsValid.Should().BeFalse();
 
-            result.Errors.Should().Contain(
-                error =>
-                    error.PropertyName ==
-                    nameof(
-                        ListCategoriesQuery.Type
-                    )
-            );
+            result
+                .Errors.Should()
+                .Contain(error => error.PropertyName == nameof(ListCategoriesQuery.Type));
         }
 
         private static ListCategoriesQuery CreateQuery()
@@ -147,7 +114,7 @@ namespace Mype.Tests.Application.Categories.Queries
             return new ListCategoriesQuery
             {
                 BusinessId = BusinessId,
-                CurrentUserId = CurrentUserId
+                CurrentUserId = CurrentUserId,
             };
         }
     }

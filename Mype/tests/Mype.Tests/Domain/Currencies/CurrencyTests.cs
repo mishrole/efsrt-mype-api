@@ -1,6 +1,6 @@
+using System;
 using FluentAssertions;
 using Mype.Domain.Currencies;
-using System;
 
 namespace Mype.Tests.Domain.Currencies
 {
@@ -11,13 +11,7 @@ namespace Mype.Tests.Domain.Currencies
         {
             var id = Guid.NewGuid();
 
-            var currency = Currency.CreateSystem(
-                id,
-                "PEN",
-                "Sol peruano",
-                "S/",
-                2
-            );
+            var currency = Currency.CreateSystem(id, "PEN", "Sol peruano", "S/", 2);
 
             currency.Id.Should().Be(id);
             currency.Code.Should().Be("PEN");

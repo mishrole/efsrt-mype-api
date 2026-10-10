@@ -10,11 +10,9 @@ namespace Mype.Application.Products.Commands.CreateProduct
 
         public Guid CategoryId { get; set; }
 
-        public string CategoryName { get; set; } =
-            string.Empty;
+        public string CategoryName { get; set; } = string.Empty;
 
-        public string Name { get; set; } =
-            string.Empty;
+        public string Name { get; set; } = string.Empty;
 
         public decimal SalePrice { get; set; }
 
@@ -22,16 +20,8 @@ namespace Mype.Application.Products.Commands.CreateProduct
 
         public bool IsActive { get; set; }
 
-        public DateTimeOffset CreatedAt
-        {
-            get;
-            set;
-        }
+        public DateTimeOffset CreatedAt { get; set; }
 
-        public DateTimeOffset UpdatedAt
-        {
-            get;
-            set;
-        }
+        public DateTimeOffset UpdatedAt { get; set; }
     }
 }

@@ -8,13 +8,13 @@ namespace Mype.Application.Extensions
 {
     public static class DependencyInjectionExtension
     {
-        public static IServiceCollection AddApplication(
-            this IServiceCollection services
-        )
+        public static IServiceCollection AddApplication(this IServiceCollection services)
         {
             services.AddMediatR(configuration =>
             {
-                configuration.RegisterServicesFromAssembly(typeof(DependencyInjectionExtension).Assembly);
+                configuration.RegisterServicesFromAssembly(
+                    typeof(DependencyInjectionExtension).Assembly
+                );
 
                 configuration.AddOpenBehavior(typeof(ValidationBehavior<,>));
             });

@@ -1,3 +1,7 @@
+using System;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using MediatR;
 using Mype.Application.BusinessMemberships.Interfaces;
 using Mype.Application.Categories.Interfaces;
@@ -11,14 +15,11 @@ using Mype.Domain.Businesses;
 using Mype.Domain.BusinessMemberships;
 using Mype.Domain.Permissions.Constants;
 using Mype.Shared.Constants;
-using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Mype.Application.Products.Commands.DeactivateProduct
 {
-    public sealed class DeactivateProductCommandHandler : IRequestHandler<DeactivateProductCommand, Result<ProductMaintenanceResult>>
+    public sealed class DeactivateProductCommandHandler
+        : IRequestHandler<DeactivateProductCommand, Result<ProductMaintenanceResult>>
     {
         private readonly IBusinessMembershipRepository _memberships;
         private readonly IPermissionRepository _permissions;
@@ -27,28 +28,99 @@ namespace Mype.Application.Products.Commands.DeactivateProduct
         private readonly IUnitOfWork _unitOfWork;
         private readonly IClock _clock;
 
-        public DeactivateProductCommandHandler(IBusinessMembershipRepository memberships, IPermissionRepository permissions, IProductRepository products, ICategoryRepository categories, IUnitOfWork unitOfWork, IClock clock)
-        { _memberships = memberships; _permissions = permissions; _products = products; _categories = categories; _unitOfWork = unitOfWork; _clock = clock; }
-
-        public async Task<Result<ProductMaintenanceResult>> Handle(DeactivateProductCommand request, CancellationToken cancellationToken)
+        public DeactivateProductCommandHandler(
+            IBusinessMembershipRepository memberships,
+            IPermissionRepository permissions,
+            IProductRepository products,
+            ICategoryRepository categories,
+            IUnitOfWork unitOfWork,
+            IClock clock
+        )
         {
-            var context = await _memberships.GetContextByBusinessAndUserAsync(request.BusinessId, request.CurrentUserId, cancellationToken);
-            if (context == null || context.MembershipStatus != BusinessMembershipStatus.Active || !context.RoleIsActive) return Failure(DeactivateProductErrors.BusinessAccessForbidden);
-            if (context.BusinessStatus != BusinessStatus.Active) return Failure(DeactivateProductErrors.BusinessUnavailable);
-            var permissions = await _permissions.ListActiveCodesByRoleIdAsync(context.RoleId, cancellationToken);
-            if (!permissions.Contains(SystemPermissions.ProductDeactivate.Code)) return Failure(DeactivateProductErrors.ProductAccessForbidden);
-            var product = await _products.GetTrackedByIdAndBusinessAsync(request.ProductId, request.BusinessId, cancellationToken);
-            if (product == null) return Failure(DeactivateProductErrors.ProductNotFound);
-            if (!product.IsActive) return Failure(DeactivateProductErrors.ProductAlreadyInactive);
-            var category = await _categories.GetByIdAndBusinessAsync(product.CategoryId, request.BusinessId, cancellationToken);
+            _memberships = memberships;
+            _permissions = permissions;
+            _products = products;
+            _categories = categories;
+            _unitOfWork = unitOfWork;
+            _clock = clock;
+        }
+
+        public async Task<Result<ProductMaintenanceResult>> Handle(
+            DeactivateProductCommand request,
+            CancellationToken cancellationToken
+        )
+        {
+            var context = await _memberships.GetContextByBusinessAndUserAsync(
+                request.BusinessId,
+                request.CurrentUserId,
+                cancellationToken
+            );
+            if (
+                context == null
+                || context.MembershipStatus != BusinessMembershipStatus.Active
+                || !context.RoleIsActive
+            )
+                return Failure(DeactivateProductErrors.BusinessAccessForbidden);
+            if (context.BusinessStatus != BusinessStatus.Active)
+                return Failure(DeactivateProductErrors.BusinessUnavailable);
+            var permissions = await _permissions.ListActiveCodesByRoleIdAsync(
+                context.RoleId,
+                cancellationToken
+            );
+            if (!permissions.Contains(SystemPermissions.ProductDeactivate.Code))
+                return Failure(DeactivateProductErrors.ProductAccessForbidden);
+            var product = await _products.GetTrackedByIdAndBusinessAsync(
+                request.ProductId,
+                request.BusinessId,
+                cancellationToken
+            );
+            if (product == null)
+                return Failure(DeactivateProductErrors.ProductNotFound);
+            if (!product.IsActive)
+                return Failure(DeactivateProductErrors.ProductAlreadyInactive);
+            var category = await _categories.GetByIdAndBusinessAsync(
+                product.CategoryId,
+                request.BusinessId,
+                cancellationToken
+            );
             _products.SetOriginalVersion(product, request.Version);
             product.Deactivate(request.CurrentUserId, _clock.UtcNow);
-            try { await _unitOfWork.SaveChangesAsync(cancellationToken); }
-            catch (OperationCanceledException) { throw; }
-            catch (ApplicationErrorException ex) when (ex.Code == ErrorCodes.ProductConcurrencyConflict) { return Failure(DeactivateProductErrors.ProductConcurrencyConflict); }
-            catch { return Failure(DeactivateProductErrors.ProductStatusChangeFailed); }
-            return Result<ProductMaintenanceResult>.Success(new(product.Id, product.BusinessId, product.CategoryId, category?.Name ?? string.Empty, product.Name, product.SalePrice, product.UnitCost, product.IsActive, product.DeactivatedAt, product.CreatedAt, product.UpdatedAt, product.Version));
+            try
+            {
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
+            catch (ApplicationErrorException ex)
+                when (ex.Code == ErrorCodes.ProductConcurrencyConflict)
+            {
+                return Failure(DeactivateProductErrors.ProductConcurrencyConflict);
+            }
+            catch
+            {
+                return Failure(DeactivateProductErrors.ProductStatusChangeFailed);
+            }
+            return Result<ProductMaintenanceResult>.Success(
+                new(
+                    product.Id,
+                    product.BusinessId,
+                    product.CategoryId,
+                    category?.Name ?? string.Empty,
+                    product.Name,
+                    product.SalePrice,
+                    product.UnitCost,
+                    product.IsActive,
+                    product.DeactivatedAt,
+                    product.CreatedAt,
+                    product.UpdatedAt,
+                    product.Version
+                )
+            );
         }
-        private static Result<ProductMaintenanceResult> Failure(ApplicationError error) => Result<ProductMaintenanceResult>.Failure(error);
+
+        private static Result<ProductMaintenanceResult> Failure(ApplicationError error) =>
+            Result<ProductMaintenanceResult>.Failure(error);
     }
 }

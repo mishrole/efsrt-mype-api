@@ -9,7 +9,8 @@ namespace Mype.Application.Common.Exceptions
             string message,
             ApplicationErrorType errorType,
             Exception innerException = null
-        ) : base(message, innerException)
+        )
+            : base(message, innerException)
         {
             Code = code;
             ErrorType = errorType;

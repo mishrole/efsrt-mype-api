@@ -1,4 +1,7 @@
-﻿using FluentAssertions;
+﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
+using FluentAssertions;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Moq;
@@ -8,9 +11,6 @@ using Mype.Application.Common;
 using Mype.Domain.Users;
 using Mype.Shared.Constants;
 using Mype.Shared.Models;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Mype.Tests.Api.Endpoints.v1.Auth
 {
@@ -24,8 +24,15 @@ namespace Mype.Tests.Api.Endpoints.v1.Auth
 
         private static readonly Guid UserId = Guid.NewGuid();
 
-        private static readonly DateTimeOffset ExpiresAt =
-            new(2026, 10, 8, 13, 0, 0, TimeSpan.Zero);
+        private static readonly DateTimeOffset ExpiresAt = new(
+            2026,
+            10,
+            8,
+            13,
+            0,
+            0,
+            TimeSpan.Zero
+        );
 
         private readonly Mock<ISender> _senderMock = new();
 
@@ -43,16 +50,15 @@ namespace Mype.Tests.Api.Endpoints.v1.Auth
                         Id = UserId,
                         Email = Email,
                         DisplayName = "Test User",
-                        Status = UserStatus.Active
-                    }
+                        Status = UserStatus.Active,
+                    },
                 }
             );
 
             _senderMock
-                .Setup(sender => sender.Send(
-                    It.IsAny<LoginCommand>(),
-                    It.IsAny<CancellationToken>()
-                ))
+                .Setup(sender =>
+                    sender.Send(It.IsAny<LoginCommand>(), It.IsAny<CancellationToken>())
+                )
                 .ReturnsAsync(applicationResult);
 
             var context = CreateHttpContext();
@@ -64,53 +70,34 @@ namespace Mype.Tests.Api.Endpoints.v1.Auth
                 CancellationToken.None
             );
 
-            var statusResult = result
-                .Should()
-                .BeAssignableTo<IStatusCodeHttpResult>()
-                .Subject;
+            var statusResult = result.Should().BeAssignableTo<IStatusCodeHttpResult>().Subject;
 
-            statusResult.StatusCode.Should().Be(
-                StatusCodes.Status200OK
-            );
+            statusResult.StatusCode.Should().Be(StatusCodes.Status200OK);
 
-            var valueResult = result
-                .Should()
-                .BeAssignableTo<IValueHttpResult>()
-                .Subject;
+            var valueResult = result.Should().BeAssignableTo<IValueHttpResult>().Subject;
 
-            var response = valueResult.Value
-                .Should()
-                .BeOfType<LoginResult>()
-                .Subject;
+            var response = valueResult.Value.Should().BeOfType<LoginResult>().Subject;
 
             response.AccessToken.Should().Be(AccessToken);
 
-            response.TokenType.Should().Be(
-                TokenType
-            );
+            response.TokenType.Should().Be(TokenType);
 
             response.ExpiresAt.Should().Be(ExpiresAt);
             response.User.Id.Should().Be(UserId);
             response.User.Status.Should().Be(UserStatus.Active);
 
-            context.Response.Headers.CacheControl
-                .ToString()
-                .Should()
-                .Be("no-store");
+            context.Response.Headers.CacheControl.ToString().Should().Be("no-store");
 
-            context.Response.Headers.Pragma
-                .ToString()
-                .Should()
-                .Be("no-cache");
+            context.Response.Headers.Pragma.ToString().Should().Be("no-cache");
 
             _senderMock.Verify(
-                sender => sender.Send(
-                    It.Is<LoginCommand>(command =>
-                        command.Email == Email &&
-                        command.Password == Password
+                sender =>
+                    sender.Send(
+                        It.Is<LoginCommand>(command =>
+                            command.Email == Email && command.Password == Password
+                        ),
+                        It.IsAny<CancellationToken>()
                     ),
-                    It.IsAny<CancellationToken>()
-                ),
                 Times.Once
             );
         }
@@ -118,15 +105,12 @@ namespace Mype.Tests.Api.Endpoints.v1.Auth
         [Fact]
         public async Task DoAsync_Should_Return_Unauthorized_When_Credentials_Are_Invalid()
         {
-            var applicationResult = Result<LoginResult>.Failure(
-                LoginErrors.InvalidCredentials
-            );
+            var applicationResult = Result<LoginResult>.Failure(LoginErrors.InvalidCredentials);
 
             _senderMock
-                .Setup(sender => sender.Send(
-                    It.IsAny<LoginCommand>(),
-                    It.IsAny<CancellationToken>()
-                ))
+                .Setup(sender =>
+                    sender.Send(It.IsAny<LoginCommand>(), It.IsAny<CancellationToken>())
+                )
                 .ReturnsAsync(applicationResult);
 
             var context = CreateHttpContext();
@@ -138,36 +122,19 @@ namespace Mype.Tests.Api.Endpoints.v1.Auth
                 CancellationToken.None
             );
 
-            var statusResult = result
-                .Should()
-                .BeAssignableTo<IStatusCodeHttpResult>()
-                .Subject;
+            var statusResult = result.Should().BeAssignableTo<IStatusCodeHttpResult>().Subject;
 
-            statusResult.StatusCode.Should().Be(
-                StatusCodes.Status401Unauthorized
-            );
+            statusResult.StatusCode.Should().Be(StatusCodes.Status401Unauthorized);
 
-            var valueResult = result
-                .Should()
-                .BeAssignableTo<IValueHttpResult>()
-                .Subject;
+            var valueResult = result.Should().BeAssignableTo<IValueHttpResult>().Subject;
 
-            var response = valueResult.Value
-                .Should()
-                .BeOfType<HttpStatusCodeInfo>()
-                .Subject;
+            var response = valueResult.Value.Should().BeOfType<HttpStatusCodeInfo>().Subject;
 
-            response.Code.Should().Be(
-                ErrorCodes.InvalidCredentials
-            );
+            response.Code.Should().Be(ErrorCodes.InvalidCredentials);
 
-            response.Message.Should().Be(
-                ErrorMessages.InvalidCredentials
-            );
+            response.Message.Should().Be(ErrorMessages.InvalidCredentials);
 
-            response.StatusCode.Should().Be(
-                StatusCodes.Status401Unauthorized
-            );
+            response.StatusCode.Should().Be(StatusCodes.Status401Unauthorized);
 
             response.TraceId.Should().Be(TraceId);
         }
@@ -175,15 +142,12 @@ namespace Mype.Tests.Api.Endpoints.v1.Auth
         [Fact]
         public async Task DoAsync_Should_Return_Forbidden_When_Account_Is_Unavailable()
         {
-            var applicationResult = Result<LoginResult>.Failure(
-                LoginErrors.AccountUnavailable
-            );
+            var applicationResult = Result<LoginResult>.Failure(LoginErrors.AccountUnavailable);
 
             _senderMock
-                .Setup(sender => sender.Send(
-                    It.IsAny<LoginCommand>(),
-                    It.IsAny<CancellationToken>()
-                ))
+                .Setup(sender =>
+                    sender.Send(It.IsAny<LoginCommand>(), It.IsAny<CancellationToken>())
+                )
                 .ReturnsAsync(applicationResult);
 
             var context = CreateHttpContext();
@@ -195,52 +159,29 @@ namespace Mype.Tests.Api.Endpoints.v1.Auth
                 CancellationToken.None
             );
 
-            var statusResult = result
-                .Should()
-                .BeAssignableTo<IStatusCodeHttpResult>()
-                .Subject;
+            var statusResult = result.Should().BeAssignableTo<IStatusCodeHttpResult>().Subject;
 
-            statusResult.StatusCode.Should().Be(
-                StatusCodes.Status403Forbidden
-            );
+            statusResult.StatusCode.Should().Be(StatusCodes.Status403Forbidden);
 
-            var valueResult = result
-                .Should()
-                .BeAssignableTo<IValueHttpResult>()
-                .Subject;
+            var valueResult = result.Should().BeAssignableTo<IValueHttpResult>().Subject;
 
-            var response = valueResult.Value
-                .Should()
-                .BeOfType<HttpStatusCodeInfo>()
-                .Subject;
+            var response = valueResult.Value.Should().BeOfType<HttpStatusCodeInfo>().Subject;
 
-            response.Code.Should().Be(
-                ErrorCodes.AccountUnavailable
-            );
+            response.Code.Should().Be(ErrorCodes.AccountUnavailable);
 
-            response.Message.Should().Be(
-                ErrorMessages.AccountUnavailable
-            );
+            response.Message.Should().Be(ErrorMessages.AccountUnavailable);
 
-            response.StatusCode.Should().Be(
-                StatusCodes.Status403Forbidden
-            );
+            response.StatusCode.Should().Be(StatusCodes.Status403Forbidden);
         }
 
         private static LoginEndpoint.LoginRequest CreateRequest()
         {
-            return new LoginEndpoint.LoginRequest(
-                Email,
-                Password
-            );
+            return new LoginEndpoint.LoginRequest(Email, Password);
         }
 
         private static DefaultHttpContext CreateHttpContext()
         {
-            return new DefaultHttpContext
-            {
-                TraceIdentifier = TraceId
-            };
+            return new DefaultHttpContext { TraceIdentifier = TraceId };
         }
     }
 }

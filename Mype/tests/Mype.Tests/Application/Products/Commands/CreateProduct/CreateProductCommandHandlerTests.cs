@@ -1,3 +1,6 @@
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 using FluentAssertions;
 using Moq;
 using Mype.Application.BusinessMemberships.Interfaces;
@@ -12,9 +15,6 @@ using Mype.Domain.BusinessMemberships;
 using Mype.Domain.Categories;
 using Mype.Domain.Permissions.Constants;
 using Mype.Domain.Products;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Mype.Tests.Application.Products.Commands.CreateProduct
 {
@@ -34,7 +34,14 @@ namespace Mype.Tests.Application.Products.Commands.CreateProduct
 
         public CreateProductCommandHandlerTests()
         {
-            _handler = new(_memberships.Object, _permissions.Object, _categories.Object, _products.Object, _unitOfWork.Object, _clock.Object);
+            _handler = new(
+                _memberships.Object,
+                _permissions.Object,
+                _categories.Object,
+                _products.Object,
+                _unitOfWork.Object,
+                _clock.Object
+            );
         }
 
         [Fact]
@@ -43,10 +50,15 @@ namespace Mype.Tests.Application.Products.Commands.CreateProduct
             var now = new DateTimeOffset(2026, 10, 8, 12, 0, 0, TimeSpan.Zero);
             SetupValid(now);
             Product captured = null;
-            _products.Setup(x => x.AddAsync(It.IsAny<Product>(), It.IsAny<CancellationToken>()))
-                .Callback<Product, CancellationToken>((x, _) => captured = x).Returns(Task.CompletedTask);
+            _products
+                .Setup(x => x.AddAsync(It.IsAny<Product>(), It.IsAny<CancellationToken>()))
+                .Callback<Product, CancellationToken>((x, _) => captured = x)
+                .Returns(Task.CompletedTask);
 
-            var result = await _handler.Handle(CreateCommand("  Gaseosa   500 ml  "), CancellationToken.None);
+            var result = await _handler.Handle(
+                CreateCommand("  Gaseosa   500 ml  "),
+                CancellationToken.None
+            );
 
             result.IsSuccess.Should().BeTrue();
             captured.Should().NotBeNull();
@@ -59,50 +71,151 @@ namespace Mype.Tests.Application.Products.Commands.CreateProduct
         [Fact]
         public async Task Handle_Should_Return_AccessForbidden_When_Context_Is_Missing()
         {
-            _memberships.Setup(x => x.GetContextByBusinessAndUserAsync(BusinessId, UserId, It.IsAny<CancellationToken>())).ReturnsAsync((BusinessContextProjection)null);
+            _memberships
+                .Setup(x =>
+                    x.GetContextByBusinessAndUserAsync(
+                        BusinessId,
+                        UserId,
+                        It.IsAny<CancellationToken>()
+                    )
+                )
+                .ReturnsAsync((BusinessContextProjection)null);
             var result = await _handler.Handle(CreateCommand(), CancellationToken.None);
             result.Error.Should().BeSameAs(CreateProductErrors.BusinessAccessForbidden);
-            _permissions.Verify(x => x.ListActiveCodesByRoleIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()), Times.Never);
+            _permissions.Verify(
+                x =>
+                    x.ListActiveCodesByRoleIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()),
+                Times.Never
+            );
         }
 
         [Fact]
         public async Task Handle_Should_Return_ProductAccessForbidden_When_Permission_Is_Missing()
         {
             SetupContext();
-            _permissions.Setup(x => x.ListActiveCodesByRoleIdAsync(RoleId, It.IsAny<CancellationToken>())).ReturnsAsync(Array.Empty<string>());
+            _permissions
+                .Setup(x => x.ListActiveCodesByRoleIdAsync(RoleId, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(Array.Empty<string>());
             var result = await _handler.Handle(CreateCommand(), CancellationToken.None);
             result.Error.Should().BeSameAs(CreateProductErrors.ProductAccessForbidden);
-            _categories.Verify(x => x.GetByIdAndBusinessAsync(It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<CancellationToken>()), Times.Never);
+            _categories.Verify(
+                x =>
+                    x.GetByIdAndBusinessAsync(
+                        It.IsAny<Guid>(),
+                        It.IsAny<Guid>(),
+                        It.IsAny<CancellationToken>()
+                    ),
+                Times.Never
+            );
         }
 
         [Fact]
         public async Task Handle_Should_Reject_Invalid_Category()
         {
-            SetupContext(); SetupPermission();
-            _categories.Setup(x => x.GetByIdAndBusinessAsync(CategoryId, BusinessId, It.IsAny<CancellationToken>())).ReturnsAsync((Category)null);
-            (await _handler.Handle(CreateCommand(), CancellationToken.None)).Error.Should().BeSameAs(CreateProductErrors.CategoryNotFound);
+            SetupContext();
+            SetupPermission();
+            _categories
+                .Setup(x =>
+                    x.GetByIdAndBusinessAsync(CategoryId, BusinessId, It.IsAny<CancellationToken>())
+                )
+                .ReturnsAsync((Category)null);
+            (await _handler.Handle(CreateCommand(), CancellationToken.None))
+                .Error.Should()
+                .BeSameAs(CreateProductErrors.CategoryNotFound);
         }
 
         [Fact]
         public async Task Handle_Should_Reject_Duplicate_Product()
         {
             SetupValid(DateTimeOffset.UtcNow);
-            _products.Setup(x => x.ExistsByBusinessAndNormalizedNameAsync(BusinessId, "GASEOSA 500 ML", It.IsAny<CancellationToken>())).ReturnsAsync(true);
-            (await _handler.Handle(CreateCommand(), CancellationToken.None)).Error.Should().BeSameAs(CreateProductErrors.ProductAlreadyExists);
-            _products.Verify(x => x.AddAsync(It.IsAny<Product>(), It.IsAny<CancellationToken>()), Times.Never);
+            _products
+                .Setup(x =>
+                    x.ExistsByBusinessAndNormalizedNameAsync(
+                        BusinessId,
+                        "GASEOSA 500 ML",
+                        It.IsAny<CancellationToken>()
+                    )
+                )
+                .ReturnsAsync(true);
+            (await _handler.Handle(CreateCommand(), CancellationToken.None))
+                .Error.Should()
+                .BeSameAs(CreateProductErrors.ProductAlreadyExists);
+            _products.Verify(
+                x => x.AddAsync(It.IsAny<Product>(), It.IsAny<CancellationToken>()),
+                Times.Never
+            );
         }
 
         private void SetupValid(DateTimeOffset now)
         {
-            SetupContext(); SetupPermission(); _clock.SetupGet(x => x.UtcNow).Returns(now);
-            _categories.Setup(x => x.GetByIdAndBusinessAsync(CategoryId, BusinessId, It.IsAny<CancellationToken>()))
-                .ReturnsAsync(Category.CreateDefault(BusinessId, CategoryType.Sale, "Productos", "PRODUCTOS", UserId, now));
-            _products.Setup(x => x.ExistsByBusinessAndNormalizedNameAsync(BusinessId, It.IsAny<string>(), It.IsAny<CancellationToken>())).ReturnsAsync(false);
-            _unitOfWork.Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
+            SetupContext();
+            SetupPermission();
+            _clock.SetupGet(x => x.UtcNow).Returns(now);
+            _categories
+                .Setup(x =>
+                    x.GetByIdAndBusinessAsync(CategoryId, BusinessId, It.IsAny<CancellationToken>())
+                )
+                .ReturnsAsync(
+                    Category.CreateDefault(
+                        BusinessId,
+                        CategoryType.Sale,
+                        "Productos",
+                        "PRODUCTOS",
+                        UserId,
+                        now
+                    )
+                );
+            _products
+                .Setup(x =>
+                    x.ExistsByBusinessAndNormalizedNameAsync(
+                        BusinessId,
+                        It.IsAny<string>(),
+                        It.IsAny<CancellationToken>()
+                    )
+                )
+                .ReturnsAsync(false);
+            _unitOfWork
+                .Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()))
+                .ReturnsAsync(1);
         }
-        private void SetupContext() => _memberships.Setup(x => x.GetContextByBusinessAndUserAsync(BusinessId, UserId, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new BusinessContextProjection(BusinessId, "Bodega", "PEN", BusinessStatus.Active, Guid.NewGuid(), BusinessMembershipStatus.Active, RoleId, "CUSTOM", true));
-        private void SetupPermission() => _permissions.Setup(x => x.ListActiveCodesByRoleIdAsync(RoleId, It.IsAny<CancellationToken>())).ReturnsAsync(new[] { SystemPermissions.ProductCreate.Code });
-        private static CreateProductCommand CreateCommand(string name = "Gaseosa 500 ml") => new() { BusinessId = BusinessId, CurrentUserId = UserId, CategoryId = CategoryId, Name = name, SalePrice = 3.50m, UnitCost = 2.20m };
+
+        private void SetupContext() =>
+            _memberships
+                .Setup(x =>
+                    x.GetContextByBusinessAndUserAsync(
+                        BusinessId,
+                        UserId,
+                        It.IsAny<CancellationToken>()
+                    )
+                )
+                .ReturnsAsync(
+                    new BusinessContextProjection(
+                        BusinessId,
+                        "Bodega",
+                        "PEN",
+                        BusinessStatus.Active,
+                        Guid.NewGuid(),
+                        BusinessMembershipStatus.Active,
+                        RoleId,
+                        "CUSTOM",
+                        true
+                    )
+                );
+
+        private void SetupPermission() =>
+            _permissions
+                .Setup(x => x.ListActiveCodesByRoleIdAsync(RoleId, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new[] { SystemPermissions.ProductCreate.Code });
+
+        private static CreateProductCommand CreateCommand(string name = "Gaseosa 500 ml") =>
+            new()
+            {
+                BusinessId = BusinessId,
+                CurrentUserId = UserId,
+                CategoryId = CategoryId,
+                Name = name,
+                SalePrice = 3.50m,
+                UnitCost = 2.20m,
+            };
     }
 }

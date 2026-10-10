@@ -1,13 +1,13 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Text.Json;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Mype.Api.Common;
 using Mype.Shared.Constants;
-using System;
-using System.Diagnostics.CodeAnalysis;
-using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace Mype.Api.Middlewares
 {
@@ -21,10 +21,14 @@ namespace Mype.Api.Middlewares
         private static readonly JsonSerializerOptions _jsonOptions = new()
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            WriteIndented = false
+            WriteIndented = false,
         };
 
-        public ExceptionHandlingMiddleware(RequestDelegate next, ILogger<ExceptionHandlingMiddleware> logger, IWebHostEnvironment env)
+        public ExceptionHandlingMiddleware(
+            RequestDelegate next,
+            ILogger<ExceptionHandlingMiddleware> logger,
+            IWebHostEnvironment env
+        )
         {
             _next = next;
             _logger = logger;
@@ -62,8 +66,10 @@ namespace Mype.Api.Middlewares
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = response.StatusCode;
 
-            return context.Response.WriteAsync(JsonSerializer.Serialize(response, _jsonOptions), context.RequestAborted);
+            return context.Response.WriteAsync(
+                JsonSerializer.Serialize(response, _jsonOptions),
+                context.RequestAborted
+            );
         }
-
     }
 }

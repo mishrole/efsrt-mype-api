@@ -1,6 +1,6 @@
-﻿using FluentValidation.TestHelper;
+﻿using System.Threading.Tasks;
+using FluentValidation.TestHelper;
 using Mype.Application.Auth.Commands.RegisterUser;
-using System.Threading.Tasks;
 
 namespace Mype.Tests.Application.Auth.Commands.RegisterUser
 {
@@ -48,9 +48,7 @@ namespace Mype.Tests.Application.Auth.Commands.RegisterUser
         [InlineData("")]
         [InlineData("invalid-email")]
         [InlineData("@example.com")]
-        public async Task Validate_Should_Have_Error_When_Email_Is_Invalid(
-        string email
-        )
+        public async Task Validate_Should_Have_Error_When_Email_Is_Invalid(string email)
         {
             var command = CreateValidCommand();
             command.Email = email;
@@ -76,9 +74,7 @@ namespace Mype.Tests.Application.Auth.Commands.RegisterUser
         [InlineData("pass1")]
         [InlineData("password")]
         [InlineData("12345678")]
-        public async Task Validate_Should_Have_Error_When_Password_Is_Invalid(
-        string password
-        )
+        public async Task Validate_Should_Have_Error_When_Password_Is_Invalid(string password)
         {
             var command = CreateValidCommand();
             command.Password = password;
@@ -97,9 +93,7 @@ namespace Mype.Tests.Application.Auth.Commands.RegisterUser
 
             var result = await _validator.TestValidateAsync(command);
 
-            result.ShouldHaveValidationErrorFor(
-            x => x.PasswordConfirmation
-            );
+            result.ShouldHaveValidationErrorFor(x => x.PasswordConfirmation);
         }
 
         [Fact]
@@ -110,9 +104,7 @@ namespace Mype.Tests.Application.Auth.Commands.RegisterUser
 
             var result = await _validator.TestValidateAsync(command);
 
-            result.ShouldHaveValidationErrorFor(
-            x => x.PasswordConfirmation
-            );
+            result.ShouldHaveValidationErrorFor(x => x.PasswordConfirmation);
         }
 
         private static RegisterUserCommand CreateValidCommand()
@@ -122,7 +114,7 @@ namespace Mype.Tests.Application.Auth.Commands.RegisterUser
                 DisplayName = ValidDisplayName,
                 Email = ValidEmail,
                 Password = ValidPassword,
-                PasswordConfirmation = ValidPassword
+                PasswordConfirmation = ValidPassword,
             };
         }
     }

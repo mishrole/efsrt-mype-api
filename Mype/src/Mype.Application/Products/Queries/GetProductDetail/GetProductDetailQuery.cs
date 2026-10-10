@@ -1,13 +1,10 @@
-﻿using MediatR;
+﻿using System;
+using MediatR;
 using Mype.Application.Common;
-using System;
 
 namespace Mype.Application.Products.Queries.GetProductDetail
 {
-    public sealed class GetProductDetailQuery
-        : IRequest<
-            Result<ProductDetailResult>
-        >
+    public sealed class GetProductDetailQuery : IRequest<Result<ProductDetailResult>>
     {
         public Guid BusinessId { get; set; }
 

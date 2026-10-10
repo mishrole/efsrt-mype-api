@@ -1,9 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using Mype.Application.Businesses.Interfaces;
 using Mype.Domain.Businesses;
 using Mype.Infrastructure.Persistence;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Mype.Infrastructure.Businesses.Repositories
 {
@@ -11,35 +11,21 @@ namespace Mype.Infrastructure.Businesses.Repositories
     {
         private readonly MypeDbContext _dbContext;
 
-        public BusinessRepository(
-            MypeDbContext dbContext
-        )
+        public BusinessRepository(MypeDbContext dbContext)
         {
             _dbContext = dbContext;
         }
 
-        public async Task AddAsync(
-            Business business,
-            CancellationToken cancellationToken
-        )
+        public async Task AddAsync(Business business, CancellationToken cancellationToken)
         {
-            await _dbContext.Businesses.AddAsync(
-                business,
-                cancellationToken
-            );
+            await _dbContext.Businesses.AddAsync(business, cancellationToken);
         }
 
-        public Task<bool> ExistsByRucAsync(
-            string ruc,
-            CancellationToken cancellationToken
-        )
+        public Task<bool> ExistsByRucAsync(string ruc, CancellationToken cancellationToken)
         {
-            return _dbContext.Businesses
-                .AsNoTracking()
-                .AnyAsync(
-                    business => business.Ruc == ruc,
-                    cancellationToken
-                );
+            return _dbContext
+                .Businesses.AsNoTracking()
+                .AnyAsync(business => business.Ruc == ruc, cancellationToken);
         }
     }
 }

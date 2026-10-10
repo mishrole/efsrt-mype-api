@@ -1,14 +1,12 @@
-﻿using Mype.Domain.Common;
-using System;
+﻿using System;
 using System.Diagnostics.CodeAnalysis;
+using Mype.Domain.Common;
 
 namespace Mype.Domain.Businesses
 {
     public class Business : Entity
     {
-        private Business()
-        {
-        }
+        private Business() { }
 
         private Business(
             Guid id,
@@ -18,7 +16,8 @@ namespace Mype.Domain.Businesses
             Guid currencyId,
             Guid userId,
             DateTimeOffset utcNow
-        ) : base(id)
+        )
+            : base(id)
         {
             DisplayName = displayName;
             LegalName = legalName;
@@ -31,8 +30,7 @@ namespace Mype.Domain.Businesses
             UpdatedAt = utcNow;
         }
 
-        public string DisplayName { get; private set; } =
-            string.Empty;
+        public string DisplayName { get; private set; } = string.Empty;
 
         public string LegalName { get; private set; }
 
@@ -75,10 +73,7 @@ namespace Mype.Domain.Businesses
             return Status == BusinessStatus.Active;
         }
 
-        public void Deactivate(
-            Guid currentUserId,
-            DateTimeOffset utcNow
-        )
+        public void Deactivate(Guid currentUserId, DateTimeOffset utcNow)
         {
             Status = BusinessStatus.Inactive;
             DeactivatedAt = utcNow;
@@ -86,13 +81,9 @@ namespace Mype.Domain.Businesses
             UpdatedAt = utcNow;
         }
 
-        private static string NormalizeOptionalValue(
-            string value
-        )
+        private static string NormalizeOptionalValue(string value)
         {
-            return string.IsNullOrWhiteSpace(value)
-                ? null
-                : value.Trim();
+            return string.IsNullOrWhiteSpace(value) ? null : value.Trim();
         }
     }
 }

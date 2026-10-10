@@ -1,13 +1,11 @@
-﻿using Mype.Domain.Common;
-using System;
+﻿using System;
+using Mype.Domain.Common;
 
 namespace Mype.Domain.BusinessMemberships
 {
     public class BusinessMembership : Entity
     {
-        private BusinessMembership()
-        {
-        }
+        private BusinessMembership() { }
 
         private BusinessMembership(
             Guid id,
@@ -16,7 +14,8 @@ namespace Mype.Domain.BusinessMemberships
             Guid roleId,
             Guid createdByUserId,
             DateTimeOffset utcNow
-        ) : base(id)
+        )
+            : base(id)
         {
             BusinessId = businessId;
             UserId = userId;
@@ -35,11 +34,7 @@ namespace Mype.Domain.BusinessMemberships
 
         public Guid RoleId { get; private set; }
 
-        public BusinessMembershipStatus Status
-        {
-            get;
-            private set;
-        }
+        public BusinessMembershipStatus Status { get; private set; }
 
         public DateTimeOffset JoinedAt { get; private set; }
 
@@ -53,10 +48,7 @@ namespace Mype.Domain.BusinessMemberships
 
         public uint Version { get; private set; }
 
-        public void Deactivate(
-            Guid currentUserId,
-            DateTimeOffset utcNow
-        )
+        public void Deactivate(Guid currentUserId, DateTimeOffset utcNow)
         {
             Status = BusinessMembershipStatus.Inactive;
             DeactivatedAt = utcNow;
@@ -64,10 +56,7 @@ namespace Mype.Domain.BusinessMemberships
             UpdatedAt = utcNow;
         }
 
-        public void Reactivate(
-            Guid currentUserId,
-            DateTimeOffset utcNow
-        )
+        public void Reactivate(Guid currentUserId, DateTimeOffset utcNow)
         {
             Status = BusinessMembershipStatus.Active;
             ReactivatedAt = utcNow;

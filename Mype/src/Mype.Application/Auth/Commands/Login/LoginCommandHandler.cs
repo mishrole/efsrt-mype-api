@@ -1,9 +1,9 @@
-﻿using MediatR;
+﻿using System.Threading;
+using System.Threading.Tasks;
+using MediatR;
 using Mype.Application.Common;
 using Mype.Application.Common.Interfaces;
 using Mype.Application.Users.Interfaces;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Mype.Application.Auth.Commands.Login
 {
@@ -35,9 +35,7 @@ namespace Mype.Application.Auth.Commands.Login
             CancellationToken cancellationToken
         )
         {
-            var normalizedEmail = _emailNormalizer.Normalize(
-                request.Email
-            );
+            var normalizedEmail = _emailNormalizer.Normalize(request.Email);
 
             var user = await _userRepository.GetByNormalizedEmailAsync(
                 normalizedEmail,
@@ -46,9 +44,7 @@ namespace Mype.Application.Auth.Commands.Login
 
             if (user == null)
             {
-                return Result<LoginResult>.Failure(
-                    LoginErrors.InvalidCredentials
-                );
+                return Result<LoginResult>.Failure(LoginErrors.InvalidCredentials);
             }
 
             var passwordIsValid = _passwordHasher.VerifyPassword(
@@ -58,16 +54,12 @@ namespace Mype.Application.Auth.Commands.Login
 
             if (!passwordIsValid)
             {
-                return Result<LoginResult>.Failure(
-                    LoginErrors.InvalidCredentials
-                );
+                return Result<LoginResult>.Failure(LoginErrors.InvalidCredentials);
             }
 
             if (!user.IsActive())
             {
-                return Result<LoginResult>.Failure(
-                    LoginErrors.AccountUnavailable
-                );
+                return Result<LoginResult>.Failure(LoginErrors.AccountUnavailable);
             }
 
             var issuedAt = _clock.UtcNow;
@@ -90,8 +82,8 @@ namespace Mype.Application.Auth.Commands.Login
                         Id = user.Id,
                         Email = user.Email,
                         DisplayName = user.DisplayName,
-                        Status = user.Status
-                    }
+                        Status = user.Status,
+                    },
                 }
             );
         }

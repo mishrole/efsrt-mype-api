@@ -1,3 +1,6 @@
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 using FluentAssertions;
 using MediatR;
 using Microsoft.AspNetCore.Http;
@@ -7,9 +10,6 @@ using Mype.Api.Endpoints.v1.Products;
 using Mype.Application.Common;
 using Mype.Application.Products.Queries.GetProductDetail;
 using Mype.Domain.Categories;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Mype.Tests.Api.Endpoints.v1.Products
 {
@@ -23,20 +23,14 @@ namespace Mype.Tests.Api.Endpoints.v1.Products
             var userId = Guid.NewGuid();
 
             var senderMock = new Mock<ISender>();
-            var userContextProviderMock =
-                new Mock<IUserContextProvider>();
+            var userContextProviderMock = new Mock<IUserContextProvider>();
 
-            userContextProviderMock
-                .Setup(provider =>
-                    provider.GetCurrentUserId()
-                )
-                .Returns(userId);
+            userContextProviderMock.Setup(provider => provider.GetCurrentUserId()).Returns(userId);
 
             senderMock
-                .Setup(sender => sender.Send(
-                    It.IsAny<GetProductDetailQuery>(),
-                    It.IsAny<CancellationToken>()
-                ))
+                .Setup(sender =>
+                    sender.Send(It.IsAny<GetProductDetailQuery>(), It.IsAny<CancellationToken>())
+                )
                 .ReturnsAsync(
                     Result<ProductDetailResult>.Success(
                         new ProductDetailResult(
@@ -56,30 +50,31 @@ namespace Mype.Tests.Api.Endpoints.v1.Products
                     )
                 );
 
-            var result =
-                await GetProductDetailEndpoint.DoAsync(
-                    businessId,
-                    productId,
-                    senderMock.Object,
-                    userContextProviderMock.Object,
-                    new DefaultHttpContext(),
-                    CancellationToken.None
-                );
+            var result = await GetProductDetailEndpoint.DoAsync(
+                businessId,
+                productId,
+                senderMock.Object,
+                userContextProviderMock.Object,
+                new DefaultHttpContext(),
+                CancellationToken.None
+            );
 
-            result.Should()
+            result
+                .Should()
                 .BeAssignableTo<IStatusCodeHttpResult>()
                 .Which.StatusCode.Should()
                 .Be(StatusCodes.Status200OK);
 
             senderMock.Verify(
-                sender => sender.Send(
-                    It.Is<GetProductDetailQuery>(query =>
-                        query.BusinessId == businessId &&
-                        query.ProductId == productId &&
-                        query.CurrentUserId == userId
+                sender =>
+                    sender.Send(
+                        It.Is<GetProductDetailQuery>(query =>
+                            query.BusinessId == businessId
+                            && query.ProductId == productId
+                            && query.CurrentUserId == userId
+                        ),
+                        It.IsAny<CancellationToken>()
                     ),
-                    It.IsAny<CancellationToken>()
-                ),
                 Times.Once
             );
         }

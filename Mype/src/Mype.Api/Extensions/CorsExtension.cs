@@ -1,10 +1,10 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Mype.Shared.Constants;
-using System;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 
 namespace Mype.Api.Extensions
 {
@@ -19,32 +19,37 @@ namespace Mype.Api.Extensions
         {
             services.AddCors(options =>
             {
-                options.AddPolicy(configuration[Env.CorsPolicyNameStringKey], policy =>
-                {
-                    var originsConfig = configuration[Env.OriginsConfigurationStringKey] ?? string.Empty;
+                options.AddPolicy(
+                    configuration[Env.CorsPolicyNameStringKey],
+                    policy =>
+                    {
+                        var originsConfig =
+                            configuration[Env.OriginsConfigurationStringKey] ?? string.Empty;
 
-                    if (!string.IsNullOrWhiteSpace(originsConfig))
-                    {
-                        var allowedOrigins = originsConfig
-                            .Split(',', StringSplitOptions.RemoveEmptyEntries)
-                            .Select(origin => origin.Trim())
-                            .ToArray();
+                        if (!string.IsNullOrWhiteSpace(originsConfig))
+                        {
+                            var allowedOrigins = originsConfig
+                                .Split(',', StringSplitOptions.RemoveEmptyEntries)
+                                .Select(origin => origin.Trim())
+                                .ToArray();
 
-                        policy.WithOrigins(allowedOrigins)
-                            .AllowAnyHeader()
-                            .AllowAnyMethod();
+                            policy.WithOrigins(allowedOrigins).AllowAnyHeader().AllowAnyMethod();
+                        }
+                        else if (environment.IsDevelopment())
+                        {
+                            policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
+                        }
+                        else
+                        {
+                            throw new InvalidOperationException(
+                                string.Format(
+                                    ErrorMessages.VariableRequiredInProduction,
+                                    Env.OriginsConfigurationStringKey
+                                )
+                            );
+                        }
                     }
-                    else if (environment.IsDevelopment())
-                    {
-                        policy.AllowAnyOrigin()
-                            .AllowAnyHeader()
-                            .AllowAnyMethod();
-                    }
-                    else
-                    {
-                        throw new InvalidOperationException(string.Format(ErrorMessages.VariableRequiredInProduction, Env.OriginsConfigurationStringKey));
-                    }
-                });
+                );
             });
 
             return services;

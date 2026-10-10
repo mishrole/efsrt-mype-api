@@ -6,11 +6,7 @@ namespace Mype.Domain.Common
     {
         protected ReferenceEntity() { }
 
-        protected ReferenceEntity(
-            Guid id,
-            string code,
-            string name,
-            bool isActive)
+        protected ReferenceEntity(Guid id, string code, string name, bool isActive)
         {
             Id = id;
             Code = code;

@@ -1,6 +1,6 @@
+using System;
 using FluentAssertions;
 using Mype.Infrastructure.Common;
-using System;
 
 namespace Mype.Tests.Infrastructure.Common
 {

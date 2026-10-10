@@ -1,7 +1,7 @@
-﻿using FluentAssertions;
-using Microsoft.AspNetCore.Mvc.Testing;
-using System.Net.Http;
+﻿using System.Net.Http;
 using System.Threading.Tasks;
+using FluentAssertions;
+using Microsoft.AspNetCore.Mvc.Testing;
 
 namespace Mype.Tests
 {
@@ -9,9 +9,7 @@ namespace Mype.Tests
     {
         private readonly HttpClient _client;
 
-        public HealthTests(
-            WebApplicationFactory<Program> factory
-        )
+        public HealthTests(WebApplicationFactory<Program> factory)
         {
             _client = factory.CreateClient();
         }
