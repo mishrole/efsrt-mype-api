@@ -1,3 +1,7 @@
+using System;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,10 +15,6 @@ using Mype.Infrastructure.FinancialMovements.Repositories;
 using Mype.Infrastructure.Persistence;
 using Mype.Shared.Constants;
 using Mype.Tests.Integration;
-using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Mype.Tests.Infrastructure.FinancialMovements.Repositories
 {
