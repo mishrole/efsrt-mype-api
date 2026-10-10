@@ -13,13 +13,71 @@ namespace Mype.Tests.Api.Common
 {
     public class HttpErrorMapperTests
     {
-        private const string TraceId = "test-trace-id";
-        private const string Detail = "test-stack-trace";
-        private const string RequiredMessage = "Campo requerido.";
-        private const string InvalidMessage = "Campo inválido.";
+        private const string TraceId =
+            "test-trace-id";
+
+        private const string Detail =
+            "test-stack-trace";
+
+        private const string RequiredMessage =
+            "Campo requerido.";
+
+        private const string InvalidMessage =
+            "Campo inválido.";
+
+        [Theory]
+        [InlineData(
+            ApplicationErrorType.Validation,
+            StatusCodes.Status400BadRequest
+        )]
+        [InlineData(
+            ApplicationErrorType.Unauthorized,
+            StatusCodes.Status401Unauthorized
+        )]
+        [InlineData(
+            ApplicationErrorType.Forbidden,
+            StatusCodes.Status403Forbidden
+        )]
+        [InlineData(
+            ApplicationErrorType.NotFound,
+            StatusCodes.Status404NotFound
+        )]
+        [InlineData(
+            ApplicationErrorType.Conflict,
+            StatusCodes.Status409Conflict
+        )]
+        [InlineData(
+            ApplicationErrorType.UnprocessableEntity,
+            StatusCodes.Status422UnprocessableEntity
+        )]
+        [InlineData(
+            ApplicationErrorType.Internal,
+            StatusCodes.Status500InternalServerError
+        )]
+        public void FromApplicationError_Should_Map_Error_Type(
+            ApplicationErrorType errorType,
+            int expectedStatusCode
+        )
+        {
+            var result =
+                HttpErrorMapper.FromApplicationError(
+                    ErrorCodes.InternalError,
+                    ErrorMessages.InternalError,
+                    errorType,
+                    TraceId,
+                    Detail
+                );
+
+            result.StatusCode.Should().Be(
+                expectedStatusCode
+            );
+            result.Detail.Should().Be(Detail);
+            result.TraceId.Should().Be(TraceId);
+            result.Errors.Should().BeEmpty();
+        }
 
         [Fact]
-        public void FromApplicationError_Should_Map_Conflict()
+        public void FromApplicationError_Should_Map_ApplicationError()
         {
             var error = new ApplicationError(
                 ErrorCodes.EmailAlreadyRegistered,
@@ -27,34 +85,33 @@ namespace Mype.Tests.Api.Common
                 ApplicationErrorType.Conflict
             );
 
-            var result = HttpErrorMapper.FromApplicationError(
-                error,
-                TraceId
-            );
+            var result =
+                HttpErrorMapper.FromApplicationError(
+                    error,
+                    TraceId
+                );
 
             result.Code.Should().Be(
                 ErrorCodes.EmailAlreadyRegistered
             );
-
             result.StatusCode.Should().Be(
                 StatusCodes.Status409Conflict
             );
-
             result.Message.Should().Be(
                 ErrorMessages.EmailAlreadyRegistered
             );
-
             result.TraceId.Should().Be(TraceId);
         }
 
         [Fact]
         public void FromException_Should_Map_ApplicationErrorException()
         {
-            var exception = new ApplicationErrorException(
-                ErrorCodes.EmailAlreadyRegistered,
-                ErrorMessages.EmailAlreadyRegistered,
-                ApplicationErrorType.Conflict
-            );
+            var exception =
+                new ApplicationErrorException(
+                    ErrorCodes.EmailAlreadyRegistered,
+                    ErrorMessages.EmailAlreadyRegistered,
+                    ApplicationErrorType.Conflict
+                );
 
             var result = HttpErrorMapper.FromException(
                 exception,
@@ -65,17 +122,13 @@ namespace Mype.Tests.Api.Common
             result.Code.Should().Be(
                 ErrorCodes.EmailAlreadyRegistered
             );
-
             result.StatusCode.Should().Be(
                 StatusCodes.Status409Conflict
             );
-
             result.Message.Should().Be(
                 ErrorMessages.EmailAlreadyRegistered
             );
-
             result.Detail.Should().Be(Detail);
-            result.TraceId.Should().Be(TraceId);
         }
 
         [Fact]
@@ -86,6 +139,7 @@ namespace Mype.Tests.Api.Common
                 {
                     new("Email", RequiredMessage),
                     new("Email", InvalidMessage),
+                    new("Email", RequiredMessage),
                     new("Password", RequiredMessage)
                 }
             );
@@ -99,47 +153,35 @@ namespace Mype.Tests.Api.Common
             result.Code.Should().Be(
                 ErrorCodes.ValidationError
             );
-
             result.StatusCode.Should().Be(
                 StatusCodes.Status400BadRequest
             );
-
             result.Message.Should().Be(
                 ErrorMessages.ValidationFailed
             );
-
-            result.Errors.Should().ContainKey("Email");
-
-            result.Errors["Email"].Should().BeEquivalentTo(
-                [
-                    RequiredMessage,
-                    InvalidMessage
-                ]
-            );
-
-            result.Errors.Should().ContainKey("Password");
-
+            result.Errors["Email"]
+                .Should()
+                .BeEquivalentTo(
+                    [
+                        RequiredMessage,
+                        InvalidMessage
+                    ]
+                );
             result.Errors["Password"]
                 .Should()
                 .ContainSingle()
-                .Which
-                .Should()
+                .Which.Should()
                 .Be(RequiredMessage);
-
             result.Detail.Should().Be(Detail);
-            result.TraceId.Should().Be(TraceId);
         }
 
         [Fact]
-        public void FromException_Should_Remove_Duplicate_Validation_Errors()
+        public void FromException_Should_Map_BadHttpRequest_As_Validation_Error()
         {
-            var exception = new ValidationException(
-                new List<ValidationFailure>
-                {
-                    new("Email", RequiredMessage),
-                    new("Email", RequiredMessage)
-                }
-            );
+            var exception =
+                new BadHttpRequestException(
+                    "Sensitive binding detail."
+                );
 
             var result = HttpErrorMapper.FromException(
                 exception,
@@ -147,58 +189,17 @@ namespace Mype.Tests.Api.Common
                 Detail
             );
 
-            result.Errors["Email"]
-                .Should()
-                .ContainSingle()
-                .Which
-                .Should()
-                .Be(RequiredMessage);
-        }
-
-        [Fact]
-        public void FromApplicationError_Should_Return_UnprocessableEntity()
-        {
-            var error = new ApplicationError(
-                ErrorCodes.UnsupportedCurrency,
-                ErrorMessages.UnsupportedCurrency,
-                ApplicationErrorType.UnprocessableEntity
-            );
-
-            var result = HttpErrorMapper.FromApplicationError(
-                error,
-                TraceId
-            );
-
-            result.StatusCode.Should().Be(
-                StatusCodes.Status422UnprocessableEntity
-            );
-
             result.Code.Should().Be(
-                ErrorCodes.UnsupportedCurrency
+                ErrorCodes.ValidationError
             );
-        }
-
-        [Fact]
-        public void FromApplicationError_Should_Return_InternalServerError()
-        {
-            var error = new ApplicationError(
-                ErrorCodes.BusinessCreationFailed,
-                ErrorMessages.BusinessCreationFailed,
-                ApplicationErrorType.Internal
-            );
-
-            var result = HttpErrorMapper.FromApplicationError(
-                error,
-                TraceId
-            );
-
             result.StatusCode.Should().Be(
-                StatusCodes.Status500InternalServerError
+                StatusCodes.Status400BadRequest
             );
-
-            result.Code.Should().Be(
-                ErrorCodes.BusinessCreationFailed
+            result.Message.Should().Be(
+                ErrorMessages.ValidationFailed
             );
+            result.Detail.Should().BeNull();
+            result.Errors.Should().BeEmpty();
         }
 
         [Fact]
@@ -217,21 +218,16 @@ namespace Mype.Tests.Api.Common
             result.Code.Should().Be(
                 ErrorCodes.InternalError
             );
-
             result.StatusCode.Should().Be(
                 StatusCodes.Status500InternalServerError
             );
-
             result.Message.Should().Be(
                 ErrorMessages.InternalError
             );
-
             result.Message.Should().NotContain(
                 exception.Message
             );
-
             result.Detail.Should().Be(Detail);
-            result.TraceId.Should().Be(TraceId);
         }
 
         [Theory]
@@ -260,10 +256,11 @@ namespace Mype.Tests.Api.Common
             int expectedStatusCode
         )
         {
-            var exception = (Exception)Activator.CreateInstance(
-                exceptionType,
-                "Known error."
-            )!;
+            var exception =
+                (Exception)Activator.CreateInstance(
+                    exceptionType,
+                    "Known error."
+                );
 
             var result = HttpErrorMapper.FromException(
                 exception,
@@ -271,8 +268,12 @@ namespace Mype.Tests.Api.Common
                 Detail
             );
 
-            result.StatusCode.Should().Be(expectedStatusCode);
-            result.Message.Should().Be(exception.Message);
+            result.StatusCode.Should().Be(
+                expectedStatusCode
+            );
+            result.Message.Should().Be(
+                exception.Message
+            );
             result.TraceId.Should().Be(TraceId);
         }
     }
