@@ -13,22 +13,6 @@ namespace Mype.Api.Common
     public static class HttpErrorMapper
     {
         public static HttpStatusCodeInfo FromApplicationError(
-            string code,
-            string message,
-            ApplicationErrorType errorType,
-            string traceId
-        )
-        {
-            return new HttpStatusCodeInfo
-            {
-                Code = code,
-                StatusCode = GetStatusCode(errorType),
-                Message = message,
-                TraceId = traceId
-            };
-        }
-
-        public static HttpStatusCodeInfo FromApplicationError(
             ApplicationError error,
             string traceId
         )
@@ -39,6 +23,28 @@ namespace Mype.Api.Common
                 error.Type,
                 traceId
             );
+        }
+
+        public static HttpStatusCodeInfo FromApplicationError(
+            string code,
+            string message,
+            ApplicationErrorType errorType,
+            string traceId,
+            string detail = null,
+            Dictionary<string, string[]> errors = null
+        )
+        {
+            return new HttpStatusCodeInfo
+            {
+                Code = code,
+                StatusCode = GetStatusCode(
+                    errorType
+                ),
+                Message = message,
+                Detail = detail,
+                TraceId = traceId,
+                Errors = errors ?? []
+            };
         }
 
         public static HttpStatusCodeInfo FromException(
@@ -53,33 +59,47 @@ namespace Mype.Api.Common
                     applicationError.Code,
                     applicationError.Message,
                     applicationError.ErrorType,
-                    traceId
+                    traceId,
+                    detail
                 );
-
-                response.Detail = detail;
 
                 return response;
             }
 
             if (exception is ValidationException validationException)
             {
-                return new HttpStatusCodeInfo
-                {
-                    Code = ErrorCodes.ValidationError,
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    Message = ErrorMessages.ValidationFailed,
-                    Detail = detail,
-                    TraceId = traceId,
-                    Errors = validationException.Errors
-                        .GroupBy(error => error.PropertyName)
-                        .ToDictionary(
-                            group => group.Key,
-                            group => group
-                                .Select(error => error.ErrorMessage)
-                                .Distinct()
-                                .ToArray()
-                        )
-                };
+                var errors = validationException.Errors
+                    .GroupBy(error =>
+                        error.PropertyName
+                    )
+                    .ToDictionary(
+                        group => group.Key,
+                        group => group
+                            .Select(error =>
+                                error.ErrorMessage
+                            )
+                            .Distinct()
+                            .ToArray()
+                    );
+
+                return FromApplicationError(
+                    ErrorCodes.ValidationError,
+                    ErrorMessages.ValidationFailed,
+                    ApplicationErrorType.Validation,
+                    traceId,
+                    detail,
+                    errors
+                );
+            }
+
+            if (exception is BadHttpRequestException)
+            {
+                return FromApplicationError(
+                    ErrorCodes.ValidationError,
+                    ErrorMessages.ValidationFailed,
+                    ApplicationErrorType.Validation,
+                    traceId
+                );
             }
 
             var statusCode = exception switch

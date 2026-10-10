@@ -14,6 +14,7 @@
 
         public const string InternalError = "Ocurrió un error interno.";
         public const string ValidationFailed = "Uno o más campos no son válidos.";
+        public const string BadHttpRequestReceived = "La solicitud HTTP no pudo ser procesada.";
 
         #region Auth
 
