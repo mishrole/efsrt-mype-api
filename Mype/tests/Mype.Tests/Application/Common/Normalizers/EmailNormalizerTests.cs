@@ -1,6 +1,6 @@
-﻿using FluentAssertions;
+﻿using System;
+using FluentAssertions;
 using Mype.Application.Common.Normalizers;
-using System;
 
 namespace Mype.Tests.Application.Common.Normalizers
 {
@@ -12,10 +12,7 @@ namespace Mype.Tests.Application.Common.Normalizers
         [InlineData("user@example.com", "USER@EXAMPLE.COM")]
         [InlineData("USER@EXAMPLE.COM", "USER@EXAMPLE.COM")]
         [InlineData(" user@example.com ", "USER@EXAMPLE.COM")]
-        public void Normalize_Should_Trim_And_Convert_To_Uppercase(
-            string email,
-            string expected
-        )
+        public void Normalize_Should_Trim_And_Convert_To_Uppercase(string email, string expected)
         {
             var result = _normalizer.Normalize(email);
 

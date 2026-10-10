@@ -1,7 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
-using System;
+﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Http;
 
 namespace Mype.Api.Context
 {
@@ -24,9 +24,10 @@ namespace Mype.Api.Context
                 throw new UnauthorizedAccessException();
             }
 
-            var userId = user.FindFirstValue(ClaimTypes.NameIdentifier)
-                        ?? user.FindFirstValue("sub")
-                        ?? throw new UnauthorizedAccessException();
+            var userId =
+                user.FindFirstValue(ClaimTypes.NameIdentifier)
+                ?? user.FindFirstValue("sub")
+                ?? throw new UnauthorizedAccessException();
 
             if (!Guid.TryParse(userId, out var parsedUserId))
             {
@@ -38,6 +39,5 @@ namespace Mype.Api.Context
 
         public bool IsAuthenticated =>
             _httpContextAccessor.HttpContext?.User?.Identity?.IsAuthenticated == true;
-
     }
 }

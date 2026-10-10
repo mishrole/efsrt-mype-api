@@ -1,11 +1,11 @@
-﻿using MediatR;
+﻿using System.Threading;
+using System.Threading.Tasks;
+using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Mype.Api.Context;
 using Mype.Api.Extensions;
 using Mype.Application.Businesses.Queries.ListUserBusinesses;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Mype.Api.Endpoints.v1.Businesses
 {
@@ -20,19 +20,12 @@ namespace Mype.Api.Endpoints.v1.Businesses
         {
             var query = new ListUserBusinessesQuery
             {
-                CurrentUserId =
-                    userContextProvider.GetCurrentUserId()
+                CurrentUserId = userContextProvider.GetCurrentUserId(),
             };
 
-            var result = await sender.Send(
-                query,
-                cancellationToken
-            );
+            var result = await sender.Send(query, cancellationToken);
 
-            return result.ToHttpResult(
-                context,
-                response => TypedResults.Ok(response)
-            );
+            return result.ToHttpResult(context, response => TypedResults.Ok(response));
         }
     }
 }

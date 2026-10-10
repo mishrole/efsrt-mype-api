@@ -2,8 +2,5 @@
 
 namespace Mype.Application.Categories.Models
 {
-    public sealed record DefaultCategoryDefinition(
-        string Name,
-        CategoryType Type
-    );
+    public sealed record DefaultCategoryDefinition(string Name, CategoryType Type);
 }

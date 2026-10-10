@@ -1,6 +1,6 @@
+using System;
 using FluentAssertions;
 using Mype.Domain.BusinessRolePermissions;
-using System;
 
 namespace Mype.Tests.Domain.BusinessRolePermissions
 {
@@ -11,27 +11,12 @@ namespace Mype.Tests.Domain.BusinessRolePermissions
         {
             var roleId = Guid.NewGuid();
             var permissionId = Guid.NewGuid();
-            var createdAt = new DateTimeOffset(
-                2026,
-                10,
-                9,
-                12,
-                0,
-                0,
-                TimeSpan.Zero
-            );
+            var createdAt = new DateTimeOffset(2026, 10, 9, 12, 0, 0, TimeSpan.Zero);
 
-            var relation =
-                BusinessRolePermission.Create(
-                    roleId,
-                    permissionId,
-                    createdAt
-                );
+            var relation = BusinessRolePermission.Create(roleId, permissionId, createdAt);
 
             relation.BusinessRoleId.Should().Be(roleId);
-            relation.PermissionId.Should().Be(
-                permissionId
-            );
+            relation.PermissionId.Should().Be(permissionId);
             relation.CreatedAt.Should().Be(createdAt);
         }
     }

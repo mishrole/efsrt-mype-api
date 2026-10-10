@@ -1,4 +1,8 @@
-﻿using MediatR;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using MediatR;
 using Mype.Application.BusinessMemberships.Interfaces;
 using Mype.Application.Categories.Interfaces;
 using Mype.Application.Common;
@@ -8,203 +12,119 @@ using Mype.Application.Products.Normalizers;
 using Mype.Domain.Businesses;
 using Mype.Domain.BusinessMemberships;
 using Mype.Domain.Permissions.Constants;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Mype.Application.Products.Queries.ListProducts
 {
     public sealed class ListProductsQueryHandler
-        : IRequestHandler<
-            ListProductsQuery,
-            Result<
-                IReadOnlyCollection<
-                    ProductListItemResult
-                >
-            >
-        >
+        : IRequestHandler<ListProductsQuery, Result<IReadOnlyCollection<ProductListItemResult>>>
     {
-        private readonly
-            IBusinessMembershipRepository
-            _membershipRepository;
+        private readonly IBusinessMembershipRepository _membershipRepository;
 
-        private readonly
-            IPermissionRepository
-            _permissionRepository;
+        private readonly IPermissionRepository _permissionRepository;
 
-        private readonly
-            ICategoryRepository
-            _categoryRepository;
+        private readonly ICategoryRepository _categoryRepository;
 
-        private readonly
-            IProductRepository
-            _productRepository;
+        private readonly IProductRepository _productRepository;
 
         public ListProductsQueryHandler(
-            IBusinessMembershipRepository
-                membershipRepository,
-            IPermissionRepository
-                permissionRepository,
-            ICategoryRepository
-                categoryRepository,
-            IProductRepository
-                productRepository
+            IBusinessMembershipRepository membershipRepository,
+            IPermissionRepository permissionRepository,
+            ICategoryRepository categoryRepository,
+            IProductRepository productRepository
         )
         {
-            _membershipRepository =
-                membershipRepository;
+            _membershipRepository = membershipRepository;
 
-            _permissionRepository =
-                permissionRepository;
+            _permissionRepository = permissionRepository;
 
-            _categoryRepository =
-                categoryRepository;
+            _categoryRepository = categoryRepository;
 
-            _productRepository =
-                productRepository;
+            _productRepository = productRepository;
         }
 
-        public async Task<
-            Result<
-                IReadOnlyCollection<
-                    ProductListItemResult
-                >
-            >
-        > Handle(
+        public async Task<Result<IReadOnlyCollection<ProductListItemResult>>> Handle(
             ListProductsQuery request,
             CancellationToken cancellationToken
         )
         {
-            var context =
-                await _membershipRepository
-                    .GetContextByBusinessAndUserAsync(
-                        request.BusinessId,
-                        request.CurrentUserId,
-                        cancellationToken
-                    );
+            var context = await _membershipRepository.GetContextByBusinessAndUserAsync(
+                request.BusinessId,
+                request.CurrentUserId,
+                cancellationToken
+            );
 
             if (
-                context == null ||
-                context.MembershipStatus !=
-                    BusinessMembershipStatus.Active ||
-                !context.RoleIsActive
+                context == null
+                || context.MembershipStatus != BusinessMembershipStatus.Active
+                || !context.RoleIsActive
             )
             {
-                return Failure(
-                    ListProductsErrors
-                        .BusinessAccessForbidden
-                );
+                return Failure(ListProductsErrors.BusinessAccessForbidden);
             }
 
-            if (
-                context.BusinessStatus !=
-                BusinessStatus.Active
-            )
+            if (context.BusinessStatus != BusinessStatus.Active)
             {
-                return Failure(
-                    ListProductsErrors
-                        .BusinessUnavailable
-                );
+                return Failure(ListProductsErrors.BusinessUnavailable);
             }
 
-            var permissions =
-                await _permissionRepository
-                    .ListActiveCodesByRoleIdAsync(
-                        context.RoleId,
-                        cancellationToken
-                    );
+            var permissions = await _permissionRepository.ListActiveCodesByRoleIdAsync(
+                context.RoleId,
+                cancellationToken
+            );
 
-            if (
-                !permissions.Contains(
-                    SystemPermissions.ProductRead.Code
-                )
-            )
+            if (!permissions.Contains(SystemPermissions.ProductRead.Code))
             {
-                return Failure(
-                    ListProductsErrors
-                        .ProductAccessForbidden
-                );
+                return Failure(ListProductsErrors.ProductAccessForbidden);
             }
 
             if (request.CategoryId.HasValue)
             {
-                var categoryExists =
-                    await _categoryRepository
-                        .ExistsByIdAndBusinessAsync(
-                            request.CategoryId.Value,
-                            request.BusinessId,
-                            cancellationToken
-                        );
+                var categoryExists = await _categoryRepository.ExistsByIdAndBusinessAsync(
+                    request.CategoryId.Value,
+                    request.BusinessId,
+                    cancellationToken
+                );
 
                 if (!categoryExists)
                 {
-                    return Failure(
-                        ListProductsErrors
-                            .CategoryNotFound
-                    );
+                    return Failure(ListProductsErrors.CategoryNotFound);
                 }
             }
 
-            var normalizedSearch =
-                string.IsNullOrWhiteSpace(
-                    request.Search
-                )
-                    ? null
-                    : ProductNameNormalizer
-                        .NormalizeForComparison(
-                            request.Search
-                        );
+            var normalizedSearch = string.IsNullOrWhiteSpace(request.Search)
+                ? null
+                : ProductNameNormalizer.NormalizeForComparison(request.Search);
 
-            var products =
-                await _productRepository
-                    .ListByBusinessAsync(
-                        request.BusinessId,
-                        normalizedSearch,
-                        request.CategoryId,
-                        request.IsActive,
-                        request.AvailableForSale,
-                        cancellationToken
-                    );
+            var products = await _productRepository.ListByBusinessAsync(
+                request.BusinessId,
+                normalizedSearch,
+                request.CategoryId,
+                request.IsActive,
+                request.AvailableForSale,
+                cancellationToken
+            );
 
-            IReadOnlyCollection<
-                ProductListItemResult
-            > result =
-                products
-                    .Select(product =>
-                        new ProductListItemResult(
-                            product.Id,
-                            product.BusinessId,
-                            product.CategoryId,
-                            product.CategoryName,
-                            product.Name,
-                            product.SalePrice,
-                            product.UnitCost,
-                            product.IsActive
-                        )
-                    )
-                    .ToArray();
+            IReadOnlyCollection<ProductListItemResult> result = products
+                .Select(product => new ProductListItemResult(
+                    product.Id,
+                    product.BusinessId,
+                    product.CategoryId,
+                    product.CategoryName,
+                    product.Name,
+                    product.SalePrice,
+                    product.UnitCost,
+                    product.IsActive
+                ))
+                .ToArray();
 
-            return Result<
-                IReadOnlyCollection<
-                    ProductListItemResult
-                >
-            >.Success(result);
+            return Result<IReadOnlyCollection<ProductListItemResult>>.Success(result);
         }
 
-        private static Result<
-            IReadOnlyCollection<
-                ProductListItemResult
-            >
-        > Failure(
+        private static Result<IReadOnlyCollection<ProductListItemResult>> Failure(
             ApplicationError error
         )
         {
-            return Result<
-                IReadOnlyCollection<
-                    ProductListItemResult
-                >
-            >.Failure(error);
+            return Result<IReadOnlyCollection<ProductListItemResult>>.Failure(error);
         }
     }
 }

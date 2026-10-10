@@ -1,3 +1,6 @@
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 using FluentAssertions;
 using MediatR;
 using Microsoft.AspNetCore.Http;
@@ -6,9 +9,6 @@ using Mype.Api.Context;
 using Mype.Api.Endpoints.v1.Products;
 using Mype.Application.Common;
 using Mype.Application.Products.Commands.CreateProduct;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Mype.Tests.Api.Endpoints.v1.Products
 {
@@ -23,20 +23,14 @@ namespace Mype.Tests.Api.Endpoints.v1.Products
             var productId = Guid.NewGuid();
 
             var senderMock = new Mock<ISender>();
-            var userContextProviderMock =
-                new Mock<IUserContextProvider>();
+            var userContextProviderMock = new Mock<IUserContextProvider>();
 
-            userContextProviderMock
-                .Setup(provider =>
-                    provider.GetCurrentUserId()
-                )
-                .Returns(userId);
+            userContextProviderMock.Setup(provider => provider.GetCurrentUserId()).Returns(userId);
 
             senderMock
-                .Setup(sender => sender.Send(
-                    It.IsAny<CreateProductCommand>(),
-                    It.IsAny<CancellationToken>()
-                ))
+                .Setup(sender =>
+                    sender.Send(It.IsAny<CreateProductCommand>(), It.IsAny<CancellationToken>())
+                )
                 .ReturnsAsync(
                     Result<CreateProductResult>.Success(
                         new CreateProductResult
@@ -44,44 +38,39 @@ namespace Mype.Tests.Api.Endpoints.v1.Products
                             Id = productId,
                             BusinessId = businessId,
                             CategoryId = categoryId,
-                            Name = "Gaseosa"
+                            Name = "Gaseosa",
                         }
                     )
                 );
 
-            var result =
-                await CreateProductEndpoint.DoAsync(
-                    businessId,
-                    new CreateProductEndpoint
-                        .CreateProductRequest(
-                            "Gaseosa",
-                            categoryId,
-                            3.50m,
-                            2.20m
-                        ),
-                    senderMock.Object,
-                    userContextProviderMock.Object,
-                    new DefaultHttpContext(),
-                    CancellationToken.None
-                );
+            var result = await CreateProductEndpoint.DoAsync(
+                businessId,
+                new CreateProductEndpoint.CreateProductRequest("Gaseosa", categoryId, 3.50m, 2.20m),
+                senderMock.Object,
+                userContextProviderMock.Object,
+                new DefaultHttpContext(),
+                CancellationToken.None
+            );
 
-            result.Should()
+            result
+                .Should()
                 .BeAssignableTo<IStatusCodeHttpResult>()
                 .Which.StatusCode.Should()
                 .Be(StatusCodes.Status201Created);
 
             senderMock.Verify(
-                sender => sender.Send(
-                    It.Is<CreateProductCommand>(command =>
-                        command.BusinessId == businessId &&
-                        command.CurrentUserId == userId &&
-                        command.CategoryId == categoryId &&
-                        command.Name == "Gaseosa" &&
-                        command.SalePrice == 3.50m &&
-                        command.UnitCost == 2.20m
+                sender =>
+                    sender.Send(
+                        It.Is<CreateProductCommand>(command =>
+                            command.BusinessId == businessId
+                            && command.CurrentUserId == userId
+                            && command.CategoryId == categoryId
+                            && command.Name == "Gaseosa"
+                            && command.SalePrice == 3.50m
+                            && command.UnitCost == 2.20m
+                        ),
+                        It.IsAny<CancellationToken>()
                     ),
-                    It.IsAny<CancellationToken>()
-                ),
                 Times.Once
             );
         }

@@ -1,21 +1,18 @@
-using FluentAssertions;
-using Mype.Application.Products.Queries.ListProducts;
 using System;
 using System.Threading.Tasks;
+using FluentAssertions;
+using Mype.Application.Products.Queries.ListProducts;
 
 namespace Mype.Tests.Application.Products.Queries.ListProducts
 {
     public class ListProductsQueryValidatorTests
     {
-        private readonly ListProductsQueryValidator
-            _validator = new();
+        private readonly ListProductsQueryValidator _validator = new();
 
         [Fact]
         public async Task Validate_Should_Succeed_Without_Filters()
         {
-            var result = await _validator.ValidateAsync(
-                CreateQuery()
-            );
+            var result = await _validator.ValidateAsync(CreateQuery());
 
             result.IsValid.Should().BeTrue();
             result.Errors.Should().BeEmpty();
@@ -31,9 +28,7 @@ namespace Mype.Tests.Application.Products.Queries.ListProducts
             query.IsActive = true;
             query.AvailableForSale = true;
 
-            var result = await _validator.ValidateAsync(
-                query
-            );
+            var result = await _validator.ValidateAsync(query);
 
             result.IsValid.Should().BeTrue();
             result.Errors.Should().BeEmpty();
@@ -47,19 +42,13 @@ namespace Mype.Tests.Application.Products.Queries.ListProducts
             query.BusinessId = Guid.Empty;
             query.CurrentUserId = Guid.Empty;
 
-            var result = await _validator.ValidateAsync(
-                query
-            );
+            var result = await _validator.ValidateAsync(query);
 
-            result.Errors.Should().Contain(error =>
-                error.PropertyName ==
-                nameof(query.BusinessId)
-            );
+            result.Errors.Should().Contain(error => error.PropertyName == nameof(query.BusinessId));
 
-            result.Errors.Should().Contain(error =>
-                error.PropertyName ==
-                nameof(query.CurrentUserId)
-            );
+            result
+                .Errors.Should()
+                .Contain(error => error.PropertyName == nameof(query.CurrentUserId));
         }
 
         [Fact]
@@ -69,14 +58,9 @@ namespace Mype.Tests.Application.Products.Queries.ListProducts
 
             query.CategoryId = Guid.Empty;
 
-            var result = await _validator.ValidateAsync(
-                query
-            );
+            var result = await _validator.ValidateAsync(query);
 
-            result.Errors.Should().Contain(error =>
-                error.PropertyName ==
-                nameof(query.CategoryId)
-            );
+            result.Errors.Should().Contain(error => error.PropertyName == nameof(query.CategoryId));
         }
 
         private static ListProductsQuery CreateQuery()
@@ -84,7 +68,7 @@ namespace Mype.Tests.Application.Products.Queries.ListProducts
             return new ListProductsQuery
             {
                 BusinessId = Guid.NewGuid(),
-                CurrentUserId = Guid.NewGuid()
+                CurrentUserId = Guid.NewGuid(),
             };
         }
     }

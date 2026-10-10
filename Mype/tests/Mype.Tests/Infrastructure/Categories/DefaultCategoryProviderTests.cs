@@ -1,14 +1,13 @@
-﻿using FluentAssertions;
+﻿using System.Linq;
+using FluentAssertions;
 using Mype.Domain.Categories;
 using Mype.Infrastructure.Categories;
-using System.Linq;
 
 namespace Mype.Tests.Infrastructure.Categories
 {
     public class DefaultCategoryProviderTests
     {
-        private readonly DefaultCategoryProvider
-            _provider = new();
+        private readonly DefaultCategoryProvider _provider = new();
 
         [Fact]
         public void GetDefaultCategories_Should_Return_Ten_Categories()
@@ -23,9 +22,7 @@ namespace Mype.Tests.Infrastructure.Categories
         {
             var result = _provider.GetDefaultCategories();
 
-            result.Count(category =>
-                category.Type == CategoryType.Sale
-            ).Should().Be(3);
+            result.Count(category => category.Type == CategoryType.Sale).Should().Be(3);
         }
 
         [Fact]
@@ -33,9 +30,7 @@ namespace Mype.Tests.Infrastructure.Categories
         {
             var result = _provider.GetDefaultCategories();
 
-            result.Count(category =>
-                category.Type == CategoryType.Expense
-            ).Should().Be(7);
+            result.Count(category => category.Type == CategoryType.Expense).Should().Be(7);
         }
 
         [Fact]
@@ -47,9 +42,7 @@ namespace Mype.Tests.Infrastructure.Categories
                 .Select(category => new
                 {
                     category.Type,
-                    Name = category.Name
-                        .Trim()
-                        .ToUpperInvariant()
+                    Name = category.Name.Trim().ToUpperInvariant(),
                 })
                 .Should()
                 .OnlyHaveUniqueItems();
@@ -60,39 +53,25 @@ namespace Mype.Tests.Infrastructure.Categories
         {
             var result = _provider.GetDefaultCategories();
 
-            result.Should().ContainEquivalentOf(
-                new
-                {
-                    Name = "Productos",
-                    Type = CategoryType.Sale
-                }
-            );
+            result
+                .Should()
+                .ContainEquivalentOf(new { Name = "Productos", Type = CategoryType.Sale });
 
-            result.Should().ContainEquivalentOf(
-                new
-                {
-                    Name = "Servicios",
-                    Type = CategoryType.Sale
-                }
-            );
+            result
+                .Should()
+                .ContainEquivalentOf(new { Name = "Servicios", Type = CategoryType.Sale });
 
-            result.Should().ContainEquivalentOf(
-                new
-                {
-                    Name = "Otros ingresos",
-                    Type = CategoryType.Sale
-                }
-            );
+            result
+                .Should()
+                .ContainEquivalentOf(new { Name = "Otros ingresos", Type = CategoryType.Sale });
         }
 
         [Fact]
         public void GetDefaultCategories_Should_Return_Stable_Collection()
         {
-            var firstResult =
-                _provider.GetDefaultCategories();
+            var firstResult = _provider.GetDefaultCategories();
 
-            var secondResult =
-                _provider.GetDefaultCategories();
+            var secondResult = _provider.GetDefaultCategories();
 
             secondResult.Should().BeSameAs(firstResult);
         }

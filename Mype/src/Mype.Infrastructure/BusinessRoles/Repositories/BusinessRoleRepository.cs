@@ -1,9 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using Mype.Application.BusinessRoles.Interfaces;
 using Mype.Domain.BusinessRoles;
 using Mype.Infrastructure.Persistence;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Mype.Infrastructure.BusinessRoles.Repositories
 {
@@ -11,9 +11,7 @@ namespace Mype.Infrastructure.BusinessRoles.Repositories
     {
         private readonly MypeDbContext _dbContext;
 
-        public BusinessRoleRepository(
-            MypeDbContext dbContext
-        )
+        public BusinessRoleRepository(MypeDbContext dbContext)
         {
             _dbContext = dbContext;
         }
@@ -23,12 +21,10 @@ namespace Mype.Infrastructure.BusinessRoles.Repositories
             CancellationToken cancellationToken
         )
         {
-            return _dbContext.BusinessRoles
-                .AsNoTracking()
+            return _dbContext
+                .BusinessRoles.AsNoTracking()
                 .SingleOrDefaultAsync(
-                    role =>
-                        role.Code == code &&
-                        role.IsActive,
+                    role => role.Code == code && role.IsActive,
                     cancellationToken
                 );
         }

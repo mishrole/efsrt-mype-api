@@ -1,20 +1,18 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Mype.Infrastructure.Persistence;
 using Mype.Shared.Constants;
-using System;
-using System.Diagnostics.CodeAnalysis;
-using System.Threading.Tasks;
 
 namespace Mype.Infrastructure.Extensions
 {
     [ExcludeFromCodeCoverage]
     public static class MigrationExtension
     {
-        public static async Task ApplyMigrationsAsync(
-            this IServiceProvider services
-        )
+        public static async Task ApplyMigrationsAsync(this IServiceProvider services)
         {
             await using var scope = services.CreateAsyncScope();
 

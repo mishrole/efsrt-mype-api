@@ -1,7 +1,7 @@
-﻿using FluentValidation.TestHelper;
+﻿using System.Threading.Tasks;
+using FluentValidation.TestHelper;
 using Mype.Application.Auth.Commands.Login;
 using Mype.Domain.Users.Constraints;
-using System.Threading.Tasks;
 
 namespace Mype.Tests.Application.Auth.Commands.Login
 {
@@ -30,27 +30,21 @@ namespace Mype.Tests.Application.Auth.Commands.Login
 
             var result = await _validator.TestValidateAsync(command);
 
-            result.ShouldHaveValidationErrorFor(
-                current => current.Email
-            );
+            result.ShouldHaveValidationErrorFor(current => current.Email);
         }
 
         [Theory]
         [InlineData("invalid-email")]
         [InlineData("@example.com")]
         [InlineData("user@")]
-        public async Task Validate_Should_Have_Error_When_Email_Is_Invalid(
-            string email
-        )
+        public async Task Validate_Should_Have_Error_When_Email_Is_Invalid(string email)
         {
             var command = CreateValidCommand();
             command.Email = email;
 
             var result = await _validator.TestValidateAsync(command);
 
-            result.ShouldHaveValidationErrorFor(
-                current => current.Email
-            );
+            result.ShouldHaveValidationErrorFor(current => current.Email);
         }
 
         [Fact]
@@ -58,16 +52,11 @@ namespace Mype.Tests.Application.Auth.Commands.Login
         {
             var command = CreateValidCommand();
 
-            command.Email = new string(
-                'a',
-                UserConstraints.EmailMaxLength + 1
-            );
+            command.Email = new string('a', UserConstraints.EmailMaxLength + 1);
 
             var result = await _validator.TestValidateAsync(command);
 
-            result.ShouldHaveValidationErrorFor(
-                current => current.Email
-            );
+            result.ShouldHaveValidationErrorFor(current => current.Email);
         }
 
         [Fact]
@@ -78,9 +67,7 @@ namespace Mype.Tests.Application.Auth.Commands.Login
 
             var result = await _validator.TestValidateAsync(command);
 
-            result.ShouldHaveValidationErrorFor(
-                current => current.Password
-            );
+            result.ShouldHaveValidationErrorFor(current => current.Password);
         }
 
         [Fact]
@@ -91,18 +78,12 @@ namespace Mype.Tests.Application.Auth.Commands.Login
 
             var result = await _validator.TestValidateAsync(command);
 
-            result.ShouldNotHaveValidationErrorFor(
-                current => current.Password
-            );
+            result.ShouldNotHaveValidationErrorFor(current => current.Password);
         }
 
         private static LoginCommand CreateValidCommand()
         {
-            return new LoginCommand
-            {
-                Email = ValidEmail,
-                Password = ValidPassword
-            };
+            return new LoginCommand { Email = ValidEmail, Password = ValidPassword };
         }
     }
 }

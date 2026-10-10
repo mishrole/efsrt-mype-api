@@ -1,10 +1,10 @@
-﻿using MediatR;
+﻿using System.Threading;
+using System.Threading.Tasks;
+using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Mype.Api.Extensions;
 using Mype.Application.Auth.Commands.RegisterUser;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Mype.Api.Endpoints.v1.Auth
 {
@@ -29,20 +29,14 @@ namespace Mype.Api.Endpoints.v1.Auth
                 DisplayName = request.DisplayName,
                 Email = request.Email,
                 Password = request.Password,
-                PasswordConfirmation = request.PasswordConfirmation
+                PasswordConfirmation = request.PasswordConfirmation,
             };
 
-            var result = await sender.Send(
-                command,
-                cancellationToken
-            );
+            var result = await sender.Send(command, cancellationToken);
 
             return result.ToHttpResult(
                 context,
-                value => TypedResults.Created(
-                    $"/api/v1/users/{value.UserId}",
-                    value
-                )
+                value => TypedResults.Created($"/api/v1/users/{value.UserId}", value)
             );
         }
     }

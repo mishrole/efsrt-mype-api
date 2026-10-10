@@ -5,8 +5,7 @@ using Mype.Shared.Constants;
 
 namespace Mype.Application.Auth.Commands.RegisterUser
 {
-    public class RegisterUserCommandValidator
-        : AbstractValidator<RegisterUserCommand>
+    public class RegisterUserCommandValidator : AbstractValidator<RegisterUserCommand>
     {
         public RegisterUserCommandValidator()
         {

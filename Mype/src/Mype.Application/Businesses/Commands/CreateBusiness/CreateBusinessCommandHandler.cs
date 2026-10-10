@@ -1,4 +1,9 @@
-﻿using MediatR;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using MediatR;
 using Mype.Application.Auth.Commands.Login;
 using Mype.Application.Businesses.Interfaces;
 using Mype.Application.BusinessMemberships.Interfaces;
@@ -12,19 +17,11 @@ using Mype.Domain.Businesses;
 using Mype.Domain.BusinessMemberships;
 using Mype.Domain.BusinessRoles.Constants;
 using Mype.Domain.Categories;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Mype.Application.Businesses.Commands.CreateBusiness
 {
     public class CreateBusinessCommandHandler
-        : IRequestHandler<
-            CreateBusinessCommand,
-            Result<CreateBusinessResult>
-        >
+        : IRequestHandler<CreateBusinessCommand, Result<CreateBusinessResult>>
     {
         private readonly IUserRepository _userRepository;
         private readonly ICurrencyRepository _currencyRepository;
@@ -64,27 +61,19 @@ namespace Mype.Application.Businesses.Commands.CreateBusiness
             CancellationToken cancellationToken
         )
         {
-            var user = await _userRepository.GetByIdAsync(
-                request.CurrentUserId,
-                cancellationToken
-            );
+            var user = await _userRepository.GetByIdAsync(request.CurrentUserId, cancellationToken);
 
             if (user == null || !user.IsActive())
             {
-                return Result<CreateBusinessResult>.Failure(
-                    LoginErrors.AccountUnavailable
-                );
+                return Result<CreateBusinessResult>.Failure(LoginErrors.AccountUnavailable);
             }
 
-            var currencyCode = request.CurrencyCode
-                .Trim()
-                .ToUpperInvariant();
+            var currencyCode = request.CurrencyCode.Trim().ToUpperInvariant();
 
-            var currency =
-                await _currencyRepository.GetActiveByCodeAsync(
-                    currencyCode,
-                    cancellationToken
-                );
+            var currency = await _currencyRepository.GetActiveByCodeAsync(
+                currencyCode,
+                cancellationToken
+            );
 
             if (currency == null)
             {
@@ -93,11 +82,10 @@ namespace Mype.Application.Businesses.Commands.CreateBusiness
                 );
             }
 
-            var ownerRole =
-                await _roleRepository.GetActiveByCodeAsync(
-                    BusinessRoleConstants.OwnerCode,
-                    cancellationToken
-                );
+            var ownerRole = await _roleRepository.GetActiveByCodeAsync(
+                BusinessRoleConstants.OwnerCode,
+                cancellationToken
+            );
 
             if (ownerRole == null)
             {
@@ -106,18 +94,11 @@ namespace Mype.Application.Businesses.Commands.CreateBusiness
                 );
             }
 
-            var normalizedRuc = string.IsNullOrWhiteSpace(
-                request.Ruc
-            )
-                ? null
-                : request.Ruc.Trim();
+            var normalizedRuc = string.IsNullOrWhiteSpace(request.Ruc) ? null : request.Ruc.Trim();
 
             if (
-                normalizedRuc != null &&
-                await _businessRepository.ExistsByRucAsync(
-                    normalizedRuc,
-                    cancellationToken
-                )
+                normalizedRuc != null
+                && await _businessRepository.ExistsByRucAsync(normalizedRuc, cancellationToken)
             )
             {
                 return Result<CreateBusinessResult>.Failure(
@@ -143,35 +124,20 @@ namespace Mype.Application.Businesses.Commands.CreateBusiness
                 utcNow
             );
 
-            var categories = CreateDefaultCategories(
-                business.Id,
-                request.CurrentUserId,
-                utcNow
-            );
+            var categories = CreateDefaultCategories(business.Id, request.CurrentUserId, utcNow);
 
-            await _businessRepository.AddAsync(
-                business,
-                cancellationToken
-            );
+            await _businessRepository.AddAsync(business, cancellationToken);
 
-            await _membershipRepository.AddAsync(
-                membership,
-                cancellationToken
-            );
+            await _membershipRepository.AddAsync(membership, cancellationToken);
 
             foreach (var category in categories)
             {
-                await _categoryRepository.AddAsync(
-                    category,
-                    cancellationToken
-                );
+                await _categoryRepository.AddAsync(category, cancellationToken);
             }
 
             try
             {
-                await _unitOfWork.SaveChangesAsync(
-                    cancellationToken
-                );
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
             }
             catch (OperationCanceledException)
             {
@@ -193,30 +159,25 @@ namespace Mype.Application.Businesses.Commands.CreateBusiness
                     MembershipId = membership.Id,
                     RoleCode = ownerRole.Code,
                     DefaultCategories = categories
-                        .Select(category =>
-                            new CategoryResult
-                            {
-                                Id = category.Id,
-                                Name = category.Name,
-                                Type = category.Type,
-                                IsDefault =
-                                    category.IsDefault,
-                                IsActive =
-                                    category.IsActive
-                            }
-                        )
+                        .Select(category => new CategoryResult
+                        {
+                            Id = category.Id,
+                            Name = category.Name,
+                            Type = category.Type,
+                            IsDefault = category.IsDefault,
+                            IsActive = category.IsActive,
+                        })
                         .ToArray(),
-                    Version = business.Version
+                    Version = business.Version,
                 }
             );
         }
 
-        private Category[]
-            CreateDefaultCategories(
-                Guid businessId,
-                Guid currentUserId,
-                DateTimeOffset utcNow
-            )
+        private Category[] CreateDefaultCategories(
+            Guid businessId,
+            Guid currentUserId,
+            DateTimeOffset utcNow
+        )
         {
             return _defaultCategoryProvider
                 .GetDefaultCategories()
@@ -225,9 +186,7 @@ namespace Mype.Application.Businesses.Commands.CreateBusiness
                         businessId,
                         definition.Type,
                         definition.Name,
-                        NormalizeCategoryName(
-                            definition.Name
-                        ),
+                        NormalizeCategoryName(definition.Name),
                         currentUserId,
                         utcNow
                     )
@@ -235,13 +194,9 @@ namespace Mype.Application.Businesses.Commands.CreateBusiness
                 .ToArray();
         }
 
-        private static string NormalizeCategoryName(
-            string name
-        )
+        private static string NormalizeCategoryName(string name)
         {
-            return name
-                .Trim()
-                .ToUpperInvariant();
+            return name.Trim().ToUpperInvariant();
         }
     }
 }

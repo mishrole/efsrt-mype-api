@@ -3,6 +3,6 @@
     public enum CategoryType
     {
         Sale = 1,
-        Expense = 2
+        Expense = 2,
     }
 }

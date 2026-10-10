@@ -1,10 +1,10 @@
+using System.Threading;
+using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using Mype.Infrastructure.Persistence;
 using Mype.Infrastructure.Persistence.Exceptions;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Mype.Tests.Infrastructure.Persistence
 {
@@ -22,8 +22,7 @@ namespace Mype.Tests.Infrastructure.Persistence
             context.BusinessMemberships.Should().NotBeNull();
             context.Categories.Should().NotBeNull();
             context.Permissions.Should().NotBeNull();
-            context.BusinessRolePermissions.Should()
-                .NotBeNull();
+            context.BusinessRolePermissions.Should().NotBeNull();
             context.Products.Should().NotBeNull();
         }
 
@@ -32,33 +31,20 @@ namespace Mype.Tests.Infrastructure.Persistence
         {
             using var context = CreateContext();
 
-            var result = await context.SaveChangesAsync(
-                CancellationToken.None
-            );
+            var result = await context.SaveChangesAsync(CancellationToken.None);
 
             result.Should().Be(0);
         }
 
         private static MypeDbContext CreateContext()
         {
-            var options =
-                new DbContextOptionsBuilder<
-                    MypeDbContext
-                >()
-                .UseNpgsql(
-                    "Host=localhost;Database=mype_tests;Username=test;Password=test"
-                )
+            var options = new DbContextOptionsBuilder<MypeDbContext>()
+                .UseNpgsql("Host=localhost;Database=mype_tests;Username=test;Password=test")
                 .Options;
 
-            var translatorMock =
-                new Mock<
-                    IPersistenceExceptionTranslator
-                >();
+            var translatorMock = new Mock<IPersistenceExceptionTranslator>();
 
-            return new MypeDbContext(
-                options,
-                translatorMock.Object
-            );
+            return new MypeDbContext(options, translatorMock.Object);
         }
     }
 }

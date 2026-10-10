@@ -1,5 +1,5 @@
-﻿using Mype.Domain.Common;
-using System;
+﻿using System;
+using Mype.Domain.Common;
 
 namespace Mype.Domain.Users
 {
@@ -14,7 +14,8 @@ namespace Mype.Domain.Users
             string passwordHash,
             string displayName,
             DateTimeOffset utcNow
-        ) : base(id)
+        )
+            : base(id)
         {
             Email = email;
             NormalizedEmail = normalizedEmail;

@@ -1,13 +1,13 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Text;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using Mype.Application.Common.Interfaces;
 using Mype.Application.Common.Models;
 using Mype.Shared.Constants;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Text;
 
 namespace Mype.Infrastructure.Auth
 {
@@ -42,7 +42,7 @@ namespace Mype.Infrastructure.Auth
                 [JwtRegisteredClaimNames.Sub] = userId.ToString(),
                 [JwtRegisteredClaimNames.Email] = email,
                 [JwtRegisteredClaimNames.Name] = displayName,
-                [JwtRegisteredClaimNames.Jti] = Guid.NewGuid().ToString()
+                [JwtRegisteredClaimNames.Jti] = Guid.NewGuid().ToString(),
             };
 
             var tokenDescriptor = new SecurityTokenDescriptor
@@ -53,54 +53,36 @@ namespace Mype.Infrastructure.Auth
                 Expires = expiresAt.UtcDateTime,
                 Issuer = issuer,
                 Audience = audience,
-                SigningCredentials = credentials
+                SigningCredentials = credentials,
             };
 
             var tokenHandler = new JsonWebTokenHandler();
 
             return new JwtTokenResult
             {
-                Value = tokenHandler.CreateToken(
-                    tokenDescriptor
-                ),
+                Value = tokenHandler.CreateToken(tokenDescriptor),
                 TokenType = AuthConstants.TokenType,
                 IssuedAt = issuedAt,
-                ExpiresAt = expiresAt
+                ExpiresAt = expiresAt,
             };
         }
 
-        private string GetRequiredConfiguration(
-            string configurationKey
-        )
+        private string GetRequiredConfiguration(string configurationKey)
         {
             return _configuration[configurationKey]
                 ?? throw new InvalidOperationException(
-                    string.Format(
-                        ErrorMessages.VariableNotConfigured,
-                        configurationKey
-                    )
+                    string.Format(ErrorMessages.VariableNotConfigured, configurationKey)
                 );
         }
 
         private int GetExpirationMinutes()
         {
-            var configuredValue = GetRequiredConfiguration(
-                Env.JwtExpirationMinutesStringKey
-            );
+            var configuredValue = GetRequiredConfiguration(Env.JwtExpirationMinutesStringKey);
 
-            if (
-                !int.TryParse(
-                    configuredValue,
-                    out var expirationMinutes
-                ) ||
-                expirationMinutes <= 0
-            )
+            if (!int.TryParse(configuredValue, out var expirationMinutes) || expirationMinutes <= 0)
             {
                 throw new InvalidOperationException(
-                    string.Format(
-                        ErrorMessages.VariableNotValid,
-                        Env.JwtExpirationMinutesStringKey
-                    )
+                    string.Format(ErrorMessages.VariableNotValid, Env.JwtExpirationMinutesStringKey)
                 );
             }
 

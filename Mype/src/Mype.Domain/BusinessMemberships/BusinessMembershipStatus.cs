@@ -3,6 +3,6 @@
     public enum BusinessMembershipStatus
     {
         Active = 1,
-        Inactive = 2
+        Inactive = 2,
     }
 }

@@ -1,6 +1,6 @@
-﻿using MediatR;
+﻿using System;
+using MediatR;
 using Mype.Application.Common;
-using System;
 
 namespace Mype.Application.Businesses.Queries.GetBusinessContext
 {

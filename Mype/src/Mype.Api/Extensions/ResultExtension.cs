@@ -1,8 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System;
+using Microsoft.AspNetCore.Http;
 using Mype.Api.Common;
 using Mype.Application.Common;
 using Mype.Shared.Constants;
-using System;
 
 namespace Mype.Api.Extensions
 {
@@ -19,28 +19,18 @@ namespace Mype.Api.Extensions
                 return success(
                     result.Value
                         ?? throw new InvalidOperationException(
-                            ErrorMessages
-                                .SuccessfulResultWithoutValue
+                            ErrorMessages.SuccessfulResultWithoutValue
                         )
                 );
             }
 
-            var error = result.Error
-                ?? throw new InvalidOperationException(
-                    ErrorMessages
-                        .FailedResultWithoutError
-                );
+            var error =
+                result.Error
+                ?? throw new InvalidOperationException(ErrorMessages.FailedResultWithoutError);
 
-            var response =
-                HttpErrorMapper.FromApplicationError(
-                    error,
-                    context.TraceIdentifier
-                );
+            var response = HttpErrorMapper.FromApplicationError(error, context.TraceIdentifier);
 
-            return Results.Json(
-                response,
-                statusCode: response.StatusCode
-            );
+            return Results.Json(response, statusCode: response.StatusCode);
         }
     }
 }

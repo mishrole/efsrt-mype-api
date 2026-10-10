@@ -1,15 +1,15 @@
-﻿using MediatR;
+﻿using System.Threading;
+using System.Threading.Tasks;
+using MediatR;
 using Mype.Application.Common;
 using Mype.Application.Common.Interfaces;
 using Mype.Application.Users.Interfaces;
 using Mype.Domain.Users;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Mype.Application.Auth.Commands.RegisterUser
 {
     public class RegisterUserCommandHandler
-    : IRequestHandler<RegisterUserCommand, Result<RegisterUserResult>>
+        : IRequestHandler<RegisterUserCommand, Result<RegisterUserResult>>
     {
         private readonly IUserRepository _userRepository;
         private readonly IPasswordHasherHelper _passwordHasher;
@@ -40,8 +40,7 @@ namespace Mype.Application.Auth.Commands.RegisterUser
             var email = request.Email.Trim();
             var normalizedEmail = _emailNormalizer.Normalize(email);
 
-            var emailExists =
-            await _userRepository.ExistsByNormalizedEmailAsync(
+            var emailExists = await _userRepository.ExistsByNormalizedEmailAsync(
                 normalizedEmail,
                 cancellationToken
             );
@@ -53,9 +52,7 @@ namespace Mype.Application.Auth.Commands.RegisterUser
                 );
             }
 
-            var passwordHash = _passwordHasher.HashPassword(
-                request.Password
-            );
+            var passwordHash = _passwordHasher.HashPassword(request.Password);
 
             var user = User.Create(
                 email,
@@ -65,14 +62,9 @@ namespace Mype.Application.Auth.Commands.RegisterUser
                 _clock.UtcNow
             );
 
-            await _userRepository.AddAsync(
-                user,
-                cancellationToken
-            );
+            await _userRepository.AddAsync(user, cancellationToken);
 
-            await _unitOfWork.SaveChangesAsync(
-                cancellationToken
-            );
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
 
             return Result<RegisterUserResult>.Success(
                 new RegisterUserResult
@@ -81,7 +73,7 @@ namespace Mype.Application.Auth.Commands.RegisterUser
                     Email = user.Email,
                     DisplayName = user.DisplayName,
                     Status = user.Status,
-                    CreatedAt = user.CreatedAt
+                    CreatedAt = user.CreatedAt,
                 }
             );
         }

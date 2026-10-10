@@ -6,6 +6,7 @@
         public const string ValidationError = "VALIDATION_ERROR";
 
         #region Auth
+
         public const string EmailAlreadyRegistered = "EMAIL_ALREADY_REGISTERED";
 
         public const string InvalidCredentials = "INVALID_CREDENTIALS";
@@ -34,8 +35,7 @@
 
         #region Categories
 
-        public const string
-            CategoryAccessForbidden = "CATEGORY_ACCESS_FORBIDDEN";
+        public const string CategoryAccessForbidden = "CATEGORY_ACCESS_FORBIDDEN";
 
         #endregion
 
@@ -47,6 +47,10 @@
 
         public const string ProductCreationFailed = "PRODUCT_CREATION_FAILED";
 
+        public const string ProductUpdateFailed = "PRODUCT_UPDATE_FAILED";
+
+        public const string ProductStatusChangeFailed = "PRODUCT_STATUS_CHANGE_FAILED";
+
         public const string ProductNotFound = "PRODUCT_NOT_FOUND";
 
         public const string CategoryNotFound = "CATEGORY_NOT_FOUND";
@@ -55,7 +59,14 @@
 
         public const string ProductCategoryMustBeSale = "PRODUCT_CATEGORY_MUST_BE_SALE";
 
-        #endregion
+        public const string ProductCategoryUnavailable = "PRODUCT_CATEGORY_UNAVAILABLE";
 
+        public const string ProductConcurrencyConflict = "PRODUCT_CONCURRENCY_CONFLICT";
+
+        public const string ProductAlreadyInactive = "PRODUCT_ALREADY_INACTIVE";
+
+        public const string ProductAlreadyActive = "PRODUCT_ALREADY_ACTIVE";
+
+        #endregion
     }
 }

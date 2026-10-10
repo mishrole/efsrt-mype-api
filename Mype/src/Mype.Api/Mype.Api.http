@@ -130,3 +130,39 @@ Accept: application/json
 GET {{Mype.Api_HostAddress}}/api/v1/businesses/{{BusinessId}}/products/{{ProductId}}
 Authorization: Bearer {{AccessToken}}
 Accept: application/json
+###
+
+PUT {{Mype.Api_HostAddress}}/api/v1/businesses/{{BusinessId}}/products/{{ProductId}}
+Authorization: Bearer {{AccessToken}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "Gaseosa 500 ml",
+  "categoryId": "{{CategoryId}}",
+  "salePrice": 3.80,
+  "unitCost": 2.35,
+  "version": 1
+}
+
+###
+
+PATCH {{Mype.Api_HostAddress}}/api/v1/businesses/{{BusinessId}}/products/{{ProductId}}/deactivate
+Authorization: Bearer {{AccessToken}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "version": 1
+}
+
+###
+
+PATCH {{Mype.Api_HostAddress}}/api/v1/businesses/{{BusinessId}}/products/{{ProductId}}/reactivate
+Authorization: Bearer {{AccessToken}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "version": 1
+}

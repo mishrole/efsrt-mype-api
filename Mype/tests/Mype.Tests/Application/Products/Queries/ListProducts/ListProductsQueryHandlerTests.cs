@@ -1,3 +1,6 @@
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 using FluentAssertions;
 using Moq;
 using Mype.Application.BusinessMemberships.Interfaces;
@@ -10,71 +13,46 @@ using Mype.Application.Products.Queries.ListProducts;
 using Mype.Domain.Businesses;
 using Mype.Domain.BusinessMemberships;
 using Mype.Domain.Permissions.Constants;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Mype.Tests.Application.Products.Queries.ListProducts
 {
     public class ListProductsQueryHandlerTests
     {
-        private const string DisplayName =
-            "Bodega";
+        private const string DisplayName = "Bodega";
 
-        private const string CurrencyCode =
-            "PEN";
+        private const string CurrencyCode = "PEN";
 
-        private const string RoleCode =
-            "CUSTOM";
+        private const string RoleCode = "CUSTOM";
 
-        private const string CategoryName =
-            "Productos";
+        private const string CategoryName = "Productos";
 
-        private const string ProductName =
-            "Gaseosa 500 ml";
+        private const string ProductName = "Gaseosa 500 ml";
 
-        private const string Search =
-            "  gaseosa  500 ml ";
+        private const string Search = "  gaseosa  500 ml ";
 
-        private const string NormalizedSearch =
-            "GASEOSA 500 ML";
+        private const string NormalizedSearch = "GASEOSA 500 ML";
 
-        private static readonly Guid BusinessId =
-            Guid.NewGuid();
+        private static readonly Guid BusinessId = Guid.NewGuid();
 
-        private static readonly Guid CurrentUserId =
-            Guid.NewGuid();
+        private static readonly Guid CurrentUserId = Guid.NewGuid();
 
-        private static readonly Guid MembershipId =
-            Guid.NewGuid();
+        private static readonly Guid MembershipId = Guid.NewGuid();
 
-        private static readonly Guid RoleId =
-            Guid.NewGuid();
+        private static readonly Guid RoleId = Guid.NewGuid();
 
-        private static readonly Guid CategoryId =
-            Guid.NewGuid();
+        private static readonly Guid CategoryId = Guid.NewGuid();
 
-        private static readonly Guid ProductId =
-            Guid.NewGuid();
+        private static readonly Guid ProductId = Guid.NewGuid();
 
-        private readonly Mock<
-            IBusinessMembershipRepository
-        > _membershipRepositoryMock = new();
+        private readonly Mock<IBusinessMembershipRepository> _membershipRepositoryMock = new();
 
-        private readonly Mock<
-            IPermissionRepository
-        > _permissionRepositoryMock = new();
+        private readonly Mock<IPermissionRepository> _permissionRepositoryMock = new();
 
-        private readonly Mock<
-            ICategoryRepository
-        > _categoryRepositoryMock = new();
+        private readonly Mock<ICategoryRepository> _categoryRepositoryMock = new();
 
-        private readonly Mock<
-            IProductRepository
-        > _productRepositoryMock = new();
+        private readonly Mock<IProductRepository> _productRepositoryMock = new();
 
-        private readonly ListProductsQueryHandler
-            _handler;
+        private readonly ListProductsQueryHandler _handler;
 
         public ListProductsQueryHandlerTests()
         {
@@ -102,9 +80,7 @@ namespace Mype.Tests.Application.Products.Queries.ListProducts
                         It.IsAny<CancellationToken>()
                     )
                 )
-                .ReturnsAsync(
-                    CreateProducts()
-                );
+                .ReturnsAsync(CreateProducts());
 
             var result = await _handler.Handle(
                 CreateQuery(
@@ -120,9 +96,7 @@ namespace Mype.Tests.Application.Products.Queries.ListProducts
             result.Error.Should().BeNull();
             result.Value.Should().ContainSingle();
 
-            var product = result.Value.Should()
-                .ContainSingle()
-                .Subject;
+            var product = result.Value.Should().ContainSingle().Subject;
 
             product.Id.Should().Be(ProductId);
             product.BusinessId.Should().Be(BusinessId);
@@ -150,16 +124,9 @@ namespace Mype.Tests.Application.Products.Queries.ListProducts
                         It.IsAny<CancellationToken>()
                     )
                 )
-                .ReturnsAsync(
-                    Array.Empty<
-                        ProductListItemProjection
-                    >()
-                );
+                .ReturnsAsync(Array.Empty<ProductListItemProjection>());
 
-            var result = await _handler.Handle(
-                CreateQuery(search: "   "),
-                CancellationToken.None
-            );
+            var result = await _handler.Handle(CreateQuery(search: "   "), CancellationToken.None);
 
             result.IsSuccess.Should().BeTrue();
             result.Value.Should().BeEmpty();
@@ -181,9 +148,7 @@ namespace Mype.Tests.Application.Products.Queries.ListProducts
         [Fact]
         public async Task Handle_Should_Return_CategoryNotFound_When_Filter_Category_Does_Not_Belong_To_Business()
         {
-            SetupValidAccess(
-                categoryExists: false
-            );
+            SetupValidAccess(categoryExists: false);
 
             var result = await _handler.Handle(
                 CreateQuery(categoryId: CategoryId),
@@ -192,9 +157,7 @@ namespace Mype.Tests.Application.Products.Queries.ListProducts
 
             result.IsSuccess.Should().BeFalse();
             result.Value.Should().BeNull();
-            result.Error.Should().BeSameAs(
-                ListProductsErrors.CategoryNotFound
-            );
+            result.Error.Should().BeSameAs(ListProductsErrors.CategoryNotFound);
 
             VerifyProductsWereNotQueried();
         }
@@ -202,25 +165,15 @@ namespace Mype.Tests.Application.Products.Queries.ListProducts
         [Fact]
         public async Task Handle_Should_Return_ProductAccessForbidden_When_Permission_Is_Missing()
         {
-            SetupContext(
-                CreateContext()
-            );
+            SetupContext(CreateContext());
 
-            SetupPermissions(
-                Array.Empty<string>()
-            );
+            SetupPermissions(Array.Empty<string>());
 
-            var result = await _handler.Handle(
-                CreateQuery(),
-                CancellationToken.None
-            );
+            var result = await _handler.Handle(CreateQuery(), CancellationToken.None);
 
             result.IsSuccess.Should().BeFalse();
             result.Value.Should().BeNull();
-            result.Error.Should().BeSameAs(
-                ListProductsErrors
-                    .ProductAccessForbidden
-            );
+            result.Error.Should().BeSameAs(ListProductsErrors.ProductAccessForbidden);
 
             VerifyCategoryWasNotQueried();
             VerifyProductsWereNotQueried();
@@ -231,17 +184,11 @@ namespace Mype.Tests.Application.Products.Queries.ListProducts
         {
             SetupContext(null);
 
-            var result = await _handler.Handle(
-                CreateQuery(),
-                CancellationToken.None
-            );
+            var result = await _handler.Handle(CreateQuery(), CancellationToken.None);
 
             result.IsSuccess.Should().BeFalse();
             result.Value.Should().BeNull();
-            result.Error.Should().BeSameAs(
-                ListProductsErrors
-                    .BusinessAccessForbidden
-            );
+            result.Error.Should().BeSameAs(ListProductsErrors.BusinessAccessForbidden);
 
             VerifyPermissionsWereNotQueried();
             VerifyCategoryWasNotQueried();
@@ -251,23 +198,11 @@ namespace Mype.Tests.Application.Products.Queries.ListProducts
         [Fact]
         public async Task Handle_Should_Return_BusinessAccessForbidden_When_Membership_Is_Inactive()
         {
-            SetupContext(
-                CreateContext(
-                    membershipStatus:
-                        BusinessMembershipStatus
-                            .Inactive
-                )
-            );
+            SetupContext(CreateContext(membershipStatus: BusinessMembershipStatus.Inactive));
 
-            var result = await _handler.Handle(
-                CreateQuery(),
-                CancellationToken.None
-            );
+            var result = await _handler.Handle(CreateQuery(), CancellationToken.None);
 
-            result.Error.Should().BeSameAs(
-                ListProductsErrors
-                    .BusinessAccessForbidden
-            );
+            result.Error.Should().BeSameAs(ListProductsErrors.BusinessAccessForbidden);
 
             VerifyPermissionsWereNotQueried();
             VerifyProductsWereNotQueried();
@@ -276,81 +211,51 @@ namespace Mype.Tests.Application.Products.Queries.ListProducts
         [Fact]
         public async Task Handle_Should_Return_BusinessUnavailable_When_Business_Is_Inactive()
         {
-            SetupContext(
-                CreateContext(
-                    businessStatus:
-                        BusinessStatus.Inactive
-                )
-            );
+            SetupContext(CreateContext(businessStatus: BusinessStatus.Inactive));
 
-            var result = await _handler.Handle(
-                CreateQuery(),
-                CancellationToken.None
-            );
+            var result = await _handler.Handle(CreateQuery(), CancellationToken.None);
 
-            result.Error.Should().BeSameAs(
-                ListProductsErrors
-                    .BusinessUnavailable
-            );
+            result.Error.Should().BeSameAs(ListProductsErrors.BusinessUnavailable);
 
             VerifyPermissionsWereNotQueried();
             VerifyProductsWereNotQueried();
         }
 
-        private void SetupValidAccess(
-            bool categoryExists = true
-        )
+        private void SetupValidAccess(bool categoryExists = true)
         {
-            SetupContext(
-                CreateContext()
-            );
+            SetupContext(CreateContext());
 
-            SetupPermissions(
-                new[]
-                {
-                    SystemPermissions.ProductRead.Code
-                }
-            );
+            SetupPermissions(new[] { SystemPermissions.ProductRead.Code });
 
             _categoryRepositoryMock
                 .Setup(repository =>
-                    repository
-                        .ExistsByIdAndBusinessAsync(
-                            CategoryId,
-                            BusinessId,
-                            It.IsAny<CancellationToken>()
-                        )
+                    repository.ExistsByIdAndBusinessAsync(
+                        CategoryId,
+                        BusinessId,
+                        It.IsAny<CancellationToken>()
+                    )
                 )
                 .ReturnsAsync(categoryExists);
         }
 
-        private void SetupContext(
-            BusinessContextProjection context
-        )
+        private void SetupContext(BusinessContextProjection context)
         {
             _membershipRepositoryMock
                 .Setup(repository =>
-                    repository
-                        .GetContextByBusinessAndUserAsync(
-                            BusinessId,
-                            CurrentUserId,
-                            It.IsAny<CancellationToken>()
-                        )
+                    repository.GetContextByBusinessAndUserAsync(
+                        BusinessId,
+                        CurrentUserId,
+                        It.IsAny<CancellationToken>()
+                    )
                 )
                 .ReturnsAsync(context);
         }
 
-        private void SetupPermissions(
-            string[] permissions
-        )
+        private void SetupPermissions(string[] permissions)
         {
             _permissionRepositoryMock
                 .Setup(repository =>
-                    repository
-                        .ListActiveCodesByRoleIdAsync(
-                            RoleId,
-                            It.IsAny<CancellationToken>()
-                        )
+                    repository.ListActiveCodesByRoleIdAsync(RoleId, It.IsAny<CancellationToken>())
                 )
                 .ReturnsAsync(permissions);
         }
@@ -359,11 +264,10 @@ namespace Mype.Tests.Application.Products.Queries.ListProducts
         {
             _permissionRepositoryMock.Verify(
                 repository =>
-                    repository
-                        .ListActiveCodesByRoleIdAsync(
-                            It.IsAny<Guid>(),
-                            It.IsAny<CancellationToken>()
-                        ),
+                    repository.ListActiveCodesByRoleIdAsync(
+                        It.IsAny<Guid>(),
+                        It.IsAny<CancellationToken>()
+                    ),
                 Times.Never
             );
         }
@@ -372,12 +276,11 @@ namespace Mype.Tests.Application.Products.Queries.ListProducts
         {
             _categoryRepositoryMock.Verify(
                 repository =>
-                    repository
-                        .ExistsByIdAndBusinessAsync(
-                            It.IsAny<Guid>(),
-                            It.IsAny<Guid>(),
-                            It.IsAny<CancellationToken>()
-                        ),
+                    repository.ExistsByIdAndBusinessAsync(
+                        It.IsAny<Guid>(),
+                        It.IsAny<Guid>(),
+                        It.IsAny<CancellationToken>()
+                    ),
                 Times.Never
             );
         }
@@ -398,15 +301,11 @@ namespace Mype.Tests.Application.Products.Queries.ListProducts
             );
         }
 
-        private static BusinessContextProjection
-            CreateContext(
-                BusinessStatus businessStatus =
-                    BusinessStatus.Active,
-                BusinessMembershipStatus
-                    membershipStatus =
-                        BusinessMembershipStatus.Active,
-                bool roleIsActive = true
-            )
+        private static BusinessContextProjection CreateContext(
+            BusinessStatus businessStatus = BusinessStatus.Active,
+            BusinessMembershipStatus membershipStatus = BusinessMembershipStatus.Active,
+            bool roleIsActive = true
+        )
         {
             return new BusinessContextProjection(
                 BusinessId,
@@ -435,12 +334,11 @@ namespace Mype.Tests.Application.Products.Queries.ListProducts
                 Search = search,
                 CategoryId = categoryId,
                 IsActive = isActive,
-                AvailableForSale = availableForSale
+                AvailableForSale = availableForSale,
             };
         }
 
-        private static ProductListItemProjection[]
-            CreateProducts()
+        private static ProductListItemProjection[] CreateProducts()
         {
             return
             [
@@ -453,7 +351,7 @@ namespace Mype.Tests.Application.Products.Queries.ListProducts
                     3.50m,
                     2.20m,
                     true
-                )
+                ),
             ];
         }
     }

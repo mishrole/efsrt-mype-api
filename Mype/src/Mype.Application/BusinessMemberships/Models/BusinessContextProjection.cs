@@ -1,6 +1,6 @@
-﻿using Mype.Domain.Businesses;
+﻿using System;
+using Mype.Domain.Businesses;
 using Mype.Domain.BusinessMemberships;
-using System;
 
 namespace Mype.Application.BusinessMemberships.Models
 {

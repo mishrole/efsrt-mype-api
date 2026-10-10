@@ -1,14 +1,14 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using Mype.Application.Products.Interfaces;
 using Mype.Application.Products.Models;
 using Mype.Domain.Categories;
 using Mype.Domain.Products;
 using Mype.Infrastructure.Persistence;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Mype.Infrastructure.Products.Repositories
 {
@@ -16,48 +16,68 @@ namespace Mype.Infrastructure.Products.Repositories
     {
         private readonly MypeDbContext _dbContext;
 
-        public ProductRepository(
-            MypeDbContext dbContext
-        )
+        public ProductRepository(MypeDbContext dbContext)
         {
             _dbContext = dbContext;
         }
 
-        public async Task AddAsync(
-            Product product,
+        public async Task AddAsync(Product product, CancellationToken cancellationToken)
+        {
+            await _dbContext.Products.AddAsync(product, cancellationToken);
+        }
+
+        public Task<bool> ExistsByBusinessAndNormalizedNameAsync(
+            Guid businessId,
+            string normalizedName,
             CancellationToken cancellationToken
         )
         {
-            await _dbContext.Products.AddAsync(
-                product,
-                cancellationToken
-            );
-        }
-
-        public async Task<bool>
-            ExistsByBusinessAndNormalizedNameAsync(
-                Guid businessId,
-                string normalizedName,
-                CancellationToken cancellationToken
-            )
-        {
-            return await _dbContext.Products
-                .AsNoTracking()
+            return _dbContext
+                .Products.AsNoTracking()
                 .AnyAsync(
                     product =>
-                        product.BusinessId ==
-                            businessId &&
-                        product.NormalizedName ==
-                            normalizedName,
+                        product.BusinessId == businessId
+                        && product.NormalizedName == normalizedName,
                     cancellationToken
                 );
         }
 
-        public async Task<
-            IReadOnlyCollection<
-                ProductListItemProjection
-            >
-        > ListByBusinessAsync(
+        public Task<bool> ExistsOtherByBusinessAndNormalizedNameAsync(
+            Guid businessId,
+            string normalizedName,
+            Guid excludedProductId,
+            CancellationToken cancellationToken
+        )
+        {
+            return _dbContext
+                .Products.AsNoTracking()
+                .AnyAsync(
+                    product =>
+                        product.BusinessId == businessId
+                        && product.NormalizedName == normalizedName
+                        && product.Id != excludedProductId,
+                    cancellationToken
+                );
+        }
+
+        public Task<Product> GetTrackedByIdAndBusinessAsync(
+            Guid productId,
+            Guid businessId,
+            CancellationToken cancellationToken
+        )
+        {
+            return _dbContext.Products.SingleOrDefaultAsync(
+                product => product.Id == productId && product.BusinessId == businessId,
+                cancellationToken
+            );
+        }
+
+        public void SetOriginalVersion(Product product, uint version)
+        {
+            _dbContext.Entry(product).Property(item => item.Version).OriginalValue = version;
+        }
+
+        public async Task<IReadOnlyCollection<ProductListItemProjection>> ListByBusinessAsync(
             Guid businessId,
             string normalizedSearch,
             Guid? categoryId,
@@ -67,120 +87,72 @@ namespace Mype.Infrastructure.Products.Repositories
         )
         {
             var query =
-                from product in
-                    _dbContext.Products
-                        .AsNoTracking()
-                join category in
-                    _dbContext.Categories
-                        .AsNoTracking()
-                    on new
+                from product in _dbContext.Products.AsNoTracking()
+                join category in _dbContext.Categories.AsNoTracking()
+                    on new { product.CategoryId, product.BusinessId } equals new
                     {
-                        product.CategoryId,
-                        product.BusinessId
+                        CategoryId = category.Id,
+                        category.BusinessId,
                     }
-                    equals new
-                    {
-                        CategoryId =
-                            category.Id,
-                        category.BusinessId
-                    }
-                where
-                    product.BusinessId ==
-                        businessId
-                select new
-                {
-                    Product = product,
-                    Category = category
-                };
+                where product.BusinessId == businessId
+                select new { Product = product, Category = category };
 
-            if (
-                !string.IsNullOrWhiteSpace(
-                    normalizedSearch
-                )
-            )
+            if (!string.IsNullOrWhiteSpace(normalizedSearch))
             {
                 query = query.Where(item =>
-                    EF.Functions.ILike(
-                        item.Product.NormalizedName,
-                        $"%{normalizedSearch}%"
-                    )
+                    EF.Functions.ILike(item.Product.NormalizedName, $"%{normalizedSearch}%")
                 );
             }
 
             if (categoryId.HasValue)
             {
-                query = query.Where(item =>
-                    item.Product.CategoryId ==
-                        categoryId.Value
-                );
+                query = query.Where(item => item.Product.CategoryId == categoryId.Value);
             }
 
             if (isActive.HasValue)
             {
-                query = query.Where(item =>
-                    item.Product.IsActive ==
-                        isActive.Value
-                );
+                query = query.Where(item => item.Product.IsActive == isActive.Value);
             }
 
             if (availableForSale)
             {
                 query = query.Where(item =>
-                    item.Product.IsActive &&
-                    item.Category.IsActive &&
-                    item.Category.Type ==
-                        CategoryType.Sale
+                    item.Product.IsActive
+                    && item.Category.IsActive
+                    && item.Category.Type == CategoryType.Sale
                 );
             }
 
             return await query
-                .OrderBy(item =>
-                    item.Product.Name
-                )
-                .Select(item =>
-                    new ProductListItemProjection(
-                        item.Product.Id,
-                        item.Product.BusinessId,
-                        item.Product.CategoryId,
-                        item.Category.Name,
-                        item.Product.Name,
-                        item.Product.SalePrice,
-                        item.Product.UnitCost,
-                        item.Product.IsActive
-                    )
-                )
+                .OrderBy(item => item.Product.Name)
+                .Select(item => new ProductListItemProjection(
+                    item.Product.Id,
+                    item.Product.BusinessId,
+                    item.Product.CategoryId,
+                    item.Category.Name,
+                    item.Product.Name,
+                    item.Product.SalePrice,
+                    item.Product.UnitCost,
+                    item.Product.IsActive
+                ))
                 .ToArrayAsync(cancellationToken);
         }
 
-        public async Task<ProductDetailProjection>
-            GetByIdAndBusinessAsync(
-                Guid productId,
-                Guid businessId,
-                CancellationToken cancellationToken
-            )
+        public Task<ProductDetailProjection> GetByIdAndBusinessAsync(
+            Guid productId,
+            Guid businessId,
+            CancellationToken cancellationToken
+        )
         {
-            return await (
-                from product in
-                    _dbContext.Products
-                        .AsNoTracking()
-                join category in
-                    _dbContext.Categories
-                        .AsNoTracking()
-                    on new
+            return (
+                from product in _dbContext.Products.AsNoTracking()
+                join category in _dbContext.Categories.AsNoTracking()
+                    on new { product.CategoryId, product.BusinessId } equals new
                     {
-                        product.CategoryId,
-                        product.BusinessId
+                        CategoryId = category.Id,
+                        category.BusinessId,
                     }
-                    equals new
-                    {
-                        CategoryId =
-                            category.Id,
-                        category.BusinessId
-                    }
-                where
-                    product.Id == productId &&
-                    product.BusinessId ==
-                        businessId
+                where product.Id == productId && product.BusinessId == businessId
                 select new ProductDetailProjection(
                     product.Id,
                     product.BusinessId,
@@ -195,9 +167,7 @@ namespace Mype.Infrastructure.Products.Repositories
                     product.UpdatedAt,
                     product.Version
                 )
-            ).SingleOrDefaultAsync(
-                cancellationToken
-            );
+            ).SingleOrDefaultAsync(cancellationToken);
         }
     }
 }

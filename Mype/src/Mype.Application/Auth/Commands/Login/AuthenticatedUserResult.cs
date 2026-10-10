@@ -1,5 +1,5 @@
-﻿using Mype.Domain.Users;
-using System;
+﻿using System;
+using Mype.Domain.Users;
 
 namespace Mype.Application.Auth.Commands.Login
 {

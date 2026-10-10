@@ -1,13 +1,11 @@
-﻿using Mype.Domain.Common;
-using System;
+﻿using System;
+using Mype.Domain.Common;
 
 namespace Mype.Domain.BusinessRoles
 {
     public class BusinessRole : ReferenceEntity
     {
-        private BusinessRole()
-        {
-        }
+        private BusinessRole() { }
 
         private BusinessRole(
             Guid id,
@@ -18,12 +16,8 @@ namespace Mype.Domain.BusinessRoles
             bool isActive,
             DateTimeOffset createdAt,
             DateTimeOffset updatedAt
-        ) : base(
-            id,
-            code,
-            name,
-            isActive
         )
+            : base(id, code, name, isActive)
         {
             Description = description;
             IsSystem = isSystem;
@@ -47,16 +41,7 @@ namespace Mype.Domain.BusinessRoles
             DateTimeOffset utcNow
         )
         {
-            return new BusinessRole(
-                id,
-                code,
-                name,
-                description,
-                true,
-                true,
-                utcNow,
-                utcNow
-            );
+            return new BusinessRole(id, code, name, description, true, true, utcNow, utcNow);
         }
     }
 }

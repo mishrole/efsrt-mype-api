@@ -1,5 +1,5 @@
-﻿using Mype.Application.Common.Interfaces;
-using System;
+﻿using System;
+using Mype.Application.Common.Interfaces;
 
 namespace Mype.Infrastructure.Common
 {

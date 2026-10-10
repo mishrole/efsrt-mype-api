@@ -1,11 +1,11 @@
-﻿using MediatR;
+﻿using System.Threading;
+using System.Threading.Tasks;
+using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Mype.Api.Context;
 using Mype.Api.Extensions;
 using Mype.Application.Businesses.Commands.CreateBusiness;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Mype.Api.Endpoints.v1.Businesses
 {
@@ -32,21 +32,15 @@ namespace Mype.Api.Endpoints.v1.Businesses
                 LegalName = request.LegalName,
                 Ruc = request.Ruc,
                 CurrencyCode = request.CurrencyCode,
-                CurrentUserId =
-                    userContextProvider.GetCurrentUserId()
+                CurrentUserId = userContextProvider.GetCurrentUserId(),
             };
 
-            var result = await sender.Send(
-                command,
-                cancellationToken
-            );
+            var result = await sender.Send(command, cancellationToken);
 
             return result.ToHttpResult(
                 context,
-                response => TypedResults.Created(
-                    $"/api/v1/businesses/{response.BusinessId}",
-                    response
-                )
+                response =>
+                    TypedResults.Created($"/api/v1/businesses/{response.BusinessId}", response)
             );
         }
     }

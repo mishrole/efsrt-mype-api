@@ -1,19 +1,18 @@
-﻿using FluentValidation;
-using MediatR;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using FluentValidation;
+using MediatR;
 
 namespace Mype.Application.Common.Behaviors
 {
-    public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse> where TRequest : notnull
+    public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
+        where TRequest : notnull
     {
         private readonly IEnumerable<IValidator<TRequest>> _validators;
 
-        public ValidationBehavior(
-            IEnumerable<IValidator<TRequest>> validators
-        )
+        public ValidationBehavior(IEnumerable<IValidator<TRequest>> validators)
         {
             _validators = validators;
         }
@@ -34,12 +33,7 @@ namespace Mype.Application.Common.Behaviors
             var context = new ValidationContext<TRequest>(request);
 
             var validationResults = await Task.WhenAll(
-                validators.Select(validator =>
-                    validator.ValidateAsync(
-                        context,
-                        cancellationToken
-                    )
-                )
+                validators.Select(validator => validator.ValidateAsync(context, cancellationToken))
             );
 
             var failures = validationResults

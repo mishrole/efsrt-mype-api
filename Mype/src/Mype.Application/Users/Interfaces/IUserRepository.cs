@@ -1,7 +1,7 @@
-﻿using Mype.Domain.Users;
-using System;
+﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Mype.Domain.Users;
 
 namespace Mype.Application.Users.Interfaces
 {
@@ -17,14 +17,8 @@ namespace Mype.Application.Users.Interfaces
             CancellationToken cancellationToken
         );
 
-        Task AddAsync(
-            User user,
-            CancellationToken cancellationToken
-        );
+        Task AddAsync(User user, CancellationToken cancellationToken);
 
-        Task<User> GetByIdAsync(
-            Guid id,
-            CancellationToken cancellationToken
-        );
+        Task<User> GetByIdAsync(Guid id, CancellationToken cancellationToken);
     }
 }

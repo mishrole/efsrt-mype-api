@@ -1,5 +1,5 @@
-﻿using Mype.Application.Common.Interfaces;
-using System;
+﻿using System;
+using Mype.Application.Common.Interfaces;
 
 namespace Mype.Application.Common.Normalizers
 {
@@ -9,9 +9,7 @@ namespace Mype.Application.Common.Normalizers
         {
             ArgumentNullException.ThrowIfNull(email);
 
-            return email
-            .Trim()
-            .ToUpperInvariant();
+            return email.Trim().ToUpperInvariant();
         }
     }
 }

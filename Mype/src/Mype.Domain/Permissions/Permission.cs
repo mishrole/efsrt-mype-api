@@ -1,13 +1,11 @@
-﻿using Mype.Domain.Common;
-using System;
+﻿using System;
+using Mype.Domain.Common;
 
 namespace Mype.Domain.Permissions
 {
     public class Permission : ReferenceEntity
     {
-        private Permission()
-        {
-        }
+        private Permission() { }
 
         private Permission(
             Guid id,
@@ -18,12 +16,8 @@ namespace Mype.Domain.Permissions
             bool isActive,
             DateTimeOffset createdAt,
             DateTimeOffset updatedAt
-        ) : base(
-            id,
-            code,
-            name,
-            isActive
         )
+            : base(id, code, name, isActive)
         {
             Description = description;
             IsSystem = isSystem;
@@ -31,8 +25,7 @@ namespace Mype.Domain.Permissions
             UpdatedAt = updatedAt;
         }
 
-        public string Description { get; private set; } =
-            string.Empty;
+        public string Description { get; private set; } = string.Empty;
 
         public bool IsSystem { get; private set; }
 
@@ -48,16 +41,7 @@ namespace Mype.Domain.Permissions
             DateTimeOffset utcNow
         )
         {
-            return new Permission(
-                id,
-                code,
-                name,
-                description,
-                true,
-                true,
-                utcNow,
-                utcNow
-            );
+            return new Permission(id, code, name, description, true, true, utcNow, utcNow);
         }
     }
 }

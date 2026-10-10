@@ -1,6 +1,6 @@
+using System;
 using FluentAssertions;
 using Mype.Domain.Common;
-using System;
 
 namespace Mype.Tests.Domain.Common
 {
@@ -28,14 +28,10 @@ namespace Mype.Tests.Domain.Common
 
         private sealed class TestEntity : Entity
         {
-            public TestEntity()
-            {
-            }
+            public TestEntity() { }
 
             public TestEntity(Guid id)
-                : base(id)
-            {
-            }
+                : base(id) { }
         }
     }
 }

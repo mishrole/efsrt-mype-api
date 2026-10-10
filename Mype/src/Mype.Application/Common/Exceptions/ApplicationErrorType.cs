@@ -8,6 +8,6 @@
         NotFound = 4,
         Conflict = 5,
         UnprocessableEntity = 6,
-        Internal = 7
+        Internal = 7,
     }
 }
