@@ -126,6 +126,11 @@
         public const string MovementItemNotFound = "El í­tem solicitado no fue encontrado.";
         public const string MovementItemAlreadyRetired = "El í­tem ya se encuentra retirado.";
         public const string MovementMustBeSale = "El movimiento debe ser una venta en borrador.";
+        public const string MovementMustBeExpense = "El movimiento debe ser un gasto en borrador.";
+        public const string ExpenseCategoryUnavailable =
+            "La categorÃ­a no se encuentra disponible para gastos.";
+        public const string ExpenseItemOperationFailed =
+            "No fue posible procesar el concepto de gasto.";
         public const string ProductInactive = "El producto no se encuentra disponible.";
         public const string MovementItemOperationFailed =
             "No fue posible procesar el í­tem del movimiento.";

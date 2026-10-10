@@ -111,6 +111,50 @@ namespace Mype.Domain.FinancialMovements
             return item;
         }
 
+        public FinancialMovementItem AddExpenseItem(
+            Guid categoryId,
+            string description,
+            decimal quantity,
+            decimal unitAmount,
+            Guid userId,
+            DateTimeOffset utcNow
+        )
+        {
+            EnsureDraftExpense();
+            var item = FinancialMovementItem.CreateExpense(
+                BusinessId,
+                Id,
+                categoryId,
+                description,
+                quantity,
+                unitAmount,
+                userId,
+                utcNow
+            );
+            _items.Add(item);
+            RecalculateTotal();
+            Touch(userId, utcNow);
+            return item;
+        }
+
+        public FinancialMovementItem UpdateExpenseItem(
+            Guid itemId,
+            Guid categoryId,
+            string description,
+            decimal quantity,
+            decimal unitAmount,
+            Guid userId,
+            DateTimeOffset utcNow
+        )
+        {
+            EnsureDraftExpense();
+            var item = GetRequiredItem(itemId);
+            item.UpdateExpense(categoryId, description, quantity, unitAmount, userId, utcNow);
+            RecalculateTotal();
+            Touch(userId, utcNow);
+            return item;
+        }
+
         public FinancialMovementItem RetireItem(Guid itemId, Guid userId, DateTimeOffset utcNow)
         {
             EnsureEditable();
@@ -142,7 +186,7 @@ namespace Mype.Domain.FinancialMovements
             );
 
         private FinancialMovementItem GetRequiredItem(Guid itemId) =>
-            _items.SingleOrDefault(x => x.Id == itemId)
+            _items.SingleOrDefault(item => item.Id == itemId)
             ?? throw new FinancialMovementItemException(FinancialMovementItemError.ItemNotFound);
 
         private void EnsureEditable()
@@ -162,8 +206,17 @@ namespace Mype.Domain.FinancialMovements
                 );
         }
 
+        private void EnsureDraftExpense()
+        {
+            EnsureEditable();
+            if (Type != FinancialMovementType.Expense)
+                throw new FinancialMovementItemException(
+                    FinancialMovementItemError.MovementMustBeExpense
+                );
+        }
+
         private void RecalculateTotal() =>
-            TotalAmount = _items.Where(x => x.IsActive).Sum(x => x.SubtotalAmount);
+            TotalAmount = _items.Where(item => item.IsActive).Sum(item => item.SubtotalAmount);
 
         private void Touch(Guid userId, DateTimeOffset utcNow)
         {

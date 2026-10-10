@@ -22,5 +22,9 @@ namespace Mype.Domain.FinancialMovements
         ProductBusinessMismatch = 5,
         InvalidQuantity = 6,
         InvalidUnitAmount = 7,
+        MovementMustBeExpense = 8,
+        InvalidCategory = 9,
+        InvalidDescription = 10,
+        DescriptionTooLong = 11,
     }
 }

@@ -82,6 +82,9 @@
         public const string MovementItemNotFound = "MOVEMENT_ITEM_NOT_FOUND";
         public const string MovementItemAlreadyRetired = "MOVEMENT_ITEM_ALREADY_RETIRED";
         public const string MovementMustBeSale = "MOVEMENT_MUST_BE_SALE";
+        public const string MovementMustBeExpense = "MOVEMENT_MUST_BE_EXPENSE";
+        public const string ExpenseCategoryUnavailable = "EXPENSE_CATEGORY_UNAVAILABLE";
+        public const string ExpenseItemOperationFailed = "EXPENSE_ITEM_OPERATION_FAILED";
         public const string ProductInactive = "PRODUCT_INACTIVE";
         public const string MovementItemOperationFailed = "MOVEMENT_ITEM_OPERATION_FAILED";
 
