@@ -1,4 +1,4 @@
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
@@ -24,6 +24,8 @@ namespace Mype.Tests.Infrastructure.Persistence
             context.Permissions.Should().NotBeNull();
             context.BusinessRolePermissions.Should().NotBeNull();
             context.Products.Should().NotBeNull();
+            context.FinancialMovements.Should().NotBeNull();
+            context.FinancialMovementItems.Should().NotBeNull();
         }
 
         [Fact]

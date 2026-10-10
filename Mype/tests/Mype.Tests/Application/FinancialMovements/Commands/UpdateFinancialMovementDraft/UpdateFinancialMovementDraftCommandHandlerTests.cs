@@ -1,3 +1,7 @@
+using System;
+using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
 using FluentAssertions;
 using Moq;
 using Mype.Application.BusinessMemberships.Interfaces;
@@ -12,10 +16,6 @@ using Mype.Domain.BusinessMemberships;
 using Mype.Domain.FinancialMovements;
 using Mype.Domain.Permissions.Constants;
 using Mype.Shared.Constants;
-using System;
-using System.Reflection;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Mype.Tests.Application.FinancialMovements.Commands.UpdateFinancialMovementDraft
 {
