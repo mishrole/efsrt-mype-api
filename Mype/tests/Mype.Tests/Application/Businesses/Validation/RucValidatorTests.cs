@@ -13,9 +13,9 @@ namespace Mype.Tests.Application.Businesses.Validation
             string ruc
         )
         {
-            var result = RucValidator.IsValid(ruc);
-
-            result.Should().BeFalse();
+            RucValidator.IsValid(ruc)
+                .Should()
+                .BeFalse();
         }
 
         [Theory]
@@ -25,9 +25,9 @@ namespace Mype.Tests.Application.Businesses.Validation
             string ruc
         )
         {
-            var result = RucValidator.IsValid(ruc);
-
-            result.Should().BeFalse();
+            RucValidator.IsValid(ruc)
+                .Should()
+                .BeFalse();
         }
 
         [Theory]
@@ -38,9 +38,9 @@ namespace Mype.Tests.Application.Businesses.Validation
             string ruc
         )
         {
-            var result = RucValidator.IsValid(ruc);
-
-            result.Should().BeFalse();
+            RucValidator.IsValid(ruc)
+                .Should()
+                .BeFalse();
         }
 
         [Theory]
@@ -51,19 +51,21 @@ namespace Mype.Tests.Application.Businesses.Validation
             string ruc
         )
         {
-            var result = RucValidator.IsValid(ruc);
-
-            result.Should().BeFalse();
+            RucValidator.IsValid(ruc)
+                .Should()
+                .BeFalse();
         }
 
-        [Fact]
-        public void IsValid_Should_Return_True_When_Ruc_Is_Structurally_Valid()
+        [Theory]
+        [InlineData("20123456786")]
+        [InlineData("10467793549")]
+        public void IsValid_Should_Return_True_When_Ruc_Is_Structurally_Valid(
+            string ruc
+        )
         {
-            var result = RucValidator.IsValid(
-                "20123456786"
-            );
-
-            result.Should().BeTrue();
+            RucValidator.IsValid(ruc)
+                .Should()
+                .BeTrue();
         }
     }
 }
