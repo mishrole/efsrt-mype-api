@@ -1,14 +1,9 @@
-using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Mype.Application.Common.Exceptions;
 using Mype.Domain.Businesses;
 using Mype.Domain.Categories;
-using Mype.Domain.Currencies;
 using Mype.Domain.FinancialMovements;
 using Mype.Domain.Products;
 using Mype.Domain.Users;
@@ -16,6 +11,10 @@ using Mype.Infrastructure.FinancialMovements.Repositories;
 using Mype.Infrastructure.Persistence;
 using Mype.Shared.Constants;
 using Mype.Tests.Integration;
+using System;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Mype.Tests.Infrastructure.FinancialMovements.Repositories
 {
@@ -224,13 +223,9 @@ namespace Mype.Tests.Infrastructure.FinancialMovements.Repositories
                 "Integration User",
                 UtcNow
             );
-            var currency = Currency.CreateSystem(
-                Guid.NewGuid(),
-                $"X{suffix[..2]}".ToUpperInvariant(),
-                $"Currency {suffix}",
-                "¤",
-                2
-            );
+            var currency = await context
+                .Currencies.AsNoTracking()
+                .SingleAsync(current => current.Code == "PEN");
             var business = Business.Create(
                 $"Business {suffix}",
                 null,
@@ -259,7 +254,6 @@ namespace Mype.Tests.Infrastructure.FinancialMovements.Repositories
             );
 
             context.Users.Add(user);
-            context.Currencies.Add(currency);
             context.Businesses.Add(business);
             context.Categories.Add(category);
             context.Products.Add(product);
