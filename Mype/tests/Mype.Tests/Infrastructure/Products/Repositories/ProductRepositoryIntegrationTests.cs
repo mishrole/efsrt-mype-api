@@ -1,3 +1,6 @@
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -7,9 +10,6 @@ using Mype.Infrastructure.Persistence;
 using Mype.Infrastructure.Products.Repositories;
 using Mype.Tests.Infrastructure.Common;
 using Mype.Tests.Integration;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Mype.Tests.Infrastructure.Products.Repositories
 {
