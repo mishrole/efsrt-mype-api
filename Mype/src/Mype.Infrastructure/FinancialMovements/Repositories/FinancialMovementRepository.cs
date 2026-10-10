@@ -1,13 +1,13 @@
-using Microsoft.EntityFrameworkCore;
-using Mype.Application.FinancialMovements.Interfaces;
-using Mype.Application.FinancialMovements.Models;
-using Mype.Domain.FinancialMovements;
-using Mype.Infrastructure.Persistence;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using Mype.Application.FinancialMovements.Interfaces;
+using Mype.Application.FinancialMovements.Models;
+using Mype.Domain.FinancialMovements;
+using Mype.Infrastructure.Persistence;
 
 namespace Mype.Infrastructure.FinancialMovements.Repositories
 {

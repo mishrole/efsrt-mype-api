@@ -1,3 +1,6 @@
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 using FluentAssertions;
 using Moq;
 using Mype.Application.BusinessMemberships.Interfaces;
@@ -14,9 +17,6 @@ using Mype.Domain.Categories;
 using Mype.Domain.Permissions.Constants;
 using Mype.Domain.Products;
 using Mype.Shared.Constants;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Mype.Tests.Application.Products.Commands.UpdateProduct
 {

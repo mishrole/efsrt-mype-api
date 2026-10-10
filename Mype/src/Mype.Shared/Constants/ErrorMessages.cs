@@ -127,7 +127,8 @@
         public const string MovementItemAlreadyRetired = "El í­tem ya se encuentra retirado.";
         public const string MovementMustBeSale = "El movimiento debe ser una venta en borrador.";
         public const string ProductInactive = "El producto no se encuentra disponible.";
-        public const string MovementItemOperationFailed = "No fue posible procesar el í­tem del movimiento.";
+        public const string MovementItemOperationFailed =
+            "No fue posible procesar el í­tem del movimiento.";
 
         #endregion
 
@@ -142,5 +143,3 @@
         #endregion
     }
 }
-
-

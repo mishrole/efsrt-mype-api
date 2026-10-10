@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Mype.Api.Endpoints.v1.Auth;
 using Mype.Api.Endpoints.v1.Businesses;
@@ -21,8 +23,6 @@ using Mype.Application.Products.Commands.CreateProduct;
 using Mype.Application.Products.Queries.GetProductDetail;
 using Mype.Application.Products.Queries.ListProducts;
 using Mype.Shared.Models;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Mype.Api
 {
@@ -254,12 +254,45 @@ namespace Mype.Api
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status409Conflict)
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
 
-            businessGroup.MapPost("/{businessId:guid}/financial-movements/{movementId:guid}/sale-items", AddSaleItemEndpoint.DoAsync).WithName("AddSaleItem").Produces<FinancialMovementItemMaintenanceResult>(StatusCodes.Status201Created).Produces<HttpStatusCodeInfo>(StatusCodes.Status400BadRequest).Produces<HttpStatusCodeInfo>(StatusCodes.Status403Forbidden).Produces<HttpStatusCodeInfo>(StatusCodes.Status404NotFound).Produces<HttpStatusCodeInfo>(StatusCodes.Status409Conflict).Produces<HttpStatusCodeInfo>(StatusCodes.Status422UnprocessableEntity).Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
-            businessGroup.MapPut("/{businessId:guid}/financial-movements/{movementId:guid}/sale-items/{itemId:guid}", UpdateSaleItemEndpoint.DoAsync).WithName("UpdateSaleItem").Produces<FinancialMovementItemMaintenanceResult>(StatusCodes.Status200OK).Produces<HttpStatusCodeInfo>(StatusCodes.Status400BadRequest).Produces<HttpStatusCodeInfo>(StatusCodes.Status403Forbidden).Produces<HttpStatusCodeInfo>(StatusCodes.Status404NotFound).Produces<HttpStatusCodeInfo>(StatusCodes.Status409Conflict).Produces<HttpStatusCodeInfo>(StatusCodes.Status422UnprocessableEntity).Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
-            businessGroup.MapPatch("/{businessId:guid}/financial-movements/{movementId:guid}/items/{itemId:guid}/retire", RetireFinancialMovementItemEndpoint.DoAsync).WithName("RetireFinancialMovementItem").Produces<RetiredFinancialMovementItemResult>(StatusCodes.Status200OK).Produces<HttpStatusCodeInfo>(StatusCodes.Status400BadRequest).Produces<HttpStatusCodeInfo>(StatusCodes.Status403Forbidden).Produces<HttpStatusCodeInfo>(StatusCodes.Status404NotFound).Produces<HttpStatusCodeInfo>(StatusCodes.Status409Conflict).Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
+            businessGroup
+                .MapPost(
+                    "/{businessId:guid}/financial-movements/{movementId:guid}/sale-items",
+                    AddSaleItemEndpoint.DoAsync
+                )
+                .WithName("AddSaleItem")
+                .Produces<FinancialMovementItemMaintenanceResult>(StatusCodes.Status201Created)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status400BadRequest)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status403Forbidden)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status404NotFound)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status409Conflict)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status422UnprocessableEntity)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
+            businessGroup
+                .MapPut(
+                    "/{businessId:guid}/financial-movements/{movementId:guid}/sale-items/{itemId:guid}",
+                    UpdateSaleItemEndpoint.DoAsync
+                )
+                .WithName("UpdateSaleItem")
+                .Produces<FinancialMovementItemMaintenanceResult>(StatusCodes.Status200OK)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status400BadRequest)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status403Forbidden)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status404NotFound)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status409Conflict)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status422UnprocessableEntity)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
+            businessGroup
+                .MapPatch(
+                    "/{businessId:guid}/financial-movements/{movementId:guid}/items/{itemId:guid}/retire",
+                    RetireFinancialMovementItemEndpoint.DoAsync
+                )
+                .WithName("RetireFinancialMovementItem")
+                .Produces<RetiredFinancialMovementItemResult>(StatusCodes.Status200OK)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status400BadRequest)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status403Forbidden)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status404NotFound)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status409Conflict)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
             #endregion
         }
     }
 }
-
-

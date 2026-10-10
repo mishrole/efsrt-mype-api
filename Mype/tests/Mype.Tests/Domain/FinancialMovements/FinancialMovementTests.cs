@@ -19,7 +19,7 @@ namespace Mype.Tests.Domain.FinancialMovements
                 BusinessId,
                 type,
                 new DateOnly(2026, 10, 10),
-                "  OperaciÃ³n  ",
+                "  Operación  ",
                 "PEN",
                 UserId,
                 UtcNow
@@ -30,7 +30,7 @@ namespace Mype.Tests.Domain.FinancialMovements
             movement.Type.Should().Be(type);
             movement.Status.Should().Be(FinancialMovementStatus.Draft);
             movement.MovementDate.Should().Be(new DateOnly(2026, 10, 10));
-            movement.Description.Should().Be("OperaciÃ³n");
+            movement.Description.Should().Be("Operación");
             movement.CurrencyCode.Should().Be("PEN");
             movement.TotalAmount.Should().Be(0m);
             movement.CreatedByUserId.Should().Be(UserId);

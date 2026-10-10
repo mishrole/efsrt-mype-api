@@ -81,15 +81,22 @@
             public const string MovementActive = "ix_financial_movement_items_movement_active";
             public const string BusinessCategory = "ix_financial_movement_items_business_category";
             public const string BusinessProduct = "ix_financial_movement_items_business_product";
-            public const string MovementBusiness = "fk_financial_movement_items_movements_movement_id_business_id";
-            public const string CategoryBusiness = "fk_financial_movement_items_categories_category_id_business_id";
+            public const string MovementBusiness =
+                "fk_financial_movement_items_movements_movement_id_business_id";
+            public const string CategoryBusiness =
+                "fk_financial_movement_items_categories_category_id_business_id";
             public const string Product = "fk_financial_movement_items_products_product_id";
-            public const string CreatedByUser = "fk_financial_movement_items_users_created_by_user_id";
-            public const string UpdatedByUser = "fk_financial_movement_items_users_updated_by_user_id";
+            public const string CreatedByUser =
+                "fk_financial_movement_items_users_created_by_user_id";
+            public const string UpdatedByUser =
+                "fk_financial_movement_items_users_updated_by_user_id";
             public const string QuantityPositive = "ck_financial_movement_items_quantity_positive";
-            public const string UnitAmountNonNegative = "ck_financial_movement_items_unit_amount_non_negative";
-            public const string SubtotalNonNegative = "ck_financial_movement_items_subtotal_non_negative";
-            public const string UnitCostNonNegative = "ck_financial_movement_items_unit_cost_non_negative";
+            public const string UnitAmountNonNegative =
+                "ck_financial_movement_items_unit_amount_non_negative";
+            public const string SubtotalNonNegative =
+                "ck_financial_movement_items_subtotal_non_negative";
+            public const string UnitCostNonNegative =
+                "ck_financial_movement_items_unit_cost_non_negative";
         }
 
         public static class Permissions
@@ -109,4 +116,3 @@
         }
     }
 }
-
