@@ -2,6 +2,7 @@
 @AccessToken = ACCESS_TOKEN
 @BusinessId = BUSINESS_ID
 @CategoryId = CATEGORY_ID
+@ExpenseCategoryId = EXPENSE_CATEGORY_ID
 @ProductId = PRODUCT_ID
 @MovementId = MOVEMENT_ID
 @MovementVersion = 1
@@ -9,11 +10,13 @@
 @MovementItemVersion = 1
 @ProductVersion = 1
 
+# Comprueba que la API y la conexión con la base de datos estén disponibles.
 GET {{Mype.Api_HostAddress}}/health
 Accept: application/json
 
 ###
 
+# Registra un usuario nuevo con sus credenciales iniciales.
 POST {{Mype.Api_HostAddress}}/api/v1/auth/register
 Content-Type: application/json
 Accept: application/json
@@ -27,6 +30,7 @@ Accept: application/json
 
 ###
 
+# Inicia sesión y devuelve el token JWT que debe copiarse en AccessToken.
 POST {{Mype.Api_HostAddress}}/api/v1/auth/login
 Content-Type: application/json
 Accept: application/json
@@ -38,6 +42,7 @@ Accept: application/json
 
 ###
 
+# Crea un negocio para el usuario autenticado.
 POST {{Mype.Api_HostAddress}}/api/v1/businesses
 Authorization: Bearer {{AccessToken}}
 Content-Type: application/json
@@ -52,42 +57,49 @@ Accept: application/json
 
 ###
 
+# Lista los negocios activos del usuario autenticado.
 GET {{Mype.Api_HostAddress}}/api/v1/businesses
 Authorization: Bearer {{AccessToken}}
 Accept: application/json
 
 ###
 
+# Obtiene el contexto autorizado del negocio indicado.
 GET {{Mype.Api_HostAddress}}/api/v1/businesses/{{BusinessId}}/context
 Authorization: Bearer {{AccessToken}}
 Accept: application/json
 
 ###
 
+# Prueba el rechazo de acceso a un negocio inexistente o no autorizado.
 GET {{Mype.Api_HostAddress}}/api/v1/businesses/00000000-0000-0000-0000-000000000001/context
 Authorization: Bearer {{AccessToken}}
 Accept: application/json
 
 ###
 
+# Lista todas las categorías del negocio.
 GET {{Mype.Api_HostAddress}}/api/v1/businesses/{{BusinessId}}/categories
 Authorization: Bearer {{AccessToken}}
 Accept: application/json
 
 ###
 
+# Lista las categorías de venta del negocio.
 GET {{Mype.Api_HostAddress}}/api/v1/businesses/{{BusinessId}}/categories?type=1
 Authorization: Bearer {{AccessToken}}
 Accept: application/json
 
 ###
 
+# Lista las categorías de gasto del negocio.
 GET {{Mype.Api_HostAddress}}/api/v1/businesses/{{BusinessId}}/categories?type=2
 Authorization: Bearer {{AccessToken}}
 Accept: application/json
 
 ###
 
+# Crea un producto asociado con una categoría de venta.
 POST {{Mype.Api_HostAddress}}/api/v1/businesses/{{BusinessId}}/products
 Authorization: Bearer {{AccessToken}}
 Content-Type: application/json
@@ -102,42 +114,49 @@ Accept: application/json
 
 ###
 
+# Lista todos los productos del negocio.
 GET {{Mype.Api_HostAddress}}/api/v1/businesses/{{BusinessId}}/products
 Authorization: Bearer {{AccessToken}}
 Accept: application/json
 
 ###
 
+# Lista únicamente los productos activos del negocio.
 GET {{Mype.Api_HostAddress}}/api/v1/businesses/{{BusinessId}}/products?isActive=true
 Authorization: Bearer {{AccessToken}}
 Accept: application/json
 
 ###
 
+# Filtra los productos por categoría.
 GET {{Mype.Api_HostAddress}}/api/v1/businesses/{{BusinessId}}/products?categoryId={{CategoryId}}
 Authorization: Bearer {{AccessToken}}
 Accept: application/json
 
 ###
 
+# Busca productos por nombre normalizado.
 GET {{Mype.Api_HostAddress}}/api/v1/businesses/{{BusinessId}}/products?search=gaseosa
 Authorization: Bearer {{AccessToken}}
 Accept: application/json
 
 ###
 
+# Lista productos disponibles para agregarlos a una venta.
 GET {{Mype.Api_HostAddress}}/api/v1/businesses/{{BusinessId}}/products?availableForSale=true
 Authorization: Bearer {{AccessToken}}
 Accept: application/json
 
 ###
 
+# Obtiene el detalle de un producto específico.
 GET {{Mype.Api_HostAddress}}/api/v1/businesses/{{BusinessId}}/products/{{ProductId}}
 Authorization: Bearer {{AccessToken}}
 Accept: application/json
 
 ###
 
+# Actualiza los datos y precios de un producto usando concurrencia optimista.
 PUT {{Mype.Api_HostAddress}}/api/v1/businesses/{{BusinessId}}/products/{{ProductId}}
 Authorization: Bearer {{AccessToken}}
 Content-Type: application/json
@@ -153,6 +172,7 @@ Accept: application/json
 
 ###
 
+# Desactiva lógicamente un producto activo.
 PATCH {{Mype.Api_HostAddress}}/api/v1/businesses/{{BusinessId}}/products/{{ProductId}}/deactivate
 Authorization: Bearer {{AccessToken}}
 Content-Type: application/json
@@ -164,6 +184,7 @@ Accept: application/json
 
 ###
 
+# Reactiva un producto previamente desactivado.
 PATCH {{Mype.Api_HostAddress}}/api/v1/businesses/{{BusinessId}}/products/{{ProductId}}/reactivate
 Authorization: Bearer {{AccessToken}}
 Content-Type: application/json
@@ -175,6 +196,7 @@ Accept: application/json
 
 ###
 
+# Crea un movimiento de venta en estado borrador.
 POST {{Mype.Api_HostAddress}}/api/v1/businesses/{{BusinessId}}/financial-movements
 Authorization: Bearer {{AccessToken}}
 Content-Type: application/json
@@ -188,18 +210,35 @@ Accept: application/json
 
 ###
 
+# Crea un movimiento de gasto en estado borrador para probar HU-12.
+POST {{Mype.Api_HostAddress}}/api/v1/businesses/{{BusinessId}}/financial-movements
+Authorization: Bearer {{AccessToken}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "type": 2,
+  "movementDate": "2026-10-10",
+  "description": "Compra de materiales de empaque"
+}
+
+###
+
+# Lista los movimientos financieros en borrador del negocio.
 GET {{Mype.Api_HostAddress}}/api/v1/businesses/{{BusinessId}}/financial-movements
 Authorization: Bearer {{AccessToken}}
 Accept: application/json
 
 ###
 
+# Obtiene el detalle de un movimiento financiero en borrador.
 GET {{Mype.Api_HostAddress}}/api/v1/businesses/{{BusinessId}}/financial-movements/{{MovementId}}
 Authorization: Bearer {{AccessToken}}
 Accept: application/json
 
 ###
 
+# Actualiza la cabecera de un movimiento financiero en borrador.
 PUT {{Mype.Api_HostAddress}}/api/v1/businesses/{{BusinessId}}/financial-movements/{{MovementId}}
 Authorization: Bearer {{AccessToken}}
 Content-Type: application/json
@@ -207,26 +246,83 @@ Accept: application/json
 
 {
   "movementDate": "2026-10-11",
-  "description": "Venta completa del turno mañana",
+  "description": "Movimiento actualizado",
   "version": {{MovementVersion}}
 }
+
 ###
+
+# Agrega un producto como ítem de una venta en borrador.
 POST {{Mype.Api_HostAddress}}/api/v1/businesses/{{BusinessId}}/financial-movements/{{MovementId}}/sale-items
 Authorization: Bearer {{AccessToken}}
 Content-Type: application/json
+Accept: application/json
 
-{"productId":"{{ProductId}}","quantity":10.0000,"unitAmount":3.50,"movementVersion":{{MovementVersion}}}
+{
+  "productId": "{{ProductId}}",
+  "quantity": 10.0000,
+  "unitAmount": 3.50,
+  "movementVersion": {{MovementVersion}}
+}
 
 ###
+
+# Modifica un ítem activo de una venta en borrador.
 PUT {{Mype.Api_HostAddress}}/api/v1/businesses/{{BusinessId}}/financial-movements/{{MovementId}}/sale-items/{{MovementItemId}}
 Authorization: Bearer {{AccessToken}}
 Content-Type: application/json
+Accept: application/json
 
-{"productId":"{{ProductId}}","quantity":12.0000,"unitAmount":3.40,"movementVersion":{{MovementVersion}},"itemVersion":{{MovementItemVersion}}}
+{
+  "productId": "{{ProductId}}",
+  "quantity": 12.0000,
+  "unitAmount": 3.40,
+  "movementVersion": {{MovementVersion}},
+  "itemVersion": {{MovementItemVersion}}
+}
 
 ###
+
+# Agrega un concepto libre a un gasto en borrador, sin producto ni coste asociado.
+POST {{Mype.Api_HostAddress}}/api/v1/businesses/{{BusinessId}}/financial-movements/{{MovementId}}/expense-items
+Authorization: Bearer {{AccessToken}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "categoryId": "{{ExpenseCategoryId}}",
+  "description": "Compra de bolsas para empaque",
+  "quantity": 2.0000,
+  "unitAmount": 15.50,
+  "movementVersion": {{MovementVersion}}
+}
+
+###
+
+# Modifica la categoría, descripción, cantidad e importe de un concepto de gasto.
+PUT {{Mype.Api_HostAddress}}/api/v1/businesses/{{BusinessId}}/financial-movements/{{MovementId}}/expense-items/{{MovementItemId}}
+Authorization: Bearer {{AccessToken}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "categoryId": "{{ExpenseCategoryId}}",
+  "description": "Compra de bolsas reforzadas",
+  "quantity": 3.0000,
+  "unitAmount": 15.50,
+  "movementVersion": {{MovementVersion}},
+  "itemVersion": {{MovementItemVersion}}
+}
+
+###
+
+# Retira lógicamente un ítem activo de venta o un concepto activo de gasto.
 PATCH {{Mype.Api_HostAddress}}/api/v1/businesses/{{BusinessId}}/financial-movements/{{MovementId}}/items/{{MovementItemId}}/retire
 Authorization: Bearer {{AccessToken}}
 Content-Type: application/json
+Accept: application/json
 
-{"movementVersion":{{MovementVersion}},"itemVersion":{{MovementItemVersion}}}
+{
+  "movementVersion": {{MovementVersion}},
+  "itemVersion": {{MovementItemVersion}}
+}
