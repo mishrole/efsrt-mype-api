@@ -7,6 +7,7 @@ using Mype.Shared.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 
 namespace Mype.Api.Common
 {
@@ -92,13 +93,19 @@ namespace Mype.Api.Common
                 );
             }
 
-            if (exception is BadHttpRequestException)
+            if (exception is BadHttpRequestException badHttpRequestException)
             {
+                var errors =
+                    CreateBindingErrors(
+                        badHttpRequestException
+                    );
+
                 return FromApplicationError(
                     ErrorCodes.ValidationError,
                     ErrorMessages.ValidationFailed,
                     ApplicationErrorType.Validation,
-                    traceId
+                    traceId,
+                    errors: errors
                 );
             }
 
@@ -164,6 +171,49 @@ namespace Mype.Api.Common
 
                 _ =>
                     StatusCodes.Status500InternalServerError
+            };
+        }
+
+        private static Dictionary<string, string[]>
+            CreateBindingErrors(
+                BadHttpRequestException exception
+            )
+        {
+            if (
+                exception.InnerException is not
+                    JsonException jsonException ||
+                string.IsNullOrWhiteSpace(
+                    jsonException.Path
+                )
+            )
+            {
+                return [];
+            }
+
+            var propertyName = jsonException.Path
+                .TrimStart('$', '.');
+
+            if (
+                string.IsNullOrWhiteSpace(
+                    propertyName
+                )
+            )
+            {
+                return [];
+            }
+
+            return new Dictionary<string, string[]>
+            {
+                {
+                    propertyName,
+                    [
+                        ValidationMessages.Invalid
+                            .Replace(
+                                "{PropertyName}",
+                                propertyName
+                            )
+                    ]
+                }
             };
         }
     }
