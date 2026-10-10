@@ -1,8 +1,9 @@
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Mype.Api.Endpoints.v1.Auth;
 using Mype.Api.Endpoints.v1.Businesses;
 using Mype.Api.Endpoints.v1.Categories;
+using Mype.Api.Endpoints.v1.FinancialMovements;
 using Mype.Api.Endpoints.v1.Products;
 using Mype.Application.Auth.Commands.Login;
 using Mype.Application.Auth.Commands.RegisterUser;
@@ -10,6 +11,10 @@ using Mype.Application.Businesses.Commands.CreateBusiness;
 using Mype.Application.Businesses.Queries.GetBusinessContext;
 using Mype.Application.Businesses.Queries.ListUserBusinesses;
 using Mype.Application.Categories.Queries.ListCategories;
+using Mype.Application.FinancialMovements.Commands.CreateFinancialMovement;
+using Mype.Application.FinancialMovements.Commands.UpdateFinancialMovementDraft;
+using Mype.Application.FinancialMovements.Queries.GetFinancialMovementDraft;
+using Mype.Application.FinancialMovements.Queries.ListFinancialMovementDrafts;
 using Mype.Application.Products.Commands.Common;
 using Mype.Application.Products.Commands.CreateProduct;
 using Mype.Application.Products.Queries.GetProductDetail;
@@ -189,7 +194,58 @@ namespace Mype.Api
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status409Conflict)
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status422UnprocessableEntity)
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
+            businessGroup
+                .MapPost("/{businessId:guid}/financial-movements", CreateFinancialMovementEndpoint.DoAsync)
+                .WithName("CreateFinancialMovement")
+                .WithSummary("Crear un movimiento financiero en borrador")
+                .Produces<CreateFinancialMovementResult>(StatusCodes.Status201Created)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status400BadRequest)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status401Unauthorized)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status403Forbidden)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status409Conflict)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
+
+            businessGroup
+                .MapPut("/{businessId:guid}/financial-movements/{movementId:guid}", UpdateFinancialMovementDraftEndpoint.DoAsync)
+                .WithName("UpdateFinancialMovementDraft")
+                .WithSummary("Actualizar la cabecera de un borrador")
+                .Produces<UpdateFinancialMovementDraftResult>(StatusCodes.Status200OK)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status400BadRequest)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status401Unauthorized)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status403Forbidden)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status404NotFound)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status409Conflict)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
+
+            businessGroup
+                .MapGet("/{businessId:guid}/financial-movements/{movementId:guid}", GetFinancialMovementDraftEndpoint.DoAsync)
+                .WithName("GetFinancialMovementDraft")
+                .WithSummary("Consultar un borrador financiero")
+                .Produces<FinancialMovementDraftDetailResult>(StatusCodes.Status200OK)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status401Unauthorized)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status403Forbidden)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status404NotFound)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status409Conflict)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
+
+            businessGroup
+                .MapGet("/{businessId:guid}/financial-movements", ListFinancialMovementDraftsEndpoint.DoAsync)
+                .WithName("ListFinancialMovementDrafts")
+                .WithSummary("Listar borradores financieros")
+                .Produces<IReadOnlyCollection<FinancialMovementDraftListItemResult>>(StatusCodes.Status200OK)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status401Unauthorized)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status403Forbidden)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status409Conflict)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
+
             #endregion
+
         }
     }
 }
+
+
+
+
+
+

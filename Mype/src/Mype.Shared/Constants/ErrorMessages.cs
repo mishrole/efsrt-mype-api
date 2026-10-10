@@ -107,6 +107,14 @@
 
         #endregion
 
+        #region FinancialMovements
+        public const string MovementAccessForbidden = "No tiene permiso para realizar esta operaciÃ³n sobre los movimientos del negocio.";
+        public const string MovementNotFound = "El movimiento solicitado no fue encontrado.";
+        public const string MovementNotEditable = "El movimiento ya no se encuentra disponible para ediciÃ³n.";
+        public const string MovementConcurrencyConflict = "El movimiento fue modificado por otro proceso. Recargue los datos e intÃ©ntelo nuevamente.";
+        public const string MovementCreationFailed = "No fue posible crear el movimiento.";
+        public const string MovementUpdateFailed = "No fue posible actualizar el movimiento.";
+        #endregion
         #region Results
 
         public const string SuccessfulResultWithoutValue =
@@ -118,3 +126,4 @@
         #endregion
     }
 }
+

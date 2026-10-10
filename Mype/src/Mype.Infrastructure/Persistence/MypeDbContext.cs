@@ -8,6 +8,7 @@ using Mype.Domain.BusinessRolePermissions;
 using Mype.Domain.BusinessRoles;
 using Mype.Domain.Categories;
 using Mype.Domain.Currencies;
+using Mype.Domain.FinancialMovements;
 using Mype.Domain.Permissions;
 using Mype.Domain.Products;
 using Mype.Domain.Users;
@@ -59,6 +60,7 @@ namespace Mype.Infrastructure.Persistence
         public DbSet<BusinessRolePermission> BusinessRolePermissions =>
             Set<BusinessRolePermission>();
         public DbSet<Product> Products => Set<Product>();
+        public DbSet<FinancialMovement> FinancialMovements => Set<FinancialMovement>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -67,3 +69,5 @@ namespace Mype.Infrastructure.Persistence
         }
     }
 }
+
+

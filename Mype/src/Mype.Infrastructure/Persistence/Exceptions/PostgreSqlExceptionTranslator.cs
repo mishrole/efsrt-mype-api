@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Mype.Application.Common.Exceptions;
+using Mype.Domain.FinancialMovements;
 using Mype.Infrastructure.Persistence.Constraints;
 using Mype.Shared.Constants;
 using Npgsql;
@@ -81,3 +82,4 @@ namespace Mype.Infrastructure.Persistence.Exceptions
         }
     }
 }
+
