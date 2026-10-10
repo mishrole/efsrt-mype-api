@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Mype.Domain.Businesses;
 using Mype.Domain.FinancialMovements;
@@ -49,6 +49,14 @@ namespace Mype.Infrastructure.Persistence.Configurations
             builder.Property(m => m.CancelledAt).HasColumnType("timestamp with time zone");
             builder.Property(m => m.DiscardedAt).HasColumnType("timestamp with time zone");
             builder.Property(m => m.Version).IsRowVersion();
+            builder
+                .HasMany(m => m.Items)
+                .WithOne()
+                .HasForeignKey(i => new { i.MovementId, i.BusinessId })
+                .HasPrincipalKey(m => new { m.Id, m.BusinessId })
+                .OnDelete(DeleteBehavior.Restrict)
+                .HasConstraintName(DatabaseConstraints.FinancialMovementItems.MovementBusiness);
+            builder.Navigation(m => m.Items).UsePropertyAccessMode(PropertyAccessMode.Field);
             builder
                 .HasAlternateKey(m => new { m.Id, m.BusinessId })
                 .HasName(DatabaseConstraints.FinancialMovements.IdBusiness);

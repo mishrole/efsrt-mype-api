@@ -1,10 +1,15 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Mype.Domain.Common;
+using Mype.Domain.Products;
 
 namespace Mype.Domain.FinancialMovements
 {
     public class FinancialMovement : Entity
     {
+        private readonly List<FinancialMovementItem> _items = new();
+
         private FinancialMovement() { }
 
         private FinancialMovement(
@@ -48,6 +53,7 @@ namespace Mype.Domain.FinancialMovements
         public DateTimeOffset? CancelledAt { get; private set; }
         public DateTimeOffset? DiscardedAt { get; private set; }
         public uint Version { get; private set; }
+        public IReadOnlyCollection<FinancialMovementItem> Items => _items.AsReadOnly();
 
         public bool IsEditable() => Status == FinancialMovementStatus.Draft;
 
@@ -58,10 +64,61 @@ namespace Mype.Domain.FinancialMovements
             DateTimeOffset utcNow
         )
         {
+            EnsureEditable();
             MovementDate = movementDate;
             Description = NormalizeOptionalValue(description);
-            UpdatedByUserId = currentUserId;
-            UpdatedAt = utcNow;
+            Touch(currentUserId, utcNow);
+        }
+
+        public FinancialMovementItem AddSaleItem(
+            Product product,
+            decimal quantity,
+            decimal unitAmount,
+            Guid userId,
+            DateTimeOffset utcNow
+        )
+        {
+            EnsureDraftSale();
+            var item = FinancialMovementItem.CreateSale(
+                BusinessId,
+                Id,
+                product,
+                quantity,
+                unitAmount,
+                userId,
+                utcNow
+            );
+            _items.Add(item);
+            RecalculateTotal();
+            Touch(userId, utcNow);
+            return item;
+        }
+
+        public FinancialMovementItem UpdateSaleItem(
+            Guid itemId,
+            Product product,
+            decimal quantity,
+            decimal unitAmount,
+            Guid userId,
+            DateTimeOffset utcNow
+        )
+        {
+            EnsureDraftSale();
+            var item = GetRequiredItem(itemId);
+            item.UpdateSale(product, quantity, unitAmount, userId, utcNow);
+            RecalculateTotal();
+            Touch(userId, utcNow);
+            return item;
+        }
+
+        public FinancialMovementItem RetireItem(Guid itemId, Guid userId, DateTimeOffset utcNow)
+        {
+            EnsureEditable();
+            var item = GetRequiredItem(itemId);
+            item.Retire(userId, utcNow);
+            RecalculateTotal();
+            Touch(userId, utcNow);
+            return item;
         }
 
         public static FinancialMovement CreateDraft(
@@ -72,9 +129,8 @@ namespace Mype.Domain.FinancialMovements
             string currencyCode,
             Guid userId,
             DateTimeOffset utcNow
-        )
-        {
-            return new FinancialMovement(
+        ) =>
+            new(
                 Guid.NewGuid(),
                 businessId,
                 type,
@@ -84,6 +140,35 @@ namespace Mype.Domain.FinancialMovements
                 userId,
                 utcNow
             );
+
+        private FinancialMovementItem GetRequiredItem(Guid itemId) =>
+            _items.SingleOrDefault(x => x.Id == itemId)
+            ?? throw new FinancialMovementItemException(FinancialMovementItemError.ItemNotFound);
+
+        private void EnsureEditable()
+        {
+            if (!IsEditable())
+                throw new FinancialMovementItemException(
+                    FinancialMovementItemError.MovementNotEditable
+                );
+        }
+
+        private void EnsureDraftSale()
+        {
+            EnsureEditable();
+            if (Type != FinancialMovementType.Sale)
+                throw new FinancialMovementItemException(
+                    FinancialMovementItemError.MovementMustBeSale
+                );
+        }
+
+        private void RecalculateTotal() =>
+            TotalAmount = _items.Where(x => x.IsActive).Sum(x => x.SubtotalAmount);
+
+        private void Touch(Guid userId, DateTimeOffset utcNow)
+        {
+            UpdatedByUserId = userId;
+            UpdatedAt = utcNow;
         }
 
         private static string NormalizeOptionalValue(string value) =>

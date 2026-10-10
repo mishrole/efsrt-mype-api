@@ -1,13 +1,13 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Mype.Application.FinancialMovements.Interfaces;
 using Mype.Application.FinancialMovements.Models;
 using Mype.Domain.FinancialMovements;
 using Mype.Infrastructure.Persistence;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Mype.Infrastructure.FinancialMovements.Repositories
 {
@@ -81,5 +81,30 @@ namespace Mype.Infrastructure.FinancialMovements.Repositories
                     m.Version
                 ))
                 .ToArrayAsync(cancellationToken);
+
+        public Task<FinancialMovement> GetAggregateTrackedByIdAndBusinessAsync(
+            Guid movementId,
+            Guid businessId,
+            CancellationToken cancellationToken
+        ) =>
+            _dbContext
+                .FinancialMovements.Include(movement => movement.Items)
+                .SingleOrDefaultAsync(
+                    movement => movement.Id == movementId && movement.BusinessId == businessId,
+                    cancellationToken
+                );
+
+        public void SetOriginalVersions(
+            FinancialMovement movement,
+            uint movementVersion,
+            FinancialMovementItem item,
+            uint itemVersion
+        )
+        {
+            SetOriginalVersion(movement, movementVersion);
+
+            _dbContext.Entry(item).Property(currentItem => currentItem.Version).OriginalValue =
+                itemVersion;
+        }
     }
 }

@@ -1,10 +1,12 @@
-@Mype.Api_HostAddress = http://localhost:5010
+﻿@Mype.Api_HostAddress = http://localhost:5010
 @AccessToken = ACCESS_TOKEN
 @BusinessId = BUSINESS_ID
 @CategoryId = CATEGORY_ID
 @ProductId = PRODUCT_ID
 @MovementId = MOVEMENT_ID
 @MovementVersion = 1
+@MovementItemId = MOVEMENT_ITEM_ID
+@MovementItemVersion = 1
 @ProductVersion = 1
 
 GET {{Mype.Api_HostAddress}}/health
@@ -208,3 +210,23 @@ Accept: application/json
   "description": "Venta completa del turno mañana",
   "version": {{MovementVersion}}
 }
+###
+POST {{Mype.Api_HostAddress}}/api/v1/businesses/{{BusinessId}}/financial-movements/{{MovementId}}/sale-items
+Authorization: Bearer {{AccessToken}}
+Content-Type: application/json
+
+{"productId":"{{ProductId}}","quantity":10.0000,"unitAmount":3.50,"movementVersion":{{MovementVersion}}}
+
+###
+PUT {{Mype.Api_HostAddress}}/api/v1/businesses/{{BusinessId}}/financial-movements/{{MovementId}}/sale-items/{{MovementItemId}}
+Authorization: Bearer {{AccessToken}}
+Content-Type: application/json
+
+{"productId":"{{ProductId}}","quantity":12.0000,"unitAmount":3.40,"movementVersion":{{MovementVersion}},"itemVersion":{{MovementItemVersion}}}
+
+###
+PATCH {{Mype.Api_HostAddress}}/api/v1/businesses/{{BusinessId}}/financial-movements/{{MovementId}}/items/{{MovementItemId}}/retire
+Authorization: Bearer {{AccessToken}}
+Content-Type: application/json
+
+{"movementVersion":{{MovementVersion}},"itemVersion":{{MovementItemVersion}}}
