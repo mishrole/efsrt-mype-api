@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using Testcontainers.PostgreSql;
 
@@ -10,7 +11,7 @@ namespace Mype.Tests.Integration
         )
             .WithDatabase("mype_tests")
             .WithUsername("postgres")
-            .WithPassword("postgres")
+            .WithPassword(Guid.NewGuid().ToString("N"))
             .WithCleanUp(true)
             .Build();
 
