@@ -47,7 +47,7 @@ namespace Mype.Api
                 .MapPost("/login", LoginEndpoint.DoAsync)
                 .AllowAnonymous()
                 .WithName("Login")
-                .WithSummary("Iniciar sesi�n")
+                .WithSummary("Iniciar sesión")
                 .Produces<LoginResult>(StatusCodes.Status200OK)
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status400BadRequest)
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status401Unauthorized)
@@ -95,7 +95,7 @@ namespace Mype.Api
             businessGroup
                 .MapGet("/{businessId:guid}/categories", ListCategoriesEndpoint.DoAsync)
                 .WithName("ListCategories")
-                .WithSummary("Consultar categor�as del negocio")
+                .WithSummary("Consultar categorías del negocio")
                 .Produces<IReadOnlyCollection<CategoryListItemResult>>(StatusCodes.Status200OK)
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status400BadRequest)
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status401Unauthorized)

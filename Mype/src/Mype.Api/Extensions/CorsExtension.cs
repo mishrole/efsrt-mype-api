@@ -1,10 +1,10 @@
-﻿using System;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Mype.Shared.Constants;
+using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 
 namespace Mype.Api.Extensions
 {
@@ -37,7 +37,13 @@ namespace Mype.Api.Extensions
                         }
                         else if (environment.IsDevelopment())
                         {
-                            policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
+                            policy
+                                .SetIsOriginAllowed(origin =>
+                                    Uri.TryCreate(origin, UriKind.Absolute, out var uri)
+                                    && uri.IsLoopback
+                                )
+                                .AllowAnyHeader()
+                                .AllowAnyMethod();
                         }
                         else
                         {
