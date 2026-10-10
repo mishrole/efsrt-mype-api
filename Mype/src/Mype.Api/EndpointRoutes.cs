@@ -1,4 +1,4 @@
-ï»¿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Mype.Api.Endpoints.v1.Auth;
 using Mype.Api.Endpoints.v1.Businesses;
@@ -10,6 +10,7 @@ using Mype.Application.Businesses.Commands.CreateBusiness;
 using Mype.Application.Businesses.Queries.GetBusinessContext;
 using Mype.Application.Businesses.Queries.ListUserBusinesses;
 using Mype.Application.Categories.Queries.ListCategories;
+using Mype.Application.Products.Commands.Common;
 using Mype.Application.Products.Commands.CreateProduct;
 using Mype.Application.Products.Queries.GetProductDetail;
 using Mype.Application.Products.Queries.ListProducts;
@@ -62,7 +63,7 @@ namespace Mype.Api
                 )
                 .AllowAnonymous()
                 .WithName("Login")
-                .WithSummary("Iniciar sesiÃ³n")
+                .WithSummary("Iniciar sesión")
                 .Produces<LoginResult>(
                     StatusCodes.Status200OK
                 )
@@ -165,7 +166,7 @@ namespace Mype.Api
                 )
                 .WithName("ListCategories")
                 .WithSummary(
-                    "Consultar categorÃ­as del negocio"
+                    "Consultar categorías del negocio"
                 )
                 .Produces<IReadOnlyCollection<CategoryListItemResult>>(
                     StatusCodes.Status200OK
@@ -290,7 +291,45 @@ namespace Mype.Api
                         .Status500InternalServerError
                 );
 
+            businessGroup
+                .MapPut("/{businessId:guid}/products/{productId:guid}", UpdateProductEndpoint.DoAsync)
+                .WithName("UpdateProduct")
+                .WithSummary("Actualizar un producto")
+                .Produces<ProductMaintenanceResult>(StatusCodes.Status200OK)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status400BadRequest)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status401Unauthorized)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status403Forbidden)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status404NotFound)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status409Conflict)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status422UnprocessableEntity)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
+
+            businessGroup
+                .MapPatch("/{businessId:guid}/products/{productId:guid}/deactivate", DeactivateProductEndpoint.DoAsync)
+                .WithName("DeactivateProduct")
+                .WithSummary("Desactivar un producto")
+                .Produces<ProductMaintenanceResult>(StatusCodes.Status200OK)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status400BadRequest)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status401Unauthorized)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status403Forbidden)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status404NotFound)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status409Conflict)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
+
+            businessGroup
+                .MapPatch("/{businessId:guid}/products/{productId:guid}/reactivate", ReactivateProductEndpoint.DoAsync)
+                .WithName("ReactivateProduct")
+                .WithSummary("Reactivar un producto")
+                .Produces<ProductMaintenanceResult>(StatusCodes.Status200OK)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status400BadRequest)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status401Unauthorized)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status403Forbidden)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status404NotFound)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status409Conflict)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status422UnprocessableEntity)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
             #endregion
         }
     }
 }
+

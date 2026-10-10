@@ -21,6 +21,25 @@ namespace Mype.Application.Products.Interfaces
                 CancellationToken cancellationToken
             );
 
+        Task<bool>
+            ExistsOtherByBusinessAndNormalizedNameAsync(
+                Guid businessId,
+                string normalizedName,
+                Guid excludedProductId,
+                CancellationToken cancellationToken
+            );
+
+        Task<Product> GetTrackedByIdAndBusinessAsync(
+            Guid productId,
+            Guid businessId,
+            CancellationToken cancellationToken
+        );
+
+        void SetOriginalVersion(
+            Product product,
+            uint version
+        );
+
         Task<
             IReadOnlyCollection<
                 ProductListItemProjection

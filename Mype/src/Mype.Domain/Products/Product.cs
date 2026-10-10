@@ -67,6 +67,47 @@ namespace Mype.Domain.Products
             return IsActive;
         }
 
+        public void Update(
+            Guid categoryId,
+            string name,
+            string normalizedName,
+            decimal salePrice,
+            decimal unitCost,
+            Guid currentUserId,
+            DateTimeOffset utcNow
+        )
+        {
+            CategoryId = categoryId;
+            Name = name;
+            NormalizedName = normalizedName;
+            SalePrice = salePrice;
+            UnitCost = unitCost;
+            UpdatedByUserId = currentUserId;
+            UpdatedAt = utcNow;
+        }
+
+        public void Deactivate(
+            Guid currentUserId,
+            DateTimeOffset utcNow
+        )
+        {
+            IsActive = false;
+            DeactivatedAt = utcNow;
+            UpdatedByUserId = currentUserId;
+            UpdatedAt = utcNow;
+        }
+
+        public void Reactivate(
+            Guid currentUserId,
+            DateTimeOffset utcNow
+        )
+        {
+            IsActive = true;
+            DeactivatedAt = null;
+            UpdatedByUserId = currentUserId;
+            UpdatedAt = utcNow;
+        }
+
         public static Product Create(
             Guid businessId,
             Guid categoryId,

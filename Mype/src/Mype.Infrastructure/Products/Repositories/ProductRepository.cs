@@ -34,23 +34,65 @@ namespace Mype.Infrastructure.Products.Repositories
             );
         }
 
-        public async Task<bool>
+        public Task<bool>
             ExistsByBusinessAndNormalizedNameAsync(
                 Guid businessId,
                 string normalizedName,
                 CancellationToken cancellationToken
             )
         {
-            return await _dbContext.Products
+            return _dbContext.Products
                 .AsNoTracking()
                 .AnyAsync(
                     product =>
-                        product.BusinessId ==
-                            businessId &&
-                        product.NormalizedName ==
-                            normalizedName,
+                        product.BusinessId == businessId &&
+                        product.NormalizedName == normalizedName,
                     cancellationToken
                 );
+        }
+
+        public Task<bool>
+            ExistsOtherByBusinessAndNormalizedNameAsync(
+                Guid businessId,
+                string normalizedName,
+                Guid excludedProductId,
+                CancellationToken cancellationToken
+            )
+        {
+            return _dbContext.Products
+                .AsNoTracking()
+                .AnyAsync(
+                    product =>
+                        product.BusinessId == businessId &&
+                        product.NormalizedName == normalizedName &&
+                        product.Id != excludedProductId,
+                    cancellationToken
+                );
+        }
+
+        public Task<Product> GetTrackedByIdAndBusinessAsync(
+            Guid productId,
+            Guid businessId,
+            CancellationToken cancellationToken
+        )
+        {
+            return _dbContext.Products
+                .SingleOrDefaultAsync(
+                    product =>
+                        product.Id == productId &&
+                        product.BusinessId == businessId,
+                    cancellationToken
+                );
+        }
+
+        public void SetOriginalVersion(
+            Product product,
+            uint version
+        )
+        {
+            _dbContext.Entry(product)
+                .Property(item => item.Version)
+                .OriginalValue = version;
         }
 
         public async Task<
@@ -68,11 +110,9 @@ namespace Mype.Infrastructure.Products.Repositories
         {
             var query =
                 from product in
-                    _dbContext.Products
-                        .AsNoTracking()
+                    _dbContext.Products.AsNoTracking()
                 join category in
-                    _dbContext.Categories
-                        .AsNoTracking()
+                    _dbContext.Categories.AsNoTracking()
                     on new
                     {
                         product.CategoryId,
@@ -80,13 +120,10 @@ namespace Mype.Infrastructure.Products.Repositories
                     }
                     equals new
                     {
-                        CategoryId =
-                            category.Id,
+                        CategoryId = category.Id,
                         category.BusinessId
                     }
-                where
-                    product.BusinessId ==
-                        businessId
+                where product.BusinessId == businessId
                 select new
                 {
                     Product = product,
@@ -134,9 +171,7 @@ namespace Mype.Infrastructure.Products.Repositories
             }
 
             return await query
-                .OrderBy(item =>
-                    item.Product.Name
-                )
+                .OrderBy(item => item.Product.Name)
                 .Select(item =>
                     new ProductListItemProjection(
                         item.Product.Id,
@@ -152,20 +187,18 @@ namespace Mype.Infrastructure.Products.Repositories
                 .ToArrayAsync(cancellationToken);
         }
 
-        public async Task<ProductDetailProjection>
+        public Task<ProductDetailProjection>
             GetByIdAndBusinessAsync(
                 Guid productId,
                 Guid businessId,
                 CancellationToken cancellationToken
             )
         {
-            return await (
+            return (
                 from product in
-                    _dbContext.Products
-                        .AsNoTracking()
+                    _dbContext.Products.AsNoTracking()
                 join category in
-                    _dbContext.Categories
-                        .AsNoTracking()
+                    _dbContext.Categories.AsNoTracking()
                     on new
                     {
                         product.CategoryId,
@@ -173,14 +206,12 @@ namespace Mype.Infrastructure.Products.Repositories
                     }
                     equals new
                     {
-                        CategoryId =
-                            category.Id,
+                        CategoryId = category.Id,
                         category.BusinessId
                     }
                 where
                     product.Id == productId &&
-                    product.BusinessId ==
-                        businessId
+                    product.BusinessId == businessId
                 select new ProductDetailProjection(
                     product.Id,
                     product.BusinessId,
@@ -195,9 +226,7 @@ namespace Mype.Infrastructure.Products.Repositories
                     product.UpdatedAt,
                     product.Version
                 )
-            ).SingleOrDefaultAsync(
-                cancellationToken
-            );
+            ).SingleOrDefaultAsync(cancellationToken);
         }
     }
 }

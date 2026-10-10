@@ -11,35 +11,54 @@ namespace Mype.Infrastructure.Persistence.Exceptions
     public class PostgreSqlExceptionTranslator
         : IPersistenceExceptionTranslator
     {
-        private static readonly Dictionary<string, Func<Exception, Exception>>
-            UniqueConstraintMappings = new()
-            {
-                {
-                    DatabaseConstraints.Users.NormalizedEmail,
-                    exception => new ApplicationErrorException(
-                        ErrorCodes.EmailAlreadyRegistered,
-                        ErrorMessages.EmailAlreadyRegistered,
-                        ApplicationErrorType.Conflict,
-                        exception
-                    )
-                },
-                {
-                    DatabaseConstraints.Products.BusinessName,
-                    exception => new ApplicationErrorException(
-                        ErrorCodes.ProductAlreadyExists,
-                        ErrorMessages.ProductAlreadyExists,
-                        ApplicationErrorType.Conflict,
-                        exception
-                    )
-                }
-            };
-
-        public Exception Translate(Exception exception)
+        private static readonly Dictionary<
+            string,
+            Func<Exception, Exception>
+        > UniqueConstraintMappings = new()
         {
+            {
+                DatabaseConstraints.Users.NormalizedEmail,
+                exception => new ApplicationErrorException(
+                    ErrorCodes.EmailAlreadyRegistered,
+                    ErrorMessages.EmailAlreadyRegistered,
+                    ApplicationErrorType.Conflict,
+                    exception
+                )
+            },
+            {
+                DatabaseConstraints.Products.BusinessName,
+                exception => new ApplicationErrorException(
+                    ErrorCodes.ProductAlreadyExists,
+                    ErrorMessages.ProductAlreadyExists,
+                    ApplicationErrorType.Conflict,
+                    exception
+                )
+            }
+        };
+
+        public Exception Translate(
+            Exception exception
+        )
+        {
+            if (
+                exception is
+                    DbUpdateConcurrencyException
+            )
+            {
+                return new ApplicationErrorException(
+                    ErrorCodes.ProductConcurrencyConflict,
+                    ErrorMessages.ProductConcurrencyConflict,
+                    ApplicationErrorType.Conflict,
+                    exception
+                );
+            }
+
             if (
                 exception is DbUpdateException
                 {
-                    InnerException: PostgresException postgresException
+                    InnerException:
+                        PostgresException
+                        postgresException
                 }
             )
             {
@@ -52,13 +71,15 @@ namespace Mype.Infrastructure.Persistence.Exceptions
             return exception;
         }
 
-        private static Exception TranslatePostgresException(
-            PostgresException postgresException,
-            Exception originalException
-        )
+        private static Exception
+            TranslatePostgresException(
+                PostgresException postgresException,
+                Exception originalException
+            )
         {
             if (
-                postgresException.SqlState == PostgresErrorCodes.UniqueViolation &&
+                postgresException.SqlState ==
+                    PostgresErrorCodes.UniqueViolation &&
                 postgresException.ConstraintName != null &&
                 UniqueConstraintMappings.TryGetValue(
                     postgresException.ConstraintName,
@@ -66,7 +87,9 @@ namespace Mype.Infrastructure.Persistence.Exceptions
                 )
             )
             {
-                return exceptionFactory(originalException);
+                return exceptionFactory(
+                    originalException
+                );
             }
 
             return originalException;
