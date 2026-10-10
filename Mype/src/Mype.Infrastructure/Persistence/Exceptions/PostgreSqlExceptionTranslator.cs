@@ -1,10 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
 using Mype.Application.Common.Exceptions;
 using Mype.Infrastructure.Persistence.Constraints;
 using Mype.Shared.Constants;
 using Npgsql;
-using System;
-using System.Collections.Generic;
 
 namespace Mype.Infrastructure.Persistence.Exceptions
 {

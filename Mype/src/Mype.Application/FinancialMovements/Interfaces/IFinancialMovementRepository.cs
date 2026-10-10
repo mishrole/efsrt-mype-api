@@ -1,9 +1,9 @@
-using Mype.Application.FinancialMovements.Models;
-using Mype.Domain.FinancialMovements;
 using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Mype.Application.FinancialMovements.Models;
+using Mype.Domain.FinancialMovements;
 
 namespace Mype.Application.FinancialMovements.Interfaces
 {
@@ -37,9 +37,8 @@ namespace Mype.Application.FinancialMovements.Interfaces
             CancellationToken cancellationToken
         );
 
-        Task<IReadOnlyCollection<FinancialMovementDraftListItemProjection>> ListDraftsByBusinessAsync(
-            Guid businessId,
-            CancellationToken cancellationToken
-        );
+        Task<
+            IReadOnlyCollection<FinancialMovementDraftListItemProjection>
+        > ListDraftsByBusinessAsync(Guid businessId, CancellationToken cancellationToken);
     }
 }

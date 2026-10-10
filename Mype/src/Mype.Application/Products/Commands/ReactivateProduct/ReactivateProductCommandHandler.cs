@@ -1,3 +1,7 @@
+using System;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using MediatR;
 using Mype.Application.BusinessMemberships.Interfaces;
 using Mype.Application.Categories.Interfaces;
@@ -12,10 +16,6 @@ using Mype.Domain.BusinessMemberships;
 using Mype.Domain.Categories;
 using Mype.Domain.Permissions.Constants;
 using Mype.Shared.Constants;
-using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Mype.Application.Products.Commands.ReactivateProduct
 {
@@ -96,8 +96,7 @@ namespace Mype.Application.Products.Commands.ReactivateProduct
             {
                 throw;
             }
-            catch (ApplicationErrorException ex)
-                when (ex.Code == ErrorCodes.ConcurrencyConflict)
+            catch (ApplicationErrorException ex) when (ex.Code == ErrorCodes.ConcurrencyConflict)
             {
                 return Failure(ReactivateProductErrors.ProductConcurrencyConflict);
             }

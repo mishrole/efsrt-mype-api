@@ -1,3 +1,7 @@
+using System;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using MediatR;
 using Mype.Application.BusinessMemberships.Interfaces;
 using Mype.Application.Common;
@@ -9,10 +13,6 @@ using Mype.Domain.Businesses;
 using Mype.Domain.BusinessMemberships;
 using Mype.Domain.Permissions.Constants;
 using Mype.Shared.Constants;
-using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Mype.Application.FinancialMovements.Commands.UpdateFinancialMovementDraft
 {

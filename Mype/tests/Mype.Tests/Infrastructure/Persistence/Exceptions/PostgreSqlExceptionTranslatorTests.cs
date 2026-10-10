@@ -1,10 +1,10 @@
-﻿using FluentAssertions;
+﻿using System;
+using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Mype.Application.Common.Exceptions;
 using Mype.Infrastructure.Persistence.Exceptions;
 using Mype.Shared.Constants;
 using Npgsql;
-using System;
 
 namespace Mype.Tests.Infrastructure.Persistence.Exceptions
 {

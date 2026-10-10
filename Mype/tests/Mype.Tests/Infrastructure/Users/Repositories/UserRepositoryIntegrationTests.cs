@@ -36,8 +36,17 @@ namespace Mype.Tests.Infrastructure.Users.Repositories
             await repository.AddAsync(user, CancellationToken.None);
             await context.SaveChangesAsync(CancellationToken.None);
 
-            (await repository.ExistsByNormalizedEmailAsync(user.NormalizedEmail, CancellationToken.None)).Should().BeTrue();
-            (await context.Users.AsNoTracking().SingleAsync(item => item.Id == user.Id)).Email.Should().Be(user.Email);
+            (
+                await repository.ExistsByNormalizedEmailAsync(
+                    user.NormalizedEmail,
+                    CancellationToken.None
+                )
+            )
+                .Should()
+                .BeTrue();
+            (await context.Users.AsNoTracking().SingleAsync(item => item.Id == user.Id))
+                .Email.Should()
+                .Be(user.Email);
         }
 
         [Fact]
@@ -52,7 +61,10 @@ namespace Mype.Tests.Infrastructure.Users.Repositories
             await context.SaveChangesAsync(CancellationToken.None);
             context.ChangeTracker.Clear();
 
-            var result = await repository.GetByNormalizedEmailAsync(user.NormalizedEmail, CancellationToken.None);
+            var result = await repository.GetByNormalizedEmailAsync(
+                user.NormalizedEmail,
+                CancellationToken.None
+            );
 
             result.Should().NotBeNull();
             result.Id.Should().Be(user.Id);
@@ -104,7 +116,13 @@ namespace Mype.Tests.Infrastructure.Users.Repositories
         private static User CreateUser(string normalizedEmail = null)
         {
             var email = UniqueEmail();
-            return User.Create(email, normalizedEmail ?? email.ToUpperInvariant(), "hash", "Integration User", DateTimeOffset.UtcNow);
+            return User.Create(
+                email,
+                normalizedEmail ?? email.ToUpperInvariant(),
+                "hash",
+                "Integration User",
+                DateTimeOffset.UtcNow
+            );
         }
 
         private static string UniqueEmail() => $"repository-{Guid.NewGuid():N}@example.com";
