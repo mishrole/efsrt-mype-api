@@ -79,7 +79,13 @@
         public const string MovementNotEditable = "MOVEMENT_NOT_EDITABLE";
         public const string MovementCreationFailed = "MOVEMENT_CREATION_FAILED";
         public const string MovementUpdateFailed = "MOVEMENT_UPDATE_FAILED";
+        public const string MovementItemNotFound = "MOVEMENT_ITEM_NOT_FOUND";
+        public const string MovementItemAlreadyRetired = "MOVEMENT_ITEM_ALREADY_RETIRED";
+        public const string MovementMustBeSale = "MOVEMENT_MUST_BE_SALE";
+        public const string ProductInactive = "PRODUCT_INACTIVE";
+        public const string MovementItemOperationFailed = "MOVEMENT_ITEM_OPERATION_FAILED";
 
         #endregion
     }
 }
+

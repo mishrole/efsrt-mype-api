@@ -1,9 +1,9 @@
+using Mype.Application.FinancialMovements.Models;
+using Mype.Domain.FinancialMovements;
 using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Mype.Application.FinancialMovements.Models;
-using Mype.Domain.FinancialMovements;
 
 namespace Mype.Application.FinancialMovements.Interfaces
 {
@@ -15,14 +15,31 @@ namespace Mype.Application.FinancialMovements.Interfaces
             Guid businessId,
             CancellationToken cancellationToken
         );
+
+        Task<FinancialMovement> GetAggregateTrackedByIdAndBusinessAsync(
+            Guid movementId,
+            Guid businessId,
+            CancellationToken cancellationToken
+        );
+
         void SetOriginalVersion(FinancialMovement movement, uint version);
+
+        void SetOriginalVersions(
+            FinancialMovement movement,
+            uint movementVersion,
+            FinancialMovementItem item,
+            uint itemVersion
+        );
+
         Task<FinancialMovementDraftProjection> GetDraftByIdAndBusinessAsync(
             Guid movementId,
             Guid businessId,
             CancellationToken cancellationToken
         );
-        Task<
-            IReadOnlyCollection<FinancialMovementDraftListItemProjection>
-        > ListDraftsByBusinessAsync(Guid businessId, CancellationToken cancellationToken);
+
+        Task<IReadOnlyCollection<FinancialMovementDraftListItemProjection>> ListDraftsByBusinessAsync(
+            Guid businessId,
+            CancellationToken cancellationToken
+        );
     }
 }

@@ -123,6 +123,11 @@
             "El movimiento fue modificado por otro proceso. Recargue los datos e inténtelo nuevamente.";
         public const string MovementCreationFailed = "No fue posible crear el movimiento.";
         public const string MovementUpdateFailed = "No fue posible actualizar el movimiento.";
+        public const string MovementItemNotFound = "El í­tem solicitado no fue encontrado.";
+        public const string MovementItemAlreadyRetired = "El í­tem ya se encuentra retirado.";
+        public const string MovementMustBeSale = "El movimiento debe ser una venta en borrador.";
+        public const string ProductInactive = "El producto no se encuentra disponible.";
+        public const string MovementItemOperationFailed = "No fue posible procesar el í­tem del movimiento.";
 
         #endregion
 
@@ -137,4 +142,5 @@
         #endregion
     }
 }
+
 

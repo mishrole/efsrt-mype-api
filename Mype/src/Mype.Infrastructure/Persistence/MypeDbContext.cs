@@ -1,6 +1,4 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Mype.Application.Common.Interfaces;
 using Mype.Domain.Businesses;
 using Mype.Domain.BusinessMemberships;
@@ -13,6 +11,8 @@ using Mype.Domain.Permissions;
 using Mype.Domain.Products;
 using Mype.Domain.Users;
 using Mype.Infrastructure.Persistence.Exceptions;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Mype.Infrastructure.Persistence
 {
@@ -57,10 +57,10 @@ namespace Mype.Infrastructure.Persistence
         public DbSet<BusinessMembership> BusinessMemberships => Set<BusinessMembership>();
         public DbSet<Category> Categories => Set<Category>();
         public DbSet<Permission> Permissions => Set<Permission>();
-        public DbSet<BusinessRolePermission> BusinessRolePermissions =>
-            Set<BusinessRolePermission>();
+        public DbSet<BusinessRolePermission> BusinessRolePermissions => Set<BusinessRolePermission>();
         public DbSet<Product> Products => Set<Product>();
         public DbSet<FinancialMovement> FinancialMovements => Set<FinancialMovement>();
+        public DbSet<FinancialMovementItem> FinancialMovementItems => Set<FinancialMovementItem>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -69,3 +69,4 @@ namespace Mype.Infrastructure.Persistence
         }
     }
 }
+
