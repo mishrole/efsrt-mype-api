@@ -281,6 +281,33 @@ namespace Mype.Api
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status422UnprocessableEntity)
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
             businessGroup
+                .MapPost(
+                    "/{businessId:guid}/financial-movements/{movementId:guid}/expense-items",
+                    AddExpenseItemEndpoint.DoAsync
+                )
+                .WithName("AddExpenseItem")
+                .Produces<ExpenseMovementItemMaintenanceResult>(StatusCodes.Status201Created)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status400BadRequest)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status403Forbidden)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status404NotFound)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status409Conflict)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status422UnprocessableEntity)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
+
+            businessGroup
+                .MapPut(
+                    "/{businessId:guid}/financial-movements/{movementId:guid}/expense-items/{itemId:guid}",
+                    UpdateExpenseItemEndpoint.DoAsync
+                )
+                .WithName("UpdateExpenseItem")
+                .Produces<ExpenseMovementItemMaintenanceResult>(StatusCodes.Status200OK)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status400BadRequest)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status403Forbidden)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status404NotFound)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status409Conflict)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status422UnprocessableEntity)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
+            businessGroup
                 .MapPatch(
                     "/{businessId:guid}/financial-movements/{movementId:guid}/items/{itemId:guid}/retire",
                     RetireFinancialMovementItemEndpoint.DoAsync

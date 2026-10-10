@@ -1,4 +1,4 @@
-using Mype.Application.Common;
+﻿using Mype.Application.Common;
 using Mype.Application.Common.Exceptions;
 using Mype.Shared.Constants;
 
@@ -42,6 +42,29 @@ namespace Mype.Application.FinancialMovements.Commands.Common
             ApplicationErrorType.UnprocessableEntity
         );
 
+        public static readonly ApplicationError MovementMustBeExpense = new(
+            ErrorCodes.MovementMustBeExpense,
+            ErrorMessages.MovementMustBeExpense,
+            ApplicationErrorType.UnprocessableEntity
+        );
+
+        public static readonly ApplicationError CategoryNotFound = new(
+            ErrorCodes.CategoryNotFound,
+            ErrorMessages.CategoryNotFound,
+            ApplicationErrorType.NotFound
+        );
+
+        public static readonly ApplicationError ExpenseCategoryUnavailable = new(
+            ErrorCodes.ExpenseCategoryUnavailable,
+            ErrorMessages.ExpenseCategoryUnavailable,
+            ApplicationErrorType.UnprocessableEntity
+        );
+
+        public static readonly ApplicationError ExpenseItemOperationFailed = new(
+            ErrorCodes.ExpenseItemOperationFailed,
+            ErrorMessages.ExpenseItemOperationFailed,
+            ApplicationErrorType.Internal
+        );
         public static readonly ApplicationError ProductNotFound = new(
             ErrorCodes.ProductNotFound,
             ErrorMessages.ProductNotFound,

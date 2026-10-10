@@ -1,5 +1,6 @@
 using System;
 using Mype.Domain.Common;
+using Mype.Domain.FinancialMovements.Constraints;
 using Mype.Domain.Products;
 
 namespace Mype.Domain.FinancialMovements
@@ -12,7 +13,6 @@ namespace Mype.Domain.FinancialMovements
             Guid id,
             Guid businessId,
             Guid movementId,
-            Product product,
             decimal quantity,
             decimal unitAmount,
             Guid userId,
@@ -22,7 +22,6 @@ namespace Mype.Domain.FinancialMovements
         {
             BusinessId = businessId;
             MovementId = movementId;
-            ApplyProduct(product);
             ApplyAmounts(quantity, unitAmount);
             IsActive = true;
             CreatedByUserId = userId;
@@ -60,16 +59,41 @@ namespace Mype.Domain.FinancialMovements
         )
         {
             EnsureProductBusiness(product, businessId);
-            return new(
+            var item = new FinancialMovementItem(
                 Guid.NewGuid(),
                 businessId,
                 movementId,
-                product,
                 quantity,
                 unitAmount,
                 userId,
                 utcNow
             );
+            item.ApplyProduct(product);
+            return item;
+        }
+
+        internal static FinancialMovementItem CreateExpense(
+            Guid businessId,
+            Guid movementId,
+            Guid categoryId,
+            string description,
+            decimal quantity,
+            decimal unitAmount,
+            Guid userId,
+            DateTimeOffset utcNow
+        )
+        {
+            var item = new FinancialMovementItem(
+                Guid.NewGuid(),
+                businessId,
+                movementId,
+                quantity,
+                unitAmount,
+                userId,
+                utcNow
+            );
+            item.ApplyExpense(categoryId, description);
+            return item;
         }
 
         internal void UpdateSale(
@@ -80,27 +104,34 @@ namespace Mype.Domain.FinancialMovements
             DateTimeOffset utcNow
         )
         {
-            if (!IsActive)
-                throw new FinancialMovementItemException(
-                    FinancialMovementItemError.ItemAlreadyRetired
-                );
+            EnsureActive();
             EnsureProductBusiness(product, BusinessId);
             ApplyProduct(product);
             ApplyAmounts(quantity, unitAmount);
-            UpdatedByUserId = userId;
-            UpdatedAt = utcNow;
+            Touch(userId, utcNow);
+        }
+
+        internal void UpdateExpense(
+            Guid categoryId,
+            string description,
+            decimal quantity,
+            decimal unitAmount,
+            Guid userId,
+            DateTimeOffset utcNow
+        )
+        {
+            EnsureActive();
+            ApplyExpense(categoryId, description);
+            ApplyAmounts(quantity, unitAmount);
+            Touch(userId, utcNow);
         }
 
         internal void Retire(Guid userId, DateTimeOffset utcNow)
         {
-            if (!IsActive)
-                throw new FinancialMovementItemException(
-                    FinancialMovementItemError.ItemAlreadyRetired
-                );
+            EnsureActive();
             IsActive = false;
             RetiredAt = utcNow;
-            UpdatedByUserId = userId;
-            UpdatedAt = utcNow;
+            Touch(userId, utcNow);
         }
 
         private void ApplyProduct(Product product)
@@ -109,6 +140,29 @@ namespace Mype.Domain.FinancialMovements
             CategoryId = product.CategoryId;
             Description = product.Name;
             UnitCostSnapshot = product.UnitCost;
+        }
+
+        private void ApplyExpense(Guid categoryId, string description)
+        {
+            if (categoryId == Guid.Empty)
+                throw new FinancialMovementItemException(
+                    FinancialMovementItemError.InvalidCategory
+                );
+            var normalizedDescription = description?.Trim();
+            if (string.IsNullOrWhiteSpace(normalizedDescription))
+                throw new FinancialMovementItemException(
+                    FinancialMovementItemError.InvalidDescription
+                );
+            if (
+                normalizedDescription.Length > FinancialMovementItemConstraints.DescriptionMaxLength
+            )
+                throw new FinancialMovementItemException(
+                    FinancialMovementItemError.DescriptionTooLong
+                );
+            CategoryId = categoryId;
+            Description = normalizedDescription;
+            ProductId = null;
+            UnitCostSnapshot = null;
         }
 
         private void ApplyAmounts(decimal quantity, decimal unitAmount)
@@ -126,12 +180,26 @@ namespace Mype.Domain.FinancialMovements
             SubtotalAmount = RoundAmount(quantity * unitAmount);
         }
 
+        private void EnsureActive()
+        {
+            if (!IsActive)
+                throw new FinancialMovementItemException(
+                    FinancialMovementItemError.ItemAlreadyRetired
+                );
+        }
+
         private static void EnsureProductBusiness(Product product, Guid businessId)
         {
             if (product == null || product.BusinessId != businessId)
                 throw new FinancialMovementItemException(
                     FinancialMovementItemError.ProductBusinessMismatch
                 );
+        }
+
+        private void Touch(Guid userId, DateTimeOffset utcNow)
+        {
+            UpdatedByUserId = userId;
+            UpdatedAt = utcNow;
         }
 
         private static decimal RoundAmount(decimal value) =>
