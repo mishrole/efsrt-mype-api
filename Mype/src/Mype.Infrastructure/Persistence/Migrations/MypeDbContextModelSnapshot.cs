@@ -915,6 +915,8 @@ namespace Mype.Infrastructure.Persistence.Migrations
 
                             t.HasCheckConstraint("ck_movement_evidences_pending_purge_state", "status <> 2 OR (removal_reason IS NOT NULL AND marked_for_purge_at IS NOT NULL AND purge_after IS NOT NULL AND purged_at IS NULL)");
 
+                            t.HasCheckConstraint("ck_movement_evidences_purged_state", "status <> 3 OR purged_at IS NOT NULL");
+
                             t.HasCheckConstraint("ck_movement_evidences_size_positive", "size_bytes > 0");
                         });
                 });
