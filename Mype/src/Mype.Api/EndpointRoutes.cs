@@ -13,6 +13,7 @@ using Mype.Application.Businesses.Commands.CreateBusiness;
 using Mype.Application.Businesses.Queries.GetBusinessContext;
 using Mype.Application.Businesses.Queries.ListUserBusinesses;
 using Mype.Application.Categories.Queries.ListCategories;
+using Mype.Application.FinancialMovements.Commands.CancelFinancialMovement;
 using Mype.Application.FinancialMovements.Commands.ConfirmFinancialMovement;
 using Mype.Application.FinancialMovements.Commands.CreateFinancialMovement;
 using Mype.Application.FinancialMovements.Commands.DiscardFinancialMovement;
@@ -282,6 +283,17 @@ namespace Mype.Api
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status422UnprocessableEntity)
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
 
+            financialMovementGroup
+                .MapPost("/{movementId:guid}/cancel", CancelFinancialMovementEndpoint.DoAsync)
+                .WithName("CancelFinancialMovement")
+                .WithSummary("Anular un movimiento financiero confirmado")
+                .Produces<CancelFinancialMovementResult>(StatusCodes.Status200OK)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status400BadRequest)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status401Unauthorized)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status403Forbidden)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status404NotFound)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status409Conflict)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
             financialMovementGroup
                 .MapPost("/{movementId:guid}/discard", DiscardFinancialMovementEndpoint.DoAsync)
                 .WithName("DiscardFinancialMovement")

@@ -7,5 +7,6 @@ namespace Mype.Domain.FinancialMovements.Constraints
         public const int AmountPrecision = 18;
         public const int AmountScale = 2;
         public const int CancellationReasonMaxLength = 500;
+        public const int CancellationReasonMinLength = 10;
     }
 }
