@@ -1,4 +1,4 @@
-﻿using System.Threading;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Mype.Application.Common.Interfaces;
@@ -9,6 +9,7 @@ using Mype.Domain.BusinessRoles;
 using Mype.Domain.Categories;
 using Mype.Domain.Currencies;
 using Mype.Domain.FinancialMovements;
+using Mype.Domain.MovementEvidences;
 using Mype.Domain.Permissions;
 using Mype.Domain.Products;
 using Mype.Domain.Users;
@@ -62,6 +63,7 @@ namespace Mype.Infrastructure.Persistence
         public DbSet<Product> Products => Set<Product>();
         public DbSet<FinancialMovement> FinancialMovements => Set<FinancialMovement>();
         public DbSet<FinancialMovementItem> FinancialMovementItems => Set<FinancialMovementItem>();
+        public DbSet<MovementEvidence> MovementEvidences => Set<MovementEvidence>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

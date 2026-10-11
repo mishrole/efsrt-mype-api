@@ -8,6 +8,7 @@ using Mype.Application.Categories.Interfaces;
 using Mype.Application.Common.Interfaces;
 using Mype.Application.Currencies.Interfaces;
 using Mype.Application.FinancialMovements.Interfaces;
+using Mype.Application.MovementEvidences.Interfaces;
 using Mype.Application.Permissions.Interfaces;
 using Mype.Application.Products.Interfaces;
 using Mype.Application.Users.Interfaces;
@@ -20,6 +21,7 @@ using Mype.Infrastructure.Categories.Repositories;
 using Mype.Infrastructure.Common;
 using Mype.Infrastructure.Currencies.Repositories;
 using Mype.Infrastructure.FinancialMovements.Repositories;
+using Mype.Infrastructure.MovementEvidences.Repositories;
 using Mype.Infrastructure.Permissions.Repositories;
 using Mype.Infrastructure.Persistence;
 using Mype.Infrastructure.Persistence.Exceptions;
@@ -50,6 +52,7 @@ namespace Mype.Infrastructure.Extensions
             services.AddScoped<IPermissionRepository, PermissionRepository>();
             services.AddScoped<IProductRepository, ProductRepository>();
             services.AddScoped<IFinancialMovementRepository, FinancialMovementRepository>();
+            services.AddScoped<IMovementEvidenceRepository, MovementEvidenceRepository>();
 
             services.AddScoped<IUnitOfWork>(provider =>
                 provider.GetRequiredService<MypeDbContext>()
