@@ -28,6 +28,10 @@ namespace Mype.Infrastructure.Persistence.Configurations
                         DatabaseConstraints.MovementEvidences.PendingPurgeState,
                         "status <> 2 OR (removal_reason IS NOT NULL AND marked_for_purge_at IS NOT NULL AND purge_after IS NOT NULL AND purged_at IS NULL)"
                     );
+                    table.HasCheckConstraint(
+                        DatabaseConstraints.MovementEvidences.PurgedState,
+                        "status <> 3 OR purged_at IS NOT NULL"
+                    );
                 }
             );
 

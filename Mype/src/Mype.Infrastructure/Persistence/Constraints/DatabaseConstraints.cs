@@ -112,6 +112,7 @@ namespace Mype.Infrastructure.Persistence.Constraints
             public const string SizePositive = "ck_movement_evidences_size_positive";
             public const string ActiveState = "ck_movement_evidences_active_state";
             public const string PendingPurgeState = "ck_movement_evidences_pending_purge_state";
+            public const string PurgedState = "ck_movement_evidences_purged_state";
         }
 
         public static class Permissions
