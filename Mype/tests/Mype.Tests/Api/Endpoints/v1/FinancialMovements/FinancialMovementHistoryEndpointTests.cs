@@ -33,16 +33,23 @@ namespace Mype.Tests.Api.Endpoints.v1.FinancialMovements
             ListFinancialMovementHistoryQuery captured = null;
             user.Setup(provider => provider.GetCurrentUserId()).Returns(userId);
             sender
-                .Setup(service => service.Send(
-                    It.IsAny<ListFinancialMovementHistoryQuery>(),
-                    It.IsAny<CancellationToken>()
-                ))
-                .Callback((IRequest<Result<FinancialMovementHistoryPageResult>> request, CancellationToken _) =>
-                    captured = (ListFinancialMovementHistoryQuery)request
+                .Setup(service =>
+                    service.Send(
+                        It.IsAny<ListFinancialMovementHistoryQuery>(),
+                        It.IsAny<CancellationToken>()
+                    )
                 )
-                .ReturnsAsync(Result<FinancialMovementHistoryPageResult>.Success(
-                    new([], expectedPage, expectedPageSize, 0, expectedPage > 1, false)
-                ));
+                .Callback(
+                    (
+                        IRequest<Result<FinancialMovementHistoryPageResult>> request,
+                        CancellationToken _
+                    ) => captured = (ListFinancialMovementHistoryQuery)request
+                )
+                .ReturnsAsync(
+                    Result<FinancialMovementHistoryPageResult>.Success(
+                        new([], expectedPage, expectedPageSize, 0, expectedPage > 1, false)
+                    )
+                );
 
             var response = await ListFinancialMovementHistoryEndpoint.DoAsync(
                 businessId,
@@ -59,8 +66,11 @@ namespace Mype.Tests.Api.Endpoints.v1.FinancialMovements
                 CancellationToken.None
             );
 
-            response.Should().BeAssignableTo<IStatusCodeHttpResult>()
-                .Which.StatusCode.Should().Be(StatusCodes.Status200OK);
+            response
+                .Should()
+                .BeAssignableTo<IStatusCodeHttpResult>()
+                .Which.StatusCode.Should()
+                .Be(StatusCodes.Status200OK);
             captured.Page.Should().Be(expectedPage);
             captured.PageSize.Should().Be(expectedPageSize);
             captured.BusinessId.Should().Be(businessId);
@@ -77,37 +87,43 @@ namespace Mype.Tests.Api.Endpoints.v1.FinancialMovements
             var user = new Mock<IUserContextProvider>();
             user.Setup(provider => provider.GetCurrentUserId()).Returns(userId);
             sender
-                .Setup(service => service.Send(
-                    It.IsAny<GetFinancialMovementHistoryDetailQuery>(),
-                    It.IsAny<CancellationToken>()
-                ))
-                .ReturnsAsync(Result<FinancialMovementHistoryDetailResult>.Success(new(
-                    movementId,
-                    businessId,
-                    FinancialMovementType.Expense,
-                    FinancialMovementStatus.Draft,
-                    new DateOnly(2026, 10, 11),
-                    null,
-                    "PEN",
-                    0m,
-                    userId,
-                    userId,
-                    null,
-                    null,
-                    null,
-                    DateTimeOffset.UtcNow,
-                    DateTimeOffset.UtcNow,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    true,
-                    [],
-                    1,
-                    [],
-                    []
-                )));
+                .Setup(service =>
+                    service.Send(
+                        It.IsAny<GetFinancialMovementHistoryDetailQuery>(),
+                        It.IsAny<CancellationToken>()
+                    )
+                )
+                .ReturnsAsync(
+                    Result<FinancialMovementHistoryDetailResult>.Success(
+                        new(
+                            movementId,
+                            businessId,
+                            FinancialMovementType.Expense,
+                            FinancialMovementStatus.Draft,
+                            new DateOnly(2026, 10, 11),
+                            null,
+                            "PEN",
+                            0m,
+                            userId,
+                            userId,
+                            null,
+                            null,
+                            null,
+                            DateTimeOffset.UtcNow,
+                            DateTimeOffset.UtcNow,
+                            null,
+                            null,
+                            null,
+                            null,
+                            null,
+                            true,
+                            [],
+                            1,
+                            [],
+                            []
+                        )
+                    )
+                );
 
             var response = await GetFinancialMovementHistoryDetailEndpoint.DoAsync(
                 businessId,
@@ -118,16 +134,23 @@ namespace Mype.Tests.Api.Endpoints.v1.FinancialMovements
                 CancellationToken.None
             );
 
-            response.Should().BeAssignableTo<IStatusCodeHttpResult>()
-                .Which.StatusCode.Should().Be(StatusCodes.Status200OK);
-            sender.Verify(service => service.Send(
-                It.Is<GetFinancialMovementHistoryDetailQuery>(query =>
-                    query.BusinessId == businessId
-                    && query.MovementId == movementId
-                    && query.CurrentUserId == userId
-                ),
-                It.IsAny<CancellationToken>()
-            ), Times.Once);
+            response
+                .Should()
+                .BeAssignableTo<IStatusCodeHttpResult>()
+                .Which.StatusCode.Should()
+                .Be(StatusCodes.Status200OK);
+            sender.Verify(
+                service =>
+                    service.Send(
+                        It.Is<GetFinancialMovementHistoryDetailQuery>(query =>
+                            query.BusinessId == businessId
+                            && query.MovementId == movementId
+                            && query.CurrentUserId == userId
+                        ),
+                        It.IsAny<CancellationToken>()
+                    ),
+                Times.Once
+            );
         }
     }
 }

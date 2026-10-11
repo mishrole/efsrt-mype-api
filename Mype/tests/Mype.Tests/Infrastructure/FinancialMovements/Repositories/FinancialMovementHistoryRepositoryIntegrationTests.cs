@@ -48,16 +48,20 @@ namespace Mype.Tests.Infrastructure.FinancialMovements.Repositories
             );
 
             firstPage.TotalCount.Should().Be(3);
-            firstPage.Items.Select(item => item.Id).Should().Equal(
-                seed.LatestMovementId,
-                seed.MiddleMovementId
-            );
+            firstPage
+                .Items.Select(item => item.Id)
+                .Should()
+                .Equal(seed.LatestMovementId, seed.MiddleMovementId);
             secondPage.Items.Should().ContainSingle(item => item.Id == seed.OldestMovementId);
             firstPage.Items.Should().OnlyContain(item => item.Id != seed.OtherBusinessMovementId);
-            firstPage.Items.Single(item => item.Id == seed.LatestMovementId)
-                .ActiveItemCount.Should().Be(1);
-            firstPage.Items.Single(item => item.Id == seed.LatestMovementId)
-                .HasActiveEvidence.Should().BeTrue();
+            firstPage
+                .Items.Single(item => item.Id == seed.LatestMovementId)
+                .ActiveItemCount.Should()
+                .Be(1);
+            firstPage
+                .Items.Single(item => item.Id == seed.LatestMovementId)
+                .HasActiveEvidence.Should()
+                .BeTrue();
             context.ChangeTracker.Entries().Should().BeEmpty();
         }
 
@@ -85,12 +89,13 @@ namespace Mype.Tests.Infrastructure.FinancialMovements.Repositories
             );
 
             page.TotalCount.Should().Be(1);
-            page.Items.Should().ContainSingle(item =>
-                item.Id == seed.LatestMovementId
-                && item.Type == FinancialMovementType.Sale
-                && item.Status == FinancialMovementStatus.Confirmed
-                && item.MovementDate == new DateOnly(2026, 10, 11)
-            );
+            page.Items.Should()
+                .ContainSingle(item =>
+                    item.Id == seed.LatestMovementId
+                    && item.Type == FinancialMovementType.Sale
+                    && item.Status == FinancialMovementStatus.Confirmed
+                    && item.MovementDate == new DateOnly(2026, 10, 11)
+                );
         }
 
         [Fact]
@@ -119,9 +124,10 @@ namespace Mype.Tests.Infrastructure.FinancialMovements.Repositories
                 CancellationToken.None
             );
 
-            fromOnly.Items.Select(item => item.Id).Should().BeEquivalentTo(
-                [seed.LatestMovementId, seed.MiddleMovementId]
-            );
+            fromOnly
+                .Items.Select(item => item.Id)
+                .Should()
+                .BeEquivalentTo([seed.LatestMovementId, seed.MiddleMovementId]);
             toOnly.Items.Should().ContainSingle(item => item.Id == seed.OldestMovementId);
             retiredCategory.TotalCount.Should().Be(0);
             retiredCategory.Items.Should().BeEmpty();
@@ -151,34 +157,36 @@ namespace Mype.Tests.Infrastructure.FinancialMovements.Repositories
             detail.Status.Should().Be(FinancialMovementStatus.Confirmed);
             detail.ConfirmedAt.Should().NotBeNull();
             detail.Items.Should().HaveCount(2);
-            detail.Items.Should().ContainSingle(item =>
-                item.IsActive
-                && item.CategoryId == seed.SaleCategoryId
-                && item.CategoryName == "Ventas"
-                && item.CategoryIsActive == false
-                && item.ProductId == seed.ProductId
-                && item.ProductName == "Producto histórico"
-                && item.ProductIsActive == false
-            );
-            detail.Items.Should().ContainSingle(item =>
-                !item.IsActive && item.CategoryId == seed.RetiredOnlyCategoryId
-            );
+            detail
+                .Items.Should()
+                .ContainSingle(item =>
+                    item.IsActive
+                    && item.CategoryId == seed.SaleCategoryId
+                    && item.CategoryName == "Ventas"
+                    && item.CategoryIsActive == false
+                    && item.ProductId == seed.ProductId
+                    && item.ProductName == "Producto histórico"
+                    && item.ProductIsActive == false
+                );
+            detail
+                .Items.Should()
+                .ContainSingle(item =>
+                    !item.IsActive && item.CategoryId == seed.RetiredOnlyCategoryId
+                );
             detail.Evidences.Should().HaveCount(2);
-            detail.Evidences.Should().ContainSingle(evidence =>
-                evidence.Status == MovementEvidenceStatus.Active
-            );
-            detail.Evidences.Should().ContainSingle(evidence =>
-                evidence.Status == MovementEvidenceStatus.PendingPurge
-            );
+            detail
+                .Evidences.Should()
+                .ContainSingle(evidence => evidence.Status == MovementEvidenceStatus.Active);
+            detail
+                .Evidences.Should()
+                .ContainSingle(evidence => evidence.Status == MovementEvidenceStatus.PendingPurge);
             foreign.Should().BeNull();
             context.ChangeTracker.Entries().Should().BeEmpty();
         }
 
         private MypeWebApplicationFactory CreateFactory() => new(_database.ConnectionString);
 
-        private static async Task<HistorySeed> SeedHistoryAsync(
-            MypeWebApplicationFactory factory
-        )
+        private static async Task<HistorySeed> SeedHistoryAsync(MypeWebApplicationFactory factory)
         {
             await using var scope = factory.Services.CreateAsyncScope();
             var context = scope.ServiceProvider.GetRequiredService<MypeDbContext>();
@@ -272,10 +280,7 @@ namespace Mype.Tests.Infrastructure.FinancialMovements.Repositories
                 firstBusiness.User.Id,
                 RepositoryTestData.UtcNow.AddMinutes(6)
             );
-            latest.Confirm(
-                firstBusiness.User.Id,
-                RepositoryTestData.UtcNow.AddMinutes(7)
-            );
+            latest.Confirm(firstBusiness.User.Id, RepositoryTestData.UtcNow.AddMinutes(7));
 
             var middle = FinancialMovement.CreateDraft(
                 firstBusiness.Business.Id,
@@ -294,10 +299,7 @@ namespace Mype.Tests.Infrastructure.FinancialMovements.Repositories
                 firstBusiness.User.Id,
                 RepositoryTestData.UtcNow.AddMinutes(3)
             );
-            middle.Discard(
-                firstBusiness.User.Id,
-                RepositoryTestData.UtcNow.AddMinutes(8)
-            );
+            middle.Discard(firstBusiness.User.Id, RepositoryTestData.UtcNow.AddMinutes(8));
 
             var oldest = FinancialMovement.CreateDraft(
                 firstBusiness.Business.Id,
@@ -353,10 +355,7 @@ namespace Mype.Tests.Infrastructure.FinancialMovements.Repositories
                 firstBusiness.User.Id,
                 RepositoryTestData.UtcNow.AddMinutes(13)
             );
-            product.Deactivate(
-                firstBusiness.User.Id,
-                RepositoryTestData.UtcNow.AddMinutes(13)
-            );
+            product.Deactivate(firstBusiness.User.Id, RepositoryTestData.UtcNow.AddMinutes(13));
             await context.SaveChangesAsync(CancellationToken.None);
 
             return new(

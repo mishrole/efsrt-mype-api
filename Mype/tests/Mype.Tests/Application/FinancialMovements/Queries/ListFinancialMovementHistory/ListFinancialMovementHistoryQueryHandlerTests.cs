@@ -24,34 +24,38 @@ namespace Mype.Tests.Application.FinancialMovements.Queries.ListFinancialMovemen
         public async Task Handle_Should_Allow_Inactive_Business_And_Map_Page()
         {
             var fixture = new Fixture(BusinessStatus.Inactive);
-            fixture.Movements
-                .Setup(repository => repository.SearchHistoryByBusinessAsync(
-                    fixture.BusinessId,
-                    It.IsAny<FinancialMovementHistoryFilters>(),
-                    It.IsAny<CancellationToken>()
-                ))
-                .ReturnsAsync(new FinancialMovementHistoryPageProjection(
-                    [
-                        new(
-                            Guid.NewGuid(),
-                            FinancialMovementType.Sale,
-                            FinancialMovementStatus.Confirmed,
-                            new DateOnly(2026, 10, 11),
-                            "Venta",
-                            "PEN",
-                            10m,
-                            2,
-                            true,
-                            fixture.Now,
-                            fixture.Now,
-                            null,
-                            null
-                        ),
-                    ],
-                    2,
-                    5,
-                    8
-                ));
+            fixture
+                .Movements.Setup(repository =>
+                    repository.SearchHistoryByBusinessAsync(
+                        fixture.BusinessId,
+                        It.IsAny<FinancialMovementHistoryFilters>(),
+                        It.IsAny<CancellationToken>()
+                    )
+                )
+                .ReturnsAsync(
+                    new FinancialMovementHistoryPageProjection(
+                        [
+                            new(
+                                Guid.NewGuid(),
+                                FinancialMovementType.Sale,
+                                FinancialMovementStatus.Confirmed,
+                                new DateOnly(2026, 10, 11),
+                                "Venta",
+                                "PEN",
+                                10m,
+                                2,
+                                true,
+                                fixture.Now,
+                                fixture.Now,
+                                null,
+                                null
+                            ),
+                        ],
+                        2,
+                        5,
+                        8
+                    )
+                );
             var query = fixture.Query();
             query.Type = FinancialMovementType.Sale;
             query.Status = FinancialMovementStatus.Confirmed;
@@ -86,12 +90,14 @@ namespace Mype.Tests.Application.FinancialMovements.Queries.ListFinancialMovemen
         public async Task Handle_Should_Reject_Category_Outside_Business()
         {
             var fixture = new Fixture(BusinessStatus.Active);
-            fixture.Categories
-                .Setup(repository => repository.ExistsByIdAndBusinessAsync(
-                    It.IsAny<Guid>(),
-                    fixture.BusinessId,
-                    It.IsAny<CancellationToken>()
-                ))
+            fixture
+                .Categories.Setup(repository =>
+                    repository.ExistsByIdAndBusinessAsync(
+                        It.IsAny<Guid>(),
+                        fixture.BusinessId,
+                        It.IsAny<CancellationToken>()
+                    )
+                )
                 .ReturnsAsync(false);
             var query = fixture.Query();
             query.CategoryId = Guid.NewGuid();
@@ -99,11 +105,15 @@ namespace Mype.Tests.Application.FinancialMovements.Queries.ListFinancialMovemen
             var result = await fixture.Handler().Handle(query, CancellationToken.None);
 
             result.Error.Code.Should().Be(ErrorCodes.CategoryNotFound);
-            fixture.Movements.Verify(repository => repository.SearchHistoryByBusinessAsync(
-                It.IsAny<Guid>(),
-                It.IsAny<FinancialMovementHistoryFilters>(),
-                It.IsAny<CancellationToken>()
-            ), Times.Never);
+            fixture.Movements.Verify(
+                repository =>
+                    repository.SearchHistoryByBusinessAsync(
+                        It.IsAny<Guid>(),
+                        It.IsAny<FinancialMovementHistoryFilters>(),
+                        It.IsAny<CancellationToken>()
+                    ),
+                Times.Never
+            );
         }
 
         [Theory]
@@ -142,29 +152,31 @@ namespace Mype.Tests.Application.FinancialMovements.Queries.ListFinancialMovemen
         public async Task Handle_Should_Map_Unexpected_Error_And_Rethrow_Cancellation()
         {
             var failure = new Fixture(BusinessStatus.Active);
-            failure.Movements
-                .Setup(repository => repository.SearchHistoryByBusinessAsync(
-                    failure.BusinessId,
-                    It.IsAny<FinancialMovementHistoryFilters>(),
-                    It.IsAny<CancellationToken>()
-                ))
+            failure
+                .Movements.Setup(repository =>
+                    repository.SearchHistoryByBusinessAsync(
+                        failure.BusinessId,
+                        It.IsAny<FinancialMovementHistoryFilters>(),
+                        It.IsAny<CancellationToken>()
+                    )
+                )
                 .ThrowsAsync(new InvalidOperationException());
 
             var failed = await failure.Handler().Handle(failure.Query(), CancellationToken.None);
             failed.Error.Code.Should().Be(ErrorCodes.FinancialHistoryQueryFailed);
 
             var cancelled = new Fixture(BusinessStatus.Active);
-            cancelled.Movements
-                .Setup(repository => repository.SearchHistoryByBusinessAsync(
-                    cancelled.BusinessId,
-                    It.IsAny<FinancialMovementHistoryFilters>(),
-                    It.IsAny<CancellationToken>()
-                ))
+            cancelled
+                .Movements.Setup(repository =>
+                    repository.SearchHistoryByBusinessAsync(
+                        cancelled.BusinessId,
+                        It.IsAny<FinancialMovementHistoryFilters>(),
+                        It.IsAny<CancellationToken>()
+                    )
+                )
                 .ThrowsAsync(new OperationCanceledException());
-            var action = () => cancelled.Handler().Handle(
-                cancelled.Query(),
-                CancellationToken.None
-            );
+            var action = () =>
+                cancelled.Handler().Handle(cancelled.Query(), CancellationToken.None);
 
             await action.Should().ThrowAsync<OperationCanceledException>();
         }
@@ -188,34 +200,42 @@ namespace Mype.Tests.Application.FinancialMovements.Queries.ListFinancialMovemen
             )
             {
                 Memberships
-                    .Setup(repository => repository.GetContextByBusinessAndUserAsync(
-                        BusinessId,
-                        UserId,
-                        It.IsAny<CancellationToken>()
-                    ))
-                    .ReturnsAsync(new BusinessContextProjection(
-                        BusinessId,
-                        "Business",
-                        "PEN",
-                        status,
-                        Guid.NewGuid(),
-                        membership,
-                        RoleId,
-                        "OWNER",
-                        roleActive
-                    ));
+                    .Setup(repository =>
+                        repository.GetContextByBusinessAndUserAsync(
+                            BusinessId,
+                            UserId,
+                            It.IsAny<CancellationToken>()
+                        )
+                    )
+                    .ReturnsAsync(
+                        new BusinessContextProjection(
+                            BusinessId,
+                            "Business",
+                            "PEN",
+                            status,
+                            Guid.NewGuid(),
+                            membership,
+                            RoleId,
+                            "OWNER",
+                            roleActive
+                        )
+                    );
                 Permissions
-                    .Setup(repository => repository.ListActiveCodesByRoleIdAsync(
-                        RoleId,
-                        It.IsAny<CancellationToken>()
-                    ))
+                    .Setup(repository =>
+                        repository.ListActiveCodesByRoleIdAsync(
+                            RoleId,
+                            It.IsAny<CancellationToken>()
+                        )
+                    )
                     .ReturnsAsync(permissions ?? [SystemPermissions.HistoryRead.Code]);
                 Movements
-                    .Setup(repository => repository.SearchHistoryByBusinessAsync(
-                        BusinessId,
-                        It.IsAny<FinancialMovementHistoryFilters>(),
-                        It.IsAny<CancellationToken>()
-                    ))
+                    .Setup(repository =>
+                        repository.SearchHistoryByBusinessAsync(
+                            BusinessId,
+                            It.IsAny<FinancialMovementHistoryFilters>(),
+                            It.IsAny<CancellationToken>()
+                        )
+                    )
                     .ReturnsAsync(new FinancialMovementHistoryPageProjection([], 1, 20, 0));
             }
 
