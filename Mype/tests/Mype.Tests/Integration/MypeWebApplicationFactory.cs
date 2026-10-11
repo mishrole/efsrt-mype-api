@@ -2,7 +2,10 @@ using System;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
+using Mype.Application.Common.Interfaces;
 using Mype.Shared.Constants;
 
 namespace Mype.Tests.Integration
@@ -27,12 +30,23 @@ namespace Mype.Tests.Integration
                 [Env.SleepDurationProviderStringKey] = "1",
                 [Env.ServiceNameStringKey] = "Mype.Tests",
                 [Env.TimeZoneStringKey] = "UTC",
+                [Env.EvidenceStorageProviderStringKey] = "AzureBlob",
+                [Env.EvidenceStorageServiceUriStringKey] = "https://storage.test",
+                [Env.EvidenceStorageContainerStringKey] = "evidences",
+                [Env.EvidenceMaxSizeBytesStringKey] = "10485760",
+                [Env.EvidenceReadUriMinutesStringKey] = "5",
+                [Env.EvidencePurgeRetentionDaysStringKey] = "30",
             };
         }
 
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
             builder.UseEnvironment("Testing");
+            builder.ConfigureServices(services =>
+            {
+                services.RemoveAll<IObjectStorage>();
+                services.AddSingleton<IObjectStorage, FakeObjectStorage>();
+            });
         }
 
         protected override IHost CreateHost(IHostBuilder builder)

@@ -1,4 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Mype.Application.Businesses.Interfaces;
@@ -24,6 +24,7 @@ using Mype.Infrastructure.Permissions.Repositories;
 using Mype.Infrastructure.Persistence;
 using Mype.Infrastructure.Persistence.Exceptions;
 using Mype.Infrastructure.Products.Repositories;
+using Mype.Infrastructure.Storage;
 using Mype.Infrastructure.Users.Repositories;
 
 namespace Mype.Infrastructure.Extensions
@@ -38,6 +39,7 @@ namespace Mype.Infrastructure.Extensions
         {
             services.AddPersistence(configuration);
             services.AddAuth();
+            services.AddObjectStorage(configuration);
 
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<ICurrencyRepository, CurrencyRepository>();
