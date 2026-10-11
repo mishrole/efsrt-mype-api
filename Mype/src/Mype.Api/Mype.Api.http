@@ -415,3 +415,34 @@ Accept: application/json
     }
   ]
 }
+
+###
+
+# Descarta un movimiento financiero en borrador y marca sus evidencias activas para purga.
+POST {{Mype.Api_HostAddress}}/api/v1/businesses/{{BusinessId}}/financial-movements/{{MovementId}}/discard
+Authorization: Bearer {{AccessToken}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "movementVersion": {{MovementVersion}},
+  "evidenceVersions": [
+    {
+      "evidenceId": "{{EvidenceId}}",
+      "version": {{EvidenceVersion}}
+    }
+  ]
+}
+
+###
+
+# Descarta un movimiento financiero en borrador sin evidencias activas.
+POST {{Mype.Api_HostAddress}}/api/v1/businesses/{{BusinessId}}/financial-movements/{{MovementId}}/discard
+Authorization: Bearer {{AccessToken}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "movementVersion": {{MovementVersion}},
+  "evidenceVersions": []
+}

@@ -22,7 +22,15 @@ namespace Mype.Application.MovementEvidences.Interfaces
             Guid businessId,
             CancellationToken cancellationToken
         );
-
+        Task<IReadOnlyCollection<MovementEvidence>> ListActiveTrackedByMovementAndBusinessAsync(
+            Guid movementId,
+            Guid businessId,
+            CancellationToken cancellationToken
+        );
         void SetOriginalVersion(MovementEvidence evidence, uint version);
+        void SetOriginalVersions(
+            IReadOnlyCollection<MovementEvidence> evidences,
+            IReadOnlyDictionary<Guid, uint> versions
+        );
     }
 }
