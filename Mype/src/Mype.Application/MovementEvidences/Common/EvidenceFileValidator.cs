@@ -71,13 +71,19 @@ namespace Mype.Application.MovementEvidences.Common
             return null;
         }
 
-        private static bool Matches(string mime, string extension, string declared) =>
-            string.Equals(mime, declared, StringComparison.OrdinalIgnoreCase)
-            && (
-                mime == "image/jpeg"
-                    ? extension is ".jpg" or ".jpeg"
-                    : extension == (mime == "image/png" ? ".png" : ".pdf")
-            );
+        private static bool Matches(string mime, string extension, string declared)
+        {
+            if (!string.Equals(mime, declared, StringComparison.OrdinalIgnoreCase))
+                return false;
+
+            return mime switch
+            {
+                "image/jpeg" => extension is ".jpg" or ".jpeg",
+                "image/png" => extension == ".png",
+                "application/pdf" => extension == ".pdf",
+                _ => false,
+            };
+        }
 
         private static string NormalizeName(string value, string extension)
         {

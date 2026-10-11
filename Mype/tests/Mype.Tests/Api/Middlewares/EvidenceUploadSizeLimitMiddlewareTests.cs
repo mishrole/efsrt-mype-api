@@ -16,6 +16,11 @@ namespace Mype.Tests.Api.Middlewares
         private const long MaxFileSize = 100;
         private const long MaximumRequestSize = MaxFileSize + (64 * 1024);
 
+        private static readonly JsonSerializerOptions JsonOptions = new()
+        {
+            PropertyNameCaseInsensitive = true,
+        };
+
         [Fact]
         public async Task InvokeAsync_Should_Reject_Oversized_Evidence_Request_Before_Next()
         {
@@ -37,7 +42,7 @@ namespace Mype.Tests.Api.Middlewares
             context.Response.Body.Position = 0;
             var response = await JsonSerializer.DeserializeAsync<HttpStatusCodeInfo>(
                 context.Response.Body,
-                new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+                JsonOptions
             );
             response.Code.Should().Be(ErrorCodes.InvalidEvidenceSize);
         }

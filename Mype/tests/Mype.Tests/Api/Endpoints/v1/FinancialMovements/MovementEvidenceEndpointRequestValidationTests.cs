@@ -125,7 +125,7 @@ namespace Mype.Tests.Api.Endpoints.v1.FinancialMovements
             return context;
         }
 
-        private static FormFile CreateFile(Stream stream) =>
+        private static FormFile CreateFile(MemoryStream stream) =>
             new(stream, 0, stream.Length, "file", "receipt.pdf")
             {
                 Headers = new HeaderDictionary(),

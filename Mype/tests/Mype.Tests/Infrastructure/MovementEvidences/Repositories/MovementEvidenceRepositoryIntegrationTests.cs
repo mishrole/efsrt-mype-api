@@ -155,11 +155,13 @@ namespace Mype.Tests.Infrastructure.MovementEvidences.Repositories
             );
 
             result.Should().ContainSingle(current => current.Id == active.Id);
-            result.Should().NotContain(current =>
-                current.Id == pending.Id
-                || current.Id == otherMovementEvidence.Id
-                || current.Id == otherBusinessEvidence.Id
-            );
+            result
+                .Should()
+                .NotContain(current =>
+                    current.Id == pending.Id
+                    || current.Id == otherMovementEvidence.Id
+                    || current.Id == otherBusinessEvidence.Id
+                );
         }
 
         [Fact]
@@ -244,10 +246,7 @@ namespace Mype.Tests.Infrastructure.MovementEvidences.Repositories
                 RepositoryTestData.UtcNow
             );
 
-        private static MovementEvidence CreateEvidence(
-            MovementSeed seed,
-            DateTimeOffset uploadedAt
-        )
+        private static MovementEvidence CreateEvidence(MovementSeed seed, DateTimeOffset uploadedAt)
         {
             var evidenceId = Guid.NewGuid();
             return MovementEvidence.CreateActive(
@@ -276,9 +275,7 @@ namespace Mype.Tests.Infrastructure.MovementEvidences.Repositories
             return new(seed.User, seed.Business, movement);
         }
 
-        private static async Task<EvidenceIds> SeedEvidenceAsync(
-            MypeWebApplicationFactory factory
-        )
+        private static async Task<EvidenceIds> SeedEvidenceAsync(MypeWebApplicationFactory factory)
         {
             await using var scope = factory.Services.CreateAsyncScope();
             var context = scope.ServiceProvider.GetRequiredService<MypeDbContext>();

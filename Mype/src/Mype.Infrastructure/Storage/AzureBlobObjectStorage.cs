@@ -35,7 +35,7 @@ namespace Mype.Infrastructure.Storage
             ArgumentNullException.ThrowIfNull(upload.Content);
 
             if (upload.Length <= 0)
-                throw new ArgumentOutOfRangeException(nameof(upload.Length));
+                throw new ArgumentOutOfRangeException(nameof(upload));
 
             var blobClient = _containerClient.GetBlobClient(upload.ObjectKey);
             var response = await blobClient.UploadAsync(
