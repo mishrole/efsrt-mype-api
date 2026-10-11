@@ -44,11 +44,12 @@ namespace Mype.Tests.Infrastructure.FinancialMovements.Repositories
                 ids.BusinessId,
                 CancellationToken.None
             );
-            var activeEvidences = await evidenceRepository.ListActiveTrackedByMovementAndBusinessAsync(
-                ids.MovementId,
-                ids.BusinessId,
-                CancellationToken.None
-            );
+            var activeEvidences =
+                await evidenceRepository.ListActiveTrackedByMovementAndBusinessAsync(
+                    ids.MovementId,
+                    ids.BusinessId,
+                    CancellationToken.None
+                );
             var movementVersion = movement.Version;
             var evidenceVersions = activeEvidences.ToDictionary(
                 evidence => evidence.Id,
@@ -147,13 +148,15 @@ namespace Mype.Tests.Infrastructure.FinancialMovements.Repositories
             persistedMovement.UpdatedByUserId.Should().Be(ids.UserId);
             persistedMovement.TotalAmount.Should().Be(totalBefore);
             persistedActiveEvidences.Should().HaveCount(2);
-            persistedActiveEvidences.Should().OnlyContain(evidence =>
-                evidence.Status == MovementEvidenceStatus.PendingPurge
-                && evidence.RemovalReason == EvidenceRemovalReason.MovementDiscarded
-                && evidence.MarkedForPurgeAt == utcNow
-                && evidence.PurgeAfter == purgeAfter
-                && evidence.UpdatedByUserId == ids.UserId
-            );
+            persistedActiveEvidences
+                .Should()
+                .OnlyContain(evidence =>
+                    evidence.Status == MovementEvidenceStatus.PendingPurge
+                    && evidence.RemovalReason == EvidenceRemovalReason.MovementDiscarded
+                    && evidence.MarkedForPurgeAt == utcNow
+                    && evidence.PurgeAfter == purgeAfter
+                    && evidence.UpdatedByUserId == ids.UserId
+                );
             itemAfter.Should().BeEquivalentTo(itemBefore, options => options.WithStrictOrdering());
             nonActiveEvidenceAfter.Should().BeEquivalentTo(nonActiveEvidenceBefore);
         }
@@ -212,11 +215,12 @@ namespace Mype.Tests.Infrastructure.FinancialMovements.Repositories
                 ids.BusinessId,
                 CancellationToken.None
             );
-            var activeEvidences = await secondEvidenceRepository.ListActiveTrackedByMovementAndBusinessAsync(
-                ids.MovementId,
-                ids.BusinessId,
-                CancellationToken.None
-            );
+            var activeEvidences =
+                await secondEvidenceRepository.ListActiveTrackedByMovementAndBusinessAsync(
+                    ids.MovementId,
+                    ids.BusinessId,
+                    CancellationToken.None
+                );
             var staleMovementVersion = staleMovement.Version;
             var evidenceVersions = activeEvidences.ToDictionary(
                 evidence => evidence.Id,
@@ -258,9 +262,9 @@ namespace Mype.Tests.Infrastructure.FinancialMovements.Repositories
                 .ToArrayAsync(CancellationToken.None);
             persistedMovement.Status.Should().Be(FinancialMovementStatus.Draft);
             persistedMovement.DiscardedAt.Should().BeNull();
-            persistedEvidences.Should().OnlyContain(
-                evidence => evidence.Status == MovementEvidenceStatus.Active
-            );
+            persistedEvidences
+                .Should()
+                .OnlyContain(evidence => evidence.Status == MovementEvidenceStatus.Active);
         }
 
         [Fact]
@@ -275,17 +279,19 @@ namespace Mype.Tests.Infrastructure.FinancialMovements.Repositories
             var firstEvidenceRepository = new MovementEvidenceRepository(firstContext);
             var secondEvidenceRepository = new MovementEvidenceRepository(secondContext);
             var secondMovementRepository = new FinancialMovementRepository(secondContext);
-            var currentEvidence = await firstEvidenceRepository.GetTrackedByIdMovementAndBusinessAsync(
-                ids.ActiveEvidenceIds[0],
-                ids.MovementId,
-                ids.BusinessId,
-                CancellationToken.None
-            );
-            var staleEvidences = await secondEvidenceRepository.ListActiveTrackedByMovementAndBusinessAsync(
-                ids.MovementId,
-                ids.BusinessId,
-                CancellationToken.None
-            );
+            var currentEvidence =
+                await firstEvidenceRepository.GetTrackedByIdMovementAndBusinessAsync(
+                    ids.ActiveEvidenceIds[0],
+                    ids.MovementId,
+                    ids.BusinessId,
+                    CancellationToken.None
+                );
+            var staleEvidences =
+                await secondEvidenceRepository.ListActiveTrackedByMovementAndBusinessAsync(
+                    ids.MovementId,
+                    ids.BusinessId,
+                    CancellationToken.None
+                );
             var movement = await secondMovementRepository.GetTrackedByIdAndBusinessAsync(
                 ids.MovementId,
                 ids.BusinessId,
