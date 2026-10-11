@@ -1,4 +1,4 @@
-﻿namespace Mype.Infrastructure.Persistence.Constraints
+namespace Mype.Infrastructure.Persistence.Constraints
 {
     public static class DatabaseConstraints
     {
@@ -47,17 +47,11 @@
         public static class Products
         {
             public const string BusinessName = "ux_products_business_name";
-
             public const string BusinessActiveName = "ix_products_business_active_name";
-
             public const string BusinessCategoryActive = "ix_products_business_category_active";
-
             public const string Business = "fk_products_businesses_business_id";
-
             public const string CategoryBusiness = "fk_products_categories_category_id_business_id";
-
             public const string CreatedByUser = "fk_products_users_created_by_user_id";
-
             public const string UpdatedByUser = "fk_products_users_updated_by_user_id";
         }
 
@@ -99,6 +93,28 @@
                 "ck_financial_movement_items_unit_cost_non_negative";
         }
 
+        public static class MovementEvidences
+        {
+            public const string StorageObject =
+                "ux_movement_evidences_storage_provider_container_object";
+            public const string MovementBusinessStatus =
+                "ix_movement_evidences_movement_business_status";
+            public const string BusinessStatus = "ix_movement_evidences_business_status";
+            public const string PendingPurge = "ix_movement_evidences_pending_purge";
+            public const string UploadedByUser = "ix_movement_evidences_uploaded_by_user_id";
+            public const string ReplacesEvidence = "ux_movement_evidences_replaces_evidence_id";
+            public const string MovementBusiness =
+                "fk_movement_evidences_movements_movement_id_business_id";
+            public const string Replaces = "fk_movement_evidences_replaces_evidence_id";
+            public const string UploadedBy = "fk_movement_evidences_users_uploaded_by_user_id";
+            public const string CreatedBy = "fk_movement_evidences_users_created_by_user_id";
+            public const string UpdatedBy = "fk_movement_evidences_users_updated_by_user_id";
+            public const string SizePositive = "ck_movement_evidences_size_positive";
+            public const string ActiveState = "ck_movement_evidences_active_state";
+            public const string PendingPurgeState = "ck_movement_evidences_pending_purge_state";
+            public const string PurgedState = "ck_movement_evidences_purged_state";
+        }
+
         public static class Permissions
         {
             public const string Code = "ux_permissions_code";
@@ -108,10 +124,8 @@
         {
             public const string BusinessRole =
                 "fk_business_role_permissions_business_roles_business_role_id";
-
             public const string Permission =
                 "fk_business_role_permissions_permissions_permission_id";
-
             public const string PermissionIndex = "ix_business_role_permissions_permission_id";
         }
     }

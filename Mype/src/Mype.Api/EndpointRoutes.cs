@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -18,6 +18,7 @@ using Mype.Application.FinancialMovements.Commands.UpdateFinancialMovementDraft;
 using Mype.Application.FinancialMovements.Models;
 using Mype.Application.FinancialMovements.Queries.GetFinancialMovementDraft;
 using Mype.Application.FinancialMovements.Queries.ListFinancialMovementDrafts;
+using Mype.Application.MovementEvidences.Models;
 using Mype.Application.Products.Commands.Common;
 using Mype.Application.Products.Commands.CreateProduct;
 using Mype.Application.Products.Queries.GetProductDetail;
@@ -98,8 +99,12 @@ namespace Mype.Api
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status409Conflict)
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
 
-            businessGroup
-                .MapGet("/{businessId:guid}/categories", ListCategoriesEndpoint.DoAsync)
+            var categoryGroup = businessGroup
+                .MapGroup("/{businessId:guid}/categories")
+                .WithTags("Categories");
+
+            categoryGroup
+                .MapGet(string.Empty, ListCategoriesEndpoint.DoAsync)
                 .WithName("ListCategories")
                 .WithSummary("Consultar categorías del negocio")
                 .Produces<IReadOnlyCollection<CategoryListItemResult>>(StatusCodes.Status200OK)
@@ -109,8 +114,12 @@ namespace Mype.Api
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status409Conflict)
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
 
-            businessGroup
-                .MapPost("/{businessId:guid}/products", CreateProductEndpoint.DoAsync)
+            var productGroup = businessGroup
+                .MapGroup("/{businessId:guid}/products")
+                .WithTags("Products");
+
+            productGroup
+                .MapPost(string.Empty, CreateProductEndpoint.DoAsync)
                 .WithName("CreateProduct")
                 .WithSummary("Crear un producto")
                 .Produces<CreateProductResult>(StatusCodes.Status201Created)
@@ -122,8 +131,8 @@ namespace Mype.Api
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status422UnprocessableEntity)
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
 
-            businessGroup
-                .MapGet("/{businessId:guid}/products", ListProductsEndpoint.DoAsync)
+            productGroup
+                .MapGet(string.Empty, ListProductsEndpoint.DoAsync)
                 .WithName("ListProducts")
                 .WithSummary("Listar y buscar productos")
                 .Produces<IReadOnlyCollection<ProductListItemResult>>(StatusCodes.Status200OK)
@@ -134,11 +143,8 @@ namespace Mype.Api
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status409Conflict)
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
 
-            businessGroup
-                .MapGet(
-                    "/{businessId:guid}/products/{productId:guid}",
-                    GetProductDetailEndpoint.DoAsync
-                )
+            productGroup
+                .MapGet("/{productId:guid}", GetProductDetailEndpoint.DoAsync)
                 .WithName("GetProductDetail")
                 .WithSummary("Consultar un producto")
                 .Produces<ProductDetailResult>(StatusCodes.Status200OK)
@@ -149,11 +155,8 @@ namespace Mype.Api
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status409Conflict)
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
 
-            businessGroup
-                .MapPut(
-                    "/{businessId:guid}/products/{productId:guid}",
-                    UpdateProductEndpoint.DoAsync
-                )
+            productGroup
+                .MapPut("/{productId:guid}", UpdateProductEndpoint.DoAsync)
                 .WithName("UpdateProduct")
                 .WithSummary("Actualizar un producto")
                 .Produces<ProductMaintenanceResult>(StatusCodes.Status200OK)
@@ -165,11 +168,8 @@ namespace Mype.Api
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status422UnprocessableEntity)
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
 
-            businessGroup
-                .MapPatch(
-                    "/{businessId:guid}/products/{productId:guid}/deactivate",
-                    DeactivateProductEndpoint.DoAsync
-                )
+            productGroup
+                .MapPatch("/{productId:guid}/deactivate", DeactivateProductEndpoint.DoAsync)
                 .WithName("DeactivateProduct")
                 .WithSummary("Desactivar un producto")
                 .Produces<ProductMaintenanceResult>(StatusCodes.Status200OK)
@@ -180,11 +180,8 @@ namespace Mype.Api
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status409Conflict)
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
 
-            businessGroup
-                .MapPatch(
-                    "/{businessId:guid}/products/{productId:guid}/reactivate",
-                    ReactivateProductEndpoint.DoAsync
-                )
+            productGroup
+                .MapPatch("/{productId:guid}/reactivate", ReactivateProductEndpoint.DoAsync)
                 .WithName("ReactivateProduct")
                 .WithSummary("Reactivar un producto")
                 .Produces<ProductMaintenanceResult>(StatusCodes.Status200OK)
@@ -196,11 +193,12 @@ namespace Mype.Api
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status422UnprocessableEntity)
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
 
-            businessGroup
-                .MapPost(
-                    "/{businessId:guid}/financial-movements",
-                    CreateFinancialMovementEndpoint.DoAsync
-                )
+            var financialMovementGroup = businessGroup
+                .MapGroup("/{businessId:guid}/financial-movements")
+                .WithTags("FinancialMovements");
+
+            financialMovementGroup
+                .MapPost(string.Empty, CreateFinancialMovementEndpoint.DoAsync)
                 .WithName("CreateFinancialMovement")
                 .WithSummary("Crear un movimiento financiero en borrador")
                 .Produces<CreateFinancialMovementResult>(StatusCodes.Status201Created)
@@ -210,11 +208,8 @@ namespace Mype.Api
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status409Conflict)
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
 
-            businessGroup
-                .MapPut(
-                    "/{businessId:guid}/financial-movements/{movementId:guid}",
-                    UpdateFinancialMovementDraftEndpoint.DoAsync
-                )
+            financialMovementGroup
+                .MapPut("/{movementId:guid}", UpdateFinancialMovementDraftEndpoint.DoAsync)
                 .WithName("UpdateFinancialMovementDraft")
                 .WithSummary("Actualizar la cabecera de un borrador")
                 .Produces<UpdateFinancialMovementDraftResult>(StatusCodes.Status200OK)
@@ -225,11 +220,8 @@ namespace Mype.Api
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status409Conflict)
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
 
-            businessGroup
-                .MapGet(
-                    "/{businessId:guid}/financial-movements/{movementId:guid}",
-                    GetFinancialMovementDraftEndpoint.DoAsync
-                )
+            financialMovementGroup
+                .MapGet("/{movementId:guid}", GetFinancialMovementDraftEndpoint.DoAsync)
                 .WithName("GetFinancialMovementDraft")
                 .WithSummary("Consultar un borrador financiero")
                 .Produces<FinancialMovementDraftDetailResult>(StatusCodes.Status200OK)
@@ -239,11 +231,8 @@ namespace Mype.Api
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status409Conflict)
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
 
-            businessGroup
-                .MapGet(
-                    "/{businessId:guid}/financial-movements",
-                    ListFinancialMovementDraftsEndpoint.DoAsync
-                )
+            financialMovementGroup
+                .MapGet(string.Empty, ListFinancialMovementDraftsEndpoint.DoAsync)
                 .WithName("ListFinancialMovementDrafts")
                 .WithSummary("Listar borradores financieros")
                 .Produces<IReadOnlyCollection<FinancialMovementDraftListItemResult>>(
@@ -254,70 +243,139 @@ namespace Mype.Api
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status409Conflict)
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
 
-            businessGroup
-                .MapPost(
-                    "/{businessId:guid}/financial-movements/{movementId:guid}/sale-items",
-                    AddSaleItemEndpoint.DoAsync
-                )
+            var financialMovementItemGroup = financialMovementGroup
+                .MapGroup("/{movementId:guid}")
+                .WithTags("FinancialMovementItems");
+
+            financialMovementItemGroup
+                .MapPost("/sale-items", AddSaleItemEndpoint.DoAsync)
                 .WithName("AddSaleItem")
+                .WithSummary("Agregar un producto a una venta")
                 .Produces<FinancialMovementItemMaintenanceResult>(StatusCodes.Status201Created)
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status400BadRequest)
-                .Produces<HttpStatusCodeInfo>(StatusCodes.Status403Forbidden)
-                .Produces<HttpStatusCodeInfo>(StatusCodes.Status404NotFound)
-                .Produces<HttpStatusCodeInfo>(StatusCodes.Status409Conflict)
-                .Produces<HttpStatusCodeInfo>(StatusCodes.Status422UnprocessableEntity)
-                .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
-            businessGroup
-                .MapPut(
-                    "/{businessId:guid}/financial-movements/{movementId:guid}/sale-items/{itemId:guid}",
-                    UpdateSaleItemEndpoint.DoAsync
-                )
-                .WithName("UpdateSaleItem")
-                .Produces<FinancialMovementItemMaintenanceResult>(StatusCodes.Status200OK)
-                .Produces<HttpStatusCodeInfo>(StatusCodes.Status400BadRequest)
-                .Produces<HttpStatusCodeInfo>(StatusCodes.Status403Forbidden)
-                .Produces<HttpStatusCodeInfo>(StatusCodes.Status404NotFound)
-                .Produces<HttpStatusCodeInfo>(StatusCodes.Status409Conflict)
-                .Produces<HttpStatusCodeInfo>(StatusCodes.Status422UnprocessableEntity)
-                .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
-            businessGroup
-                .MapPost(
-                    "/{businessId:guid}/financial-movements/{movementId:guid}/expense-items",
-                    AddExpenseItemEndpoint.DoAsync
-                )
-                .WithName("AddExpenseItem")
-                .Produces<ExpenseMovementItemMaintenanceResult>(StatusCodes.Status201Created)
-                .Produces<HttpStatusCodeInfo>(StatusCodes.Status400BadRequest)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status401Unauthorized)
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status403Forbidden)
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status404NotFound)
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status409Conflict)
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status422UnprocessableEntity)
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
 
-            businessGroup
-                .MapPut(
-                    "/{businessId:guid}/financial-movements/{movementId:guid}/expense-items/{itemId:guid}",
-                    UpdateExpenseItemEndpoint.DoAsync
-                )
-                .WithName("UpdateExpenseItem")
-                .Produces<ExpenseMovementItemMaintenanceResult>(StatusCodes.Status200OK)
+            financialMovementItemGroup
+                .MapPut("/sale-items/{itemId:guid}", UpdateSaleItemEndpoint.DoAsync)
+                .WithName("UpdateSaleItem")
+                .WithSummary("Modificar un producto de una venta")
+                .Produces<FinancialMovementItemMaintenanceResult>(StatusCodes.Status200OK)
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status400BadRequest)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status401Unauthorized)
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status403Forbidden)
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status404NotFound)
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status409Conflict)
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status422UnprocessableEntity)
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
-            businessGroup
+
+            financialMovementItemGroup
+                .MapPost("/expense-items", AddExpenseItemEndpoint.DoAsync)
+                .WithName("AddExpenseItem")
+                .WithSummary("Agregar un concepto a un gasto")
+                .Produces<ExpenseMovementItemMaintenanceResult>(StatusCodes.Status201Created)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status400BadRequest)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status401Unauthorized)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status403Forbidden)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status404NotFound)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status409Conflict)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status422UnprocessableEntity)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
+
+            financialMovementItemGroup
+                .MapPut("/expense-items/{itemId:guid}", UpdateExpenseItemEndpoint.DoAsync)
+                .WithName("UpdateExpenseItem")
+                .WithSummary("Modificar un concepto de gasto")
+                .Produces<ExpenseMovementItemMaintenanceResult>(StatusCodes.Status200OK)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status400BadRequest)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status401Unauthorized)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status403Forbidden)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status404NotFound)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status409Conflict)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status422UnprocessableEntity)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
+
+            financialMovementItemGroup
                 .MapPatch(
-                    "/{businessId:guid}/financial-movements/{movementId:guid}/items/{itemId:guid}/retire",
+                    "/items/{itemId:guid}/retire",
                     RetireFinancialMovementItemEndpoint.DoAsync
                 )
                 .WithName("RetireFinancialMovementItem")
+                .WithSummary("Retirar un ítem del movimiento")
                 .Produces<RetiredFinancialMovementItemResult>(StatusCodes.Status200OK)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status400BadRequest)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status401Unauthorized)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status403Forbidden)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status404NotFound)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status409Conflict)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
+
+            var evidenceGroup = financialMovementGroup
+                .MapGroup("/{movementId:guid}/evidences")
+                .WithTags("MovementEvidences");
+
+            evidenceGroup
+                .MapPost(string.Empty, AttachMovementEvidenceEndpoint.DoAsync)
+                .WithName("AttachMovementEvidence")
+                .WithSummary("Adjuntar evidencia a un movimiento")
+                .Produces<MovementEvidenceResult>(StatusCodes.Status201Created)
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status400BadRequest)
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status403Forbidden)
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status404NotFound)
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status409Conflict)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status413PayloadTooLarge)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status422UnprocessableEntity)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status502BadGateway)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
+
+            evidenceGroup
+                .MapPut("/{evidenceId:guid}", ReplaceMovementEvidenceEndpoint.DoAsync)
+                .WithName("ReplaceMovementEvidence")
+                .WithSummary("Sustituir una evidencia activa")
+                .Produces<MovementEvidenceResult>(StatusCodes.Status200OK)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status400BadRequest)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status403Forbidden)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status404NotFound)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status409Conflict)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status413PayloadTooLarge)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status422UnprocessableEntity)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status502BadGateway)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
+
+            evidenceGroup
+                .MapPatch("/{evidenceId:guid}/remove", RemoveMovementEvidenceEndpoint.DoAsync)
+                .WithName("RemoveMovementEvidence")
+                .WithSummary("Retirar lógicamente una evidencia")
+                .Produces(StatusCodes.Status204NoContent)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status400BadRequest)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status403Forbidden)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status404NotFound)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status409Conflict)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
+
+            evidenceGroup
+                .MapGet(string.Empty, ListMovementEvidencesEndpoint.DoAsync)
+                .WithName("ListMovementEvidences")
+                .WithSummary("Listar evidencias activas de un movimiento")
+                .Produces<IReadOnlyCollection<MovementEvidenceResult>>(StatusCodes.Status200OK)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status403Forbidden)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status404NotFound)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status409Conflict)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
+
+            evidenceGroup
+                .MapGet("/{evidenceId:guid}/content", OpenMovementEvidenceEndpoint.DoAsync)
+                .WithName("OpenMovementEvidence")
+                .WithSummary("Obtener acceso temporal a una evidencia")
+                .Produces<TemporaryEvidenceAccessResult>(StatusCodes.Status200OK)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status403Forbidden)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status404NotFound)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status409Conflict)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status502BadGateway)
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
             #endregion
         }

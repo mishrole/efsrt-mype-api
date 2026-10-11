@@ -87,6 +87,13 @@
         public const string ExpenseItemOperationFailed = "EXPENSE_ITEM_OPERATION_FAILED";
         public const string ProductInactive = "PRODUCT_INACTIVE";
         public const string MovementItemOperationFailed = "MOVEMENT_ITEM_OPERATION_FAILED";
+        public const string EvidenceNotFound = "EVIDENCE_NOT_FOUND";
+        public const string EvidenceNotActive = "EVIDENCE_NOT_ACTIVE";
+        public const string InvalidEvidenceFile = "INVALID_EVIDENCE_FILE";
+        public const string UnsupportedEvidenceFormat = "UNSUPPORTED_EVIDENCE_FORMAT";
+        public const string InvalidEvidenceSize = "INVALID_EVIDENCE_SIZE";
+        public const string EvidenceStorageError = "EVIDENCE_STORAGE_ERROR";
+        public const string EvidenceOperationFailed = "EVIDENCE_OPERATION_FAILED";
 
         #endregion
     }

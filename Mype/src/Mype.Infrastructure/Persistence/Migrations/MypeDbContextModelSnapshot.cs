@@ -776,6 +776,151 @@ namespace Mype.Infrastructure.Persistence.Migrations
                         });
                 });
 
+            modelBuilder.Entity("Mype.Domain.MovementEvidences.MovementEvidence", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<Guid>("BusinessId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("business_id");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<Guid>("CreatedByUserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("created_by_user_id");
+
+                    b.Property<DateTimeOffset?>("MarkedForPurgeAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("marked_for_purge_at");
+
+                    b.Property<string>("MimeType")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("mime_type");
+
+                    b.Property<Guid>("MovementId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("movement_id");
+
+                    b.Property<string>("OriginalFileName")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("original_file_name");
+
+                    b.Property<DateTimeOffset?>("PurgeAfter")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("purge_after");
+
+                    b.Property<DateTimeOffset?>("PurgedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("purged_at");
+
+                    b.Property<int?>("RemovalReason")
+                        .HasColumnType("integer")
+                        .HasColumnName("removal_reason");
+
+                    b.Property<Guid?>("ReplacesEvidenceId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("replaces_evidence_id");
+
+                    b.Property<long>("SizeBytes")
+                        .HasColumnType("bigint")
+                        .HasColumnName("size_bytes");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer")
+                        .HasColumnName("status");
+
+                    b.Property<string>("StorageContainer")
+                        .IsRequired()
+                        .HasMaxLength(63)
+                        .HasColumnType("character varying(63)")
+                        .HasColumnName("storage_container");
+
+                    b.Property<string>("StorageObjectKey")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("storage_object_key");
+
+                    b.Property<string>("StorageProvider")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("storage_provider");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid>("UpdatedByUserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("updated_by_user_id");
+
+                    b.Property<DateTimeOffset>("UploadedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("uploaded_at");
+
+                    b.Property<Guid>("UploadedByUserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("uploaded_by_user_id");
+
+                    b.Property<uint>("Version")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
+                    b.HasKey("Id")
+                        .HasName("pk_movement_evidences");
+
+                    b.HasIndex("CreatedByUserId")
+                        .HasDatabaseName("ix_movement_evidences_created_by_user_id");
+
+                    b.HasIndex("PurgeAfter")
+                        .HasDatabaseName("ix_movement_evidences_pending_purge")
+                        .HasFilter("status = 2");
+
+                    b.HasIndex("ReplacesEvidenceId")
+                        .IsUnique()
+                        .HasDatabaseName("ux_movement_evidences_replaces_evidence_id")
+                        .HasFilter("replaces_evidence_id IS NOT NULL");
+
+                    b.HasIndex("UpdatedByUserId")
+                        .HasDatabaseName("ix_movement_evidences_updated_by_user_id");
+
+                    b.HasIndex("UploadedByUserId")
+                        .HasDatabaseName("ix_movement_evidences_uploaded_by_user_id");
+
+                    b.HasIndex("BusinessId", "Status")
+                        .HasDatabaseName("ix_movement_evidences_business_status");
+
+                    b.HasIndex("MovementId", "BusinessId", "Status")
+                        .HasDatabaseName("ix_movement_evidences_movement_business_status");
+
+                    b.HasIndex("StorageProvider", "StorageContainer", "StorageObjectKey")
+                        .IsUnique()
+                        .HasDatabaseName("ux_movement_evidences_storage_provider_container_object");
+
+                    b.ToTable("movement_evidences", null, t =>
+                        {
+                            t.HasCheckConstraint("ck_movement_evidences_active_state", "status <> 1 OR (removal_reason IS NULL AND marked_for_purge_at IS NULL AND purge_after IS NULL AND purged_at IS NULL)");
+
+                            t.HasCheckConstraint("ck_movement_evidences_pending_purge_state", "status <> 2 OR (removal_reason IS NOT NULL AND marked_for_purge_at IS NOT NULL AND purge_after IS NOT NULL AND purged_at IS NULL)");
+
+                            t.HasCheckConstraint("ck_movement_evidences_purged_state", "status <> 3 OR purged_at IS NOT NULL");
+
+                            t.HasCheckConstraint("ck_movement_evidences_size_positive", "size_bytes > 0");
+                        });
+                });
+
             modelBuilder.Entity("Mype.Domain.Permissions.Permission", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1403,6 +1548,44 @@ namespace Mype.Infrastructure.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("fk_financial_movement_items_movements_movement_id_business_id");
+                });
+
+            modelBuilder.Entity("Mype.Domain.MovementEvidences.MovementEvidence", b =>
+                {
+                    b.HasOne("Mype.Domain.Users.User", null)
+                        .WithMany()
+                        .HasForeignKey("CreatedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_movement_evidences_users_created_by_user_id");
+
+                    b.HasOne("Mype.Domain.MovementEvidences.MovementEvidence", null)
+                        .WithMany()
+                        .HasForeignKey("ReplacesEvidenceId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_movement_evidences_replaces_evidence_id");
+
+                    b.HasOne("Mype.Domain.Users.User", null)
+                        .WithMany()
+                        .HasForeignKey("UpdatedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_movement_evidences_users_updated_by_user_id");
+
+                    b.HasOne("Mype.Domain.Users.User", null)
+                        .WithMany()
+                        .HasForeignKey("UploadedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_movement_evidences_users_uploaded_by_user_id");
+
+                    b.HasOne("Mype.Domain.FinancialMovements.FinancialMovement", null)
+                        .WithMany()
+                        .HasForeignKey("MovementId", "BusinessId")
+                        .HasPrincipalKey("Id", "BusinessId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_movement_evidences_movements_movement_id_business_id");
                 });
 
             modelBuilder.Entity("Mype.Domain.Products.Product", b =>

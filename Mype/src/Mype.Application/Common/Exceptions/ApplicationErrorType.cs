@@ -1,4 +1,4 @@
-﻿namespace Mype.Application.Common.Exceptions
+namespace Mype.Application.Common.Exceptions
 {
     public enum ApplicationErrorType
     {
@@ -9,5 +9,6 @@
         Conflict = 5,
         UnprocessableEntity = 6,
         Internal = 7,
+        External = 8,
     }
 }

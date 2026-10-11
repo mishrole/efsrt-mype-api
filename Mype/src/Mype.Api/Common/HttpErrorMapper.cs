@@ -138,6 +138,8 @@ namespace Mype.Api.Common
 
                 ApplicationErrorType.Internal => StatusCodes.Status500InternalServerError,
 
+                ApplicationErrorType.External => StatusCodes.Status502BadGateway,
+
                 _ => StatusCodes.Status500InternalServerError,
             };
         }

@@ -1,4 +1,4 @@
-﻿namespace Mype.Shared.Constants
+namespace Mype.Shared.Constants
 {
     public static class ErrorMessages
     {
@@ -71,7 +71,8 @@
 
         #region Categories
 
-        public const string CategoryAccessForbidden = "CATEGORY_ACCESS_FORBIDDEN";
+        public const string CategoryAccessForbidden =
+            "No tiene permiso para consultar las categorías del negocio.";
 
         #endregion
 
@@ -123,18 +124,34 @@
             "El movimiento fue modificado por otro proceso. Recargue los datos e inténtelo nuevamente.";
         public const string MovementCreationFailed = "No fue posible crear el movimiento.";
         public const string MovementUpdateFailed = "No fue posible actualizar el movimiento.";
-        public const string MovementItemNotFound = "El í­tem solicitado no fue encontrado.";
-        public const string MovementItemAlreadyRetired = "El í­tem ya se encuentra retirado.";
+        public const string MovementItemNotFound = "El ítem solicitado no fue encontrado.";
+        public const string MovementItemAlreadyRetired = "El ítem ya se encuentra retirado.";
         public const string MovementMustBeSale = "El movimiento debe ser una venta en borrador.";
         public const string MovementMustBeExpense = "El movimiento debe ser un gasto en borrador.";
         public const string ExpenseCategoryUnavailable =
-            "La categorÃ­a no se encuentra disponible para gastos.";
+            "La categoría no se encuentra disponible para gastos.";
         public const string ExpenseItemOperationFailed =
             "No fue posible procesar el concepto de gasto.";
         public const string ProductInactive = "El producto no se encuentra disponible.";
         public const string MovementItemOperationFailed =
-            "No fue posible procesar el í­tem del movimiento.";
+            "No fue posible procesar el ítem del movimiento.";
 
+        public const string EvidenceNotFound = "La evidencia solicitada no fue encontrada.";
+
+        public const string EvidenceNotActive = "La evidencia ya no se encuentra activa.";
+
+        public const string InvalidEvidenceFile = "El archivo de evidencia no es válido.";
+
+        public const string UnsupportedEvidenceFormat =
+            "El formato de la evidencia no está permitido.";
+
+        public const string InvalidEvidenceSize = "El tamaño de la evidencia no está permitido.";
+
+        public const string EvidenceStorageError =
+            "No fue posible almacenar o recuperar la evidencia.";
+
+        public const string EvidenceOperationFailed =
+            "No fue posible procesar la evidencia del movimiento.";
         #endregion
 
         #region Results
