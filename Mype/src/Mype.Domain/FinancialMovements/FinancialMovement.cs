@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Mype.Domain.Common;
+using Mype.Domain.FinancialMovements.Constraints;
 using Mype.Domain.Products;
 
 namespace Mype.Domain.FinancialMovements
@@ -192,6 +193,28 @@ namespace Mype.Domain.FinancialMovements
                 userId,
                 utcNow
             );
+        }
+
+        public void Cancel(string reason, Guid userId, DateTimeOffset utcNow)
+        {
+            if (Status != FinancialMovementStatus.Confirmed)
+                throw new FinancialMovementCancellationException(
+                    FinancialMovementCancellationError.MovementNotConfirmed
+                );
+            if (
+                string.IsNullOrWhiteSpace(reason)
+                || reason.Length < FinancialMovementConstraints.CancellationReasonMinLength
+                || reason.Length > FinancialMovementConstraints.CancellationReasonMaxLength
+                || reason != reason.Trim()
+            )
+                throw new FinancialMovementCancellationException(
+                    FinancialMovementCancellationError.InvalidReason
+                );
+            Status = FinancialMovementStatus.Cancelled;
+            CancellationReason = reason;
+            CancelledByUserId = userId;
+            CancelledAt = utcNow;
+            Touch(userId, utcNow);
         }
 
         public void Discard(Guid userId, DateTimeOffset utcNow)

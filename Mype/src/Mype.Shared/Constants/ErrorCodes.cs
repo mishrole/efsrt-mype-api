@@ -74,6 +74,7 @@ namespace Mype.Shared.Constants
         public const string InvalidExpenseItems = "INVALID_EXPENSE_ITEMS";
         public const string MovementConfirmationFailed = "MOVEMENT_CONFIRMATION_FAILED";
         public const string MovementDiscardFailed = "MOVEMENT_DISCARD_FAILED";
+        public const string MovementCancellationFailed = "MOVEMENT_CANCELLATION_FAILED";
         public const string FinancialHistoryQueryFailed = "FINANCIAL_HISTORY_QUERY_FAILED";
         public const string MovementDetailQueryFailed = "MOVEMENT_DETAIL_QUERY_FAILED";
         public const string EvidenceNotFound = "EVIDENCE_NOT_FOUND";
