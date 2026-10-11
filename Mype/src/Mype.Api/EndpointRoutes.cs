@@ -19,7 +19,9 @@ using Mype.Application.FinancialMovements.Commands.DiscardFinancialMovement;
 using Mype.Application.FinancialMovements.Commands.UpdateFinancialMovementDraft;
 using Mype.Application.FinancialMovements.Models;
 using Mype.Application.FinancialMovements.Queries.GetFinancialMovementDraft;
+using Mype.Application.FinancialMovements.Queries.GetFinancialMovementHistoryDetail;
 using Mype.Application.FinancialMovements.Queries.ListFinancialMovementDrafts;
+using Mype.Application.FinancialMovements.Queries.ListFinancialMovementHistory;
 using Mype.Application.MovementEvidences.Models;
 using Mype.Application.Products.Commands.Common;
 using Mype.Application.Products.Commands.CreateProduct;
@@ -222,6 +224,28 @@ namespace Mype.Api
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status409Conflict)
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
 
+            financialMovementGroup
+                .MapGet("/history", ListFinancialMovementHistoryEndpoint.DoAsync)
+                .WithName("ListFinancialMovementHistory")
+                .WithSummary("Consultar y filtrar el historial financiero")
+                .Produces<FinancialMovementHistoryPageResult>(StatusCodes.Status200OK)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status400BadRequest)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status401Unauthorized)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status403Forbidden)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status404NotFound)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
+            financialMovementGroup
+                .MapGet(
+                    "/{movementId:guid}/detail",
+                    GetFinancialMovementHistoryDetailEndpoint.DoAsync
+                )
+                .WithName("GetFinancialMovementHistoryDetail")
+                .WithSummary("Consultar el detalle histórico de un movimiento financiero")
+                .Produces<FinancialMovementHistoryDetailResult>(StatusCodes.Status200OK)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status401Unauthorized)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status403Forbidden)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status404NotFound)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
             financialMovementGroup
                 .MapGet("/{movementId:guid}", GetFinancialMovementDraftEndpoint.DoAsync)
                 .WithName("GetFinancialMovementDraft")

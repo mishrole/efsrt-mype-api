@@ -46,5 +46,15 @@ namespace Mype.Application.FinancialMovements.Interfaces
         Task<
             IReadOnlyCollection<FinancialMovementDraftListItemProjection>
         > ListDraftsByBusinessAsync(Guid businessId, CancellationToken cancellationToken);
+        Task<FinancialMovementHistoryPageProjection> SearchHistoryByBusinessAsync(
+            Guid businessId,
+            FinancialMovementHistoryFilters filters,
+            CancellationToken cancellationToken
+        );
+        Task<FinancialMovementHistoryDetailProjection> GetHistoryDetailByIdAndBusinessAsync(
+            Guid movementId,
+            Guid businessId,
+            CancellationToken cancellationToken
+        );
     }
 }

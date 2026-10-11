@@ -118,6 +118,10 @@ namespace Mype.Shared.Constants
         public const string InvalidDiscardEvidenceVersions =
             "Las versiones de las evidencias no coinciden con las evidencias activas del movimiento.";
         public const string MovementDiscardFailed = "No fue posible descartar el movimiento.";
+        public const string FinancialHistoryQueryFailed =
+            "No fue posible consultar el historial financiero.";
+        public const string MovementDetailQueryFailed =
+            "No fue posible consultar el detalle del movimiento.";
         public const string EvidenceNotFound = "La evidencia solicitada no fue encontrada.";
         public const string EvidenceNotActive = "La evidencia ya no se encuentra activa.";
         public const string InvalidEvidenceFile = "El archivo de evidencia no es válido.";

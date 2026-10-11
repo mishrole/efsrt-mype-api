@@ -1,4 +1,4 @@
-﻿@Mype.Api_HostAddress = http://localhost:5010
+@Mype.Api_HostAddress = http://localhost:5010
 @AccessToken = ACCESS_TOKEN
 @BusinessId = BUSINESS_ID
 @CategoryId = CATEGORY_ID
@@ -446,3 +446,17 @@ Accept: application/json
   "movementVersion": {{MovementVersion}},
   "evidenceVersions": []
 }
+
+###
+
+# Consulta el historial financiero con filtros combinables y paginación.
+GET {{Mype.Api_HostAddress}}/api/v1/businesses/{{BusinessId}}/financial-movements/history?type=1&status=2&dateFrom=2026-10-01&dateTo=2026-10-31&categoryId={{CategoryId}}&page=1&pageSize=20
+Authorization: Bearer {{AccessToken}}
+Accept: application/json
+
+###
+
+# Consulta el detalle histórico de un movimiento en cualquier estado.
+GET {{Mype.Api_HostAddress}}/api/v1/businesses/{{BusinessId}}/financial-movements/{{MovementId}}/detail
+Authorization: Bearer {{AccessToken}}
+Accept: application/json
