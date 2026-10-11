@@ -155,6 +155,45 @@ namespace Mype.Domain.FinancialMovements
             return item;
         }
 
+        public FinancialMovementConfirmation Confirm(Guid userId, DateTimeOffset utcNow)
+        {
+            if (!IsEditable())
+                throw new FinancialMovementConfirmationException(
+                    FinancialMovementConfirmationError.MovementNotEditable
+                );
+
+            var activeItems = _items.Where(item => item.IsActive).ToArray();
+            if (activeItems.Length == 0)
+                throw new FinancialMovementConfirmationException(
+                    FinancialMovementConfirmationError.MovementRequiresActiveItems
+                );
+
+            foreach (var item in activeItems)
+                item.ValidateAndRecalculateForConfirmation(Type);
+
+            TotalAmount = activeItems.Sum(item => item.SubtotalAmount);
+            Status = FinancialMovementStatus.Confirmed;
+            ConfirmedByUserId = userId;
+            ConfirmedAt = utcNow;
+            Touch(userId, utcNow);
+
+            decimal? estimatedCost = null;
+            decimal? estimatedMargin = null;
+            if (Type == FinancialMovementType.Sale)
+            {
+                estimatedCost = activeItems.Sum(item => item.EstimatedCost);
+                estimatedMargin = TotalAmount - estimatedCost;
+            }
+
+            return new FinancialMovementConfirmation(
+                TotalAmount,
+                estimatedCost,
+                estimatedMargin,
+                userId,
+                utcNow
+            );
+        }
+
         public void RegisterEvidenceChange(Guid userId, DateTimeOffset utcNow)
         {
             EnsureEditable();

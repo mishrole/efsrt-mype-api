@@ -31,6 +31,12 @@ namespace Mype.Application.FinancialMovements.Interfaces
             uint itemVersion
         );
 
+        void SetOriginalVersions(
+            FinancialMovement movement,
+            uint movementVersion,
+            IReadOnlyDictionary<Guid, uint> itemVersions
+        );
+
         Task<FinancialMovementDraftProjection> GetDraftByIdAndBusinessAsync(
             Guid movementId,
             Guid businessId,

@@ -13,6 +13,7 @@ using Mype.Application.Businesses.Commands.CreateBusiness;
 using Mype.Application.Businesses.Queries.GetBusinessContext;
 using Mype.Application.Businesses.Queries.ListUserBusinesses;
 using Mype.Application.Categories.Queries.ListCategories;
+using Mype.Application.FinancialMovements.Commands.ConfirmFinancialMovement;
 using Mype.Application.FinancialMovements.Commands.CreateFinancialMovement;
 using Mype.Application.FinancialMovements.Commands.UpdateFinancialMovementDraft;
 using Mype.Application.FinancialMovements.Models;
@@ -243,6 +244,19 @@ namespace Mype.Api
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status409Conflict)
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
 
+            financialMovementGroup
+                .MapPost("/{movementId:guid}/confirm", ConfirmFinancialMovementEndpoint.DoAsync)
+                .WithName("ConfirmFinancialMovement")
+                .WithSummary("Confirmar un movimiento financiero")
+                .Produces<ConfirmFinancialMovementResult>(StatusCodes.Status200OK)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status400BadRequest)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status401Unauthorized)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status403Forbidden)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status404NotFound)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status409Conflict)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status422UnprocessableEntity)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
+
             var financialMovementItemGroup = financialMovementGroup
                 .MapGroup("/{movementId:guid}")
                 .WithTags("FinancialMovementItems");
@@ -377,6 +391,7 @@ namespace Mype.Api
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status409Conflict)
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status502BadGateway)
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
+
             #endregion
         }
     }

@@ -106,5 +106,22 @@ namespace Mype.Infrastructure.FinancialMovements.Repositories
             _dbContext.Entry(item).Property(currentItem => currentItem.Version).OriginalValue =
                 itemVersion;
         }
+
+        public void SetOriginalVersions(
+            FinancialMovement movement,
+            uint movementVersion,
+            IReadOnlyDictionary<Guid, uint> itemVersions
+        )
+        {
+            SetOriginalVersion(movement, movementVersion);
+
+            foreach (var item in movement.Items.Where(current => current.IsActive))
+            {
+                _dbContext.Entry(item).Property(current => current.Version).OriginalValue =
+                    itemVersions[item.Id];
+                _dbContext.Entry(item).Property(current => current.SubtotalAmount).IsModified =
+                    true;
+            }
+        }
     }
 }
