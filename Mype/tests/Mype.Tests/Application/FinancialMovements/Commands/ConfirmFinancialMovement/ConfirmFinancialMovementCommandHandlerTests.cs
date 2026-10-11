@@ -7,6 +7,7 @@ using FluentAssertions;
 using Moq;
 using Mype.Application.BusinessMemberships.Interfaces;
 using Mype.Application.BusinessMemberships.Models;
+using Mype.Application.Categories.Interfaces;
 using Mype.Application.Common.Exceptions;
 using Mype.Application.Common.Interfaces;
 using Mype.Application.FinancialMovements.Commands.ConfirmFinancialMovement;
@@ -14,6 +15,7 @@ using Mype.Application.FinancialMovements.Interfaces;
 using Mype.Application.Permissions.Interfaces;
 using Mype.Domain.Businesses;
 using Mype.Domain.BusinessMemberships;
+using Mype.Domain.Categories;
 using Mype.Domain.FinancialMovements;
 using Mype.Domain.Permissions.Constants;
 using Mype.Domain.Products;
@@ -225,6 +227,7 @@ namespace Mype.Tests.Application.FinancialMovements.Commands.ConfirmFinancialMov
             public Mock<IFinancialMovementRepository> Movements { get; } = new();
             public Mock<IUnitOfWork> UnitOfWork { get; } = new();
             public Mock<IClock> Clock { get; } = new();
+            public Mock<ICategoryRepository> Categories { get; } = new();
 
             public Fixture()
             {
@@ -299,7 +302,8 @@ namespace Mype.Tests.Application.FinancialMovements.Commands.ConfirmFinancialMov
                 return movement;
             }
 
-            public void UseMovement(FinancialMovement movement) =>
+            public void UseMovement(FinancialMovement movement)
+            {
                 Movements
                     .Setup(repository =>
                         repository.GetAggregateTrackedByIdAndBusinessAsync(
@@ -309,6 +313,31 @@ namespace Mype.Tests.Application.FinancialMovements.Commands.ConfirmFinancialMov
                         )
                     )
                     .ReturnsAsync(movement);
+
+                var categoryType =
+                    movement.Type == FinancialMovementType.Sale
+                        ? CategoryType.Sale
+                        : CategoryType.Expense;
+
+                var category = Category.CreateDefault(
+                    BusinessId,
+                    categoryType,
+                    "Categoría",
+                    $"CATEGORY {Guid.NewGuid():N}".ToUpperInvariant(),
+                    UserId,
+                    Now.AddMinutes(-2)
+                );
+
+                Categories
+                    .Setup(repository =>
+                        repository.GetByIdAndBusinessAsync(
+                            It.IsAny<Guid>(),
+                            BusinessId,
+                            It.IsAny<CancellationToken>()
+                        )
+                    )
+                    .ReturnsAsync(category);
+            }
 
             public ConfirmFinancialMovementCommand EmptyCommand() =>
                 new()
@@ -338,6 +367,7 @@ namespace Mype.Tests.Application.FinancialMovements.Commands.ConfirmFinancialMov
                     Memberships.Object,
                     Permissions.Object,
                     Movements.Object,
+                    Categories.Object,
                     UnitOfWork.Object,
                     Clock.Object
                 );

@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Mype.Application.BusinessMemberships.Interfaces;
+using Mype.Application.Categories.Interfaces;
 using Mype.Application.Common;
 using Mype.Application.Common.Exceptions;
 using Mype.Application.Common.Interfaces;
@@ -12,6 +13,7 @@ using Mype.Application.FinancialMovements.Interfaces;
 using Mype.Application.Permissions.Interfaces;
 using Mype.Domain.Businesses;
 using Mype.Domain.BusinessMemberships;
+using Mype.Domain.Categories;
 using Mype.Domain.FinancialMovements;
 using Mype.Domain.Permissions.Constants;
 using Mype.Shared.Constants;
@@ -24,6 +26,7 @@ namespace Mype.Application.FinancialMovements.Commands.ConfirmFinancialMovement
         private readonly IBusinessMembershipRepository _memberships;
         private readonly IPermissionRepository _permissions;
         private readonly IFinancialMovementRepository _movements;
+        private readonly ICategoryRepository _categories;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IClock _clock;
 
@@ -31,6 +34,7 @@ namespace Mype.Application.FinancialMovements.Commands.ConfirmFinancialMovement
             IBusinessMembershipRepository memberships,
             IPermissionRepository permissions,
             IFinancialMovementRepository movements,
+            ICategoryRepository categories,
             IUnitOfWork unitOfWork,
             IClock clock
         )
@@ -38,6 +42,7 @@ namespace Mype.Application.FinancialMovements.Commands.ConfirmFinancialMovement
             _memberships = memberships;
             _permissions = permissions;
             _movements = movements;
+            _categories = categories;
             _unitOfWork = unitOfWork;
             _clock = clock;
         }
@@ -82,6 +87,14 @@ namespace Mype.Application.FinancialMovements.Commands.ConfirmFinancialMovement
             if (!TryBuildItemVersions(activeItems, request.ItemVersions, out var itemVersions))
                 return Failure(ConfirmFinancialMovementErrors.InvalidItemVersions);
 
+            var categoryValidationError = await ValidateCategoriesAsync(
+                movement,
+                activeItems,
+                cancellationToken
+            );
+            if (categoryValidationError != null)
+                return Failure(categoryValidationError);
+
             _movements.SetOriginalVersions(movement, request.MovementVersion, itemVersions);
 
             FinancialMovementConfirmation confirmation;
@@ -124,6 +137,35 @@ namespace Mype.Application.FinancialMovements.Commands.ConfirmFinancialMovement
                     movement.Version
                 )
             );
+        }
+
+        private async Task<ApplicationError> ValidateCategoriesAsync(
+            FinancialMovement movement,
+            IReadOnlyCollection<FinancialMovementItem> activeItems,
+            CancellationToken cancellationToken
+        )
+        {
+            var expectedType =
+                movement.Type == FinancialMovementType.Sale
+                    ? CategoryType.Sale
+                    : CategoryType.Expense;
+
+            foreach (var categoryId in activeItems.Select(item => item.CategoryId).Distinct())
+            {
+                var category = await _categories.GetByIdAndBusinessAsync(
+                    categoryId,
+                    movement.BusinessId,
+                    cancellationToken
+                );
+                if (category == null)
+                    return ConfirmFinancialMovementErrors.InvalidMovementItems;
+                if (category.Type != expectedType)
+                    return movement.Type == FinancialMovementType.Sale
+                        ? ConfirmFinancialMovementErrors.InvalidSaleItems
+                        : ConfirmFinancialMovementErrors.InvalidExpenseItems;
+            }
+
+            return null;
         }
 
         private static bool TryBuildItemVersions(
