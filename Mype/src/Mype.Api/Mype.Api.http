@@ -397,3 +397,21 @@ Accept: application/json
   "movementVersion": {{MovementVersion}},
   "evidenceVersion": {{EvidenceVersion}}
 }
+
+###
+
+# Confirma el movimiento financiero usando las versiones vigentes del movimiento y sus ítems activos.
+POST {{Mype.Api_HostAddress}}/api/v1/businesses/{{BusinessId}}/financial-movements/{{MovementId}}/confirm
+Authorization: Bearer {{AccessToken}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "movementVersion": {{MovementVersion}},
+  "itemVersions": [
+    {
+      "itemId": "{{MovementItemId}}",
+      "version": {{MovementItemVersion}}
+    }
+  ]
+}

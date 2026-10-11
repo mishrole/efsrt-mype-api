@@ -139,6 +139,51 @@ namespace Mype.Domain.FinancialMovements
             Touch(userId, utcNow);
         }
 
+        internal void ValidateAndRecalculateForConfirmation(FinancialMovementType movementType)
+        {
+            if (Quantity <= 0m || UnitAmount < 0m)
+                throw new FinancialMovementConfirmationException(
+                    FinancialMovementConfirmationError.InvalidItemAmounts,
+                    Id
+                );
+
+            if (movementType == FinancialMovementType.Sale)
+                ValidateSaleForConfirmation();
+            else
+                ValidateExpenseForConfirmation();
+
+            SubtotalAmount = RoundAmount(Quantity * UnitAmount);
+        }
+
+        private void ValidateSaleForConfirmation()
+        {
+            if (
+                ProductId == null
+                || ProductId == Guid.Empty
+                || CategoryId == Guid.Empty
+                || UnitCostSnapshot == null
+                || UnitCostSnapshot < 0m
+            )
+                throw new FinancialMovementConfirmationException(
+                    FinancialMovementConfirmationError.InvalidSaleItem,
+                    Id
+                );
+        }
+
+        private void ValidateExpenseForConfirmation()
+        {
+            if (
+                ProductId != null
+                || UnitCostSnapshot != null
+                || CategoryId == Guid.Empty
+                || string.IsNullOrWhiteSpace(Description)
+            )
+                throw new FinancialMovementConfirmationException(
+                    FinancialMovementConfirmationError.InvalidExpenseItem,
+                    Id
+                );
+        }
+
         private void ApplyProduct(Product product)
         {
             ProductId = product.Id;
@@ -190,14 +235,7 @@ namespace Mype.Domain.FinancialMovements
 
         private void ApplyAmounts(decimal quantity, decimal unitAmount)
         {
-            if (quantity <= 0m)
-                throw new FinancialMovementItemException(
-                    FinancialMovementItemError.InvalidQuantity
-                );
-            if (unitAmount < 0m)
-                throw new FinancialMovementItemException(
-                    FinancialMovementItemError.InvalidUnitAmount
-                );
+            ValidateAmounts(quantity, unitAmount);
             Quantity = quantity;
             UnitAmount = unitAmount;
             SubtotalAmount = RoundAmount(quantity * unitAmount);

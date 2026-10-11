@@ -1,4 +1,4 @@
-﻿namespace Mype.Shared.Constants
+namespace Mype.Shared.Constants
 {
     public static class ErrorCodes
     {
@@ -13,11 +13,8 @@
         #region Auth
 
         public const string EmailAlreadyRegistered = "EMAIL_ALREADY_REGISTERED";
-
         public const string InvalidCredentials = "INVALID_CREDENTIALS";
-
         public const string AccountUnavailable = "ACCOUNT_UNAVAILABLE";
-
         public const string Unauthenticated = "UNAUTHENTICATED";
 
         #endregion
@@ -25,15 +22,10 @@
         #region Businesses
 
         public const string UnsupportedCurrency = "UNSUPPORTED_CURRENCY";
-
         public const string SystemRoleUnavailable = "SYSTEM_ROLE_UNAVAILABLE";
-
         public const string BusinessCreationFailed = "BUSINESS_CREATION_FAILED";
-
         public const string BusinessAccessForbidden = "BUSINESS_ACCESS_FORBIDDEN";
-
         public const string BusinessUnavailable = "BUSINESS_UNAVAILABLE";
-
         public const string RucAlreadyRegistered = "RUC_ALREADY_REGISTERED";
 
         #endregion
@@ -47,27 +39,16 @@
         #region Products
 
         public const string ProductAccessForbidden = "PRODUCT_ACCESS_FORBIDDEN";
-
         public const string ProductAlreadyExists = "PRODUCT_ALREADY_EXISTS";
-
         public const string ProductCreationFailed = "PRODUCT_CREATION_FAILED";
-
         public const string ProductUpdateFailed = "PRODUCT_UPDATE_FAILED";
-
         public const string ProductStatusChangeFailed = "PRODUCT_STATUS_CHANGE_FAILED";
-
         public const string ProductNotFound = "PRODUCT_NOT_FOUND";
-
         public const string CategoryNotFound = "CATEGORY_NOT_FOUND";
-
         public const string CategoryUnavailable = "CATEGORY_UNAVAILABLE";
-
         public const string ProductCategoryMustBeSale = "PRODUCT_CATEGORY_MUST_BE_SALE";
-
         public const string ProductCategoryUnavailable = "PRODUCT_CATEGORY_UNAVAILABLE";
-
         public const string ProductAlreadyInactive = "PRODUCT_ALREADY_INACTIVE";
-
         public const string ProductAlreadyActive = "PRODUCT_ALREADY_ACTIVE";
 
         #endregion
@@ -87,6 +68,11 @@
         public const string ExpenseItemOperationFailed = "EXPENSE_ITEM_OPERATION_FAILED";
         public const string ProductInactive = "PRODUCT_INACTIVE";
         public const string MovementItemOperationFailed = "MOVEMENT_ITEM_OPERATION_FAILED";
+        public const string MovementRequiresActiveItems = "MOVEMENT_REQUIRES_ACTIVE_ITEMS";
+        public const string InvalidMovementItems = "INVALID_MOVEMENT_ITEMS";
+        public const string InvalidSaleItems = "INVALID_SALE_ITEMS";
+        public const string InvalidExpenseItems = "INVALID_EXPENSE_ITEMS";
+        public const string MovementConfirmationFailed = "MOVEMENT_CONFIRMATION_FAILED";
         public const string EvidenceNotFound = "EVIDENCE_NOT_FOUND";
         public const string EvidenceNotActive = "EVIDENCE_NOT_ACTIVE";
         public const string InvalidEvidenceFile = "INVALID_EVIDENCE_FILE";
