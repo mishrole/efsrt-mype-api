@@ -16,9 +16,10 @@ namespace Mype.Tests.Application.MovementEvidences.Common
 
             var key = generator.Generate(businessId, movementId, evidenceId, ".pdf");
 
-            key.Should().StartWith(
-                $"businesses/{businessId:N}/movements/{movementId:N}/evidences/{evidenceId:N}/"
-            );
+            key.Should()
+                .StartWith(
+                    $"businesses/{businessId:N}/movements/{movementId:N}/evidences/{evidenceId:N}/"
+                );
             key.Should().EndWith(".pdf");
             key.Should().NotContain("receipt");
         }

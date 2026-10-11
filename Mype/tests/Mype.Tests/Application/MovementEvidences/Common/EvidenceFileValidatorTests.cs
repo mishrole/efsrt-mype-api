@@ -13,13 +13,38 @@ namespace Mype.Tests.Application.MovementEvidences.Common
     {
         private readonly EvidenceFileValidator _validator = new(new Settings());
 
-        public static TheoryData<string, string, byte[], string, string> ValidFiles => new()
-        {
-            { "photo.jpg", "image/jpeg", new byte[] { 0xFF, 0xD8, 0xFF, 0x01 }, "image/jpeg", ".jpg" },
-            { "photo.jpeg", "image/jpeg", new byte[] { 0xFF, 0xD8, 0xFF, 0x01 }, "image/jpeg", ".jpg" },
-            { "image.png", "image/png", new byte[] { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A }, "image/png", ".png" },
-            { "document.pdf", "application/pdf", new byte[] { 0x25, 0x50, 0x44, 0x46, 0x2D }, "application/pdf", ".pdf" },
-        };
+        public static TheoryData<string, string, byte[], string, string> ValidFiles =>
+            new()
+            {
+                {
+                    "photo.jpg",
+                    "image/jpeg",
+                    new byte[] { 0xFF, 0xD8, 0xFF, 0x01 },
+                    "image/jpeg",
+                    ".jpg"
+                },
+                {
+                    "photo.jpeg",
+                    "image/jpeg",
+                    new byte[] { 0xFF, 0xD8, 0xFF, 0x01 },
+                    "image/jpeg",
+                    ".jpg"
+                },
+                {
+                    "image.png",
+                    "image/png",
+                    new byte[] { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A },
+                    "image/png",
+                    ".png"
+                },
+                {
+                    "document.pdf",
+                    "application/pdf",
+                    new byte[] { 0x25, 0x50, 0x44, 0x46, 0x2D },
+                    "application/pdf",
+                    ".pdf"
+                },
+            };
 
         [Theory]
         [MemberData(nameof(ValidFiles))]
@@ -33,7 +58,9 @@ namespace Mype.Tests.Application.MovementEvidences.Common
         {
             using var stream = new MemoryStream(bytes);
 
-            var result = _validator.Validate(new EvidenceFile(name, declaredMime, bytes.Length, stream));
+            var result = _validator.Validate(
+                new EvidenceFile(name, declaredMime, bytes.Length, stream)
+            );
 
             result.IsSuccess.Should().BeTrue();
             result.Value.MimeType.Should().Be(expectedMime);
@@ -47,7 +74,9 @@ namespace Mype.Tests.Application.MovementEvidences.Common
             var bytes = new byte[] { 0x00, 0x00, 0x25, 0x50, 0x44, 0x46, 0x2D };
             using var stream = new MemoryStream(bytes) { Position = 2 };
 
-            var result = _validator.Validate(new EvidenceFile("document.pdf", "application/pdf", 5, stream));
+            var result = _validator.Validate(
+                new EvidenceFile("document.pdf", "application/pdf", 5, stream)
+            );
 
             result.IsSuccess.Should().BeTrue();
             stream.Position.Should().Be(2);
@@ -60,7 +89,9 @@ namespace Mype.Tests.Application.MovementEvidences.Common
         {
             using var stream = new MemoryStream(new byte[] { 0x25, 0x50, 0x44, 0x46, 0x2D });
 
-            var result = _validator.Validate(new EvidenceFile("document.pdf", "application/pdf", length, stream));
+            var result = _validator.Validate(
+                new EvidenceFile("document.pdf", "application/pdf", length, stream)
+            );
 
             result.IsSuccess.Should().BeFalse();
             result.Error.Code.Should().Be(ErrorCodes.InvalidEvidenceSize);
@@ -70,7 +101,10 @@ namespace Mype.Tests.Application.MovementEvidences.Common
         [InlineData("document.exe", "application/pdf")]
         [InlineData("document.pdf", "image/png")]
         [InlineData("document.png", "application/pdf")]
-        public void Validate_Should_Reject_Inconsistent_Extension_Mime_Or_Signature(string name, string mime)
+        public void Validate_Should_Reject_Inconsistent_Extension_Mime_Or_Signature(
+            string name,
+            string mime
+        )
         {
             using var stream = new MemoryStream(new byte[] { 0x25, 0x50, 0x44, 0x46, 0x2D });
 
@@ -85,7 +119,9 @@ namespace Mype.Tests.Application.MovementEvidences.Common
         {
             using var stream = new MemoryStream(new byte[] { 0x01, 0x02, 0x03, 0x04 });
 
-            var result = _validator.Validate(new EvidenceFile("file.pdf", "application/pdf", stream.Length, stream));
+            var result = _validator.Validate(
+                new EvidenceFile("file.pdf", "application/pdf", stream.Length, stream)
+            );
 
             result.IsSuccess.Should().BeFalse();
             result.Error.Code.Should().Be(ErrorCodes.UnsupportedEvidenceFormat);
@@ -97,7 +133,12 @@ namespace Mype.Tests.Application.MovementEvidences.Common
             using var stream = new MemoryStream(new byte[] { 0x25, 0x50, 0x44, 0x46, 0x2D });
 
             var result = _validator.Validate(
-                new EvidenceFile("../  inva\u0000lid<>name.PDF", "application/pdf", stream.Length, stream)
+                new EvidenceFile(
+                    "../  inva\u0000lid<>name.PDF",
+                    "application/pdf",
+                    stream.Length,
+                    stream
+                )
             );
 
             result.IsSuccess.Should().BeTrue();
@@ -109,7 +150,9 @@ namespace Mype.Tests.Application.MovementEvidences.Common
         {
             using var stream = new MemoryStream(new byte[] { 0x25, 0x50, 0x44, 0x46, 0x2D });
 
-            var result = _validator.Validate(new EvidenceFile("<>.pdf", "application/pdf", stream.Length, stream));
+            var result = _validator.Validate(
+                new EvidenceFile("<>.pdf", "application/pdf", stream.Length, stream)
+            );
 
             result.IsSuccess.Should().BeTrue();
             result.Value.OriginalFileName.Should().Be("evidence.pdf");
@@ -121,7 +164,9 @@ namespace Mype.Tests.Application.MovementEvidences.Common
             var name = new string('a', 300) + ".pdf";
             using var stream = new MemoryStream(new byte[] { 0x25, 0x50, 0x44, 0x46, 0x2D });
 
-            var result = _validator.Validate(new EvidenceFile(name, "application/pdf", stream.Length, stream));
+            var result = _validator.Validate(
+                new EvidenceFile(name, "application/pdf", stream.Length, stream)
+            );
 
             result.IsSuccess.Should().BeTrue();
             result.Value.OriginalFileName.Should().HaveLength(255);
@@ -134,7 +179,9 @@ namespace Mype.Tests.Application.MovementEvidences.Common
             var bytes = new byte[] { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 0x7A, 0x7B };
             using var stream = new MemoryStream(bytes.ToArray());
 
-            var result = _validator.Validate(new EvidenceFile("image.png", "image/png", bytes.Length, stream));
+            var result = _validator.Validate(
+                new EvidenceFile("image.png", "image/png", bytes.Length, stream)
+            );
 
             result.IsSuccess.Should().BeTrue();
             stream.ToArray().Should().Equal(bytes);

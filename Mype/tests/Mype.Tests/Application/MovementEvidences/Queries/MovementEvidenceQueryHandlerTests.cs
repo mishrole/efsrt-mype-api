@@ -30,8 +30,14 @@ namespace Mype.Tests.Application.MovementEvidences.Queries
         {
             var fixture = new Fixture();
             var evidence = fixture.ActiveEvidence();
-            fixture.Evidences
-                .Setup(x => x.ListActiveByMovementAndBusinessAsync(fixture.MovementId, fixture.BusinessId, It.IsAny<CancellationToken>()))
+            fixture
+                .Evidences.Setup(x =>
+                    x.ListActiveByMovementAndBusinessAsync(
+                        fixture.MovementId,
+                        fixture.BusinessId,
+                        It.IsAny<CancellationToken>()
+                    )
+                )
                 .ReturnsAsync(new[] { evidence });
             var handler = new ListMovementEvidencesQueryHandler(
                 fixture.Memberships.Object,
@@ -62,8 +68,14 @@ namespace Mype.Tests.Application.MovementEvidences.Queries
         public async Task List_Should_Return_MovementNotFound_When_Movement_Is_Other_Business()
         {
             var fixture = new Fixture();
-            fixture.Movements
-                .Setup(x => x.GetTrackedByIdAndBusinessAsync(fixture.MovementId, fixture.BusinessId, It.IsAny<CancellationToken>()))
+            fixture
+                .Movements.Setup(x =>
+                    x.GetTrackedByIdAndBusinessAsync(
+                        fixture.MovementId,
+                        fixture.BusinessId,
+                        It.IsAny<CancellationToken>()
+                    )
+                )
                 .ReturnsAsync((FinancialMovement)null);
             var handler = new ListMovementEvidencesQueryHandler(
                 fixture.Memberships.Object,
@@ -85,7 +97,12 @@ namespace Mype.Tests.Application.MovementEvidences.Queries
             result.IsSuccess.Should().BeFalse();
             result.Error.Code.Should().Be(ErrorCodes.MovementNotFound);
             fixture.Evidences.Verify(
-                x => x.ListActiveByMovementAndBusinessAsync(It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<CancellationToken>()),
+                x =>
+                    x.ListActiveByMovementAndBusinessAsync(
+                        It.IsAny<Guid>(),
+                        It.IsAny<Guid>(),
+                        It.IsAny<CancellationToken>()
+                    ),
                 Times.Never
             );
         }
@@ -95,12 +112,30 @@ namespace Mype.Tests.Application.MovementEvidences.Queries
         {
             var fixture = new Fixture();
             var evidence = fixture.ActiveEvidence();
-            fixture.Evidences
-                .Setup(x => x.GetTrackedByIdMovementAndBusinessAsync(evidence.Id, fixture.MovementId, fixture.BusinessId, It.IsAny<CancellationToken>()))
+            fixture
+                .Evidences.Setup(x =>
+                    x.GetTrackedByIdMovementAndBusinessAsync(
+                        evidence.Id,
+                        fixture.MovementId,
+                        fixture.BusinessId,
+                        It.IsAny<CancellationToken>()
+                    )
+                )
                 .ReturnsAsync(evidence);
-            fixture.Storage
-                .Setup(x => x.CreateTemporaryReadAccessAsync(evidence.StorageObjectKey, TimeSpan.FromMinutes(5), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new TemporaryObjectAccessResult(new Uri("https://storage.test/read"), fixture.Now.AddMinutes(5)));
+            fixture
+                .Storage.Setup(x =>
+                    x.CreateTemporaryReadAccessAsync(
+                        evidence.StorageObjectKey,
+                        TimeSpan.FromMinutes(5),
+                        It.IsAny<CancellationToken>()
+                    )
+                )
+                .ReturnsAsync(
+                    new TemporaryObjectAccessResult(
+                        new Uri("https://storage.test/read"),
+                        fixture.Now.AddMinutes(5)
+                    )
+                );
             var handler = new OpenMovementEvidenceQueryHandler(
                 fixture.Memberships.Object,
                 fixture.Permissions.Object,
@@ -131,9 +166,21 @@ namespace Mype.Tests.Application.MovementEvidences.Queries
         {
             var fixture = new Fixture();
             var evidence = fixture.ActiveEvidence();
-            evidence.MarkPendingPurge(EvidenceRemovalReason.Removed, fixture.UserId, fixture.Now, fixture.Now.AddDays(30));
-            fixture.Evidences
-                .Setup(x => x.GetTrackedByIdMovementAndBusinessAsync(evidence.Id, fixture.MovementId, fixture.BusinessId, It.IsAny<CancellationToken>()))
+            evidence.MarkPendingPurge(
+                EvidenceRemovalReason.Removed,
+                fixture.UserId,
+                fixture.Now,
+                fixture.Now.AddDays(30)
+            );
+            fixture
+                .Evidences.Setup(x =>
+                    x.GetTrackedByIdMovementAndBusinessAsync(
+                        evidence.Id,
+                        fixture.MovementId,
+                        fixture.BusinessId,
+                        It.IsAny<CancellationToken>()
+                    )
+                )
                 .ReturnsAsync(evidence);
             var handler = new OpenMovementEvidenceQueryHandler(
                 fixture.Memberships.Object,
@@ -158,7 +205,12 @@ namespace Mype.Tests.Application.MovementEvidences.Queries
             result.IsSuccess.Should().BeFalse();
             result.Error.Code.Should().Be(ErrorCodes.EvidenceNotActive);
             fixture.Storage.Verify(
-                x => x.CreateTemporaryReadAccessAsync(It.IsAny<string>(), It.IsAny<TimeSpan>(), It.IsAny<CancellationToken>()),
+                x =>
+                    x.CreateTemporaryReadAccessAsync(
+                        It.IsAny<string>(),
+                        It.IsAny<TimeSpan>(),
+                        It.IsAny<CancellationToken>()
+                    ),
                 Times.Never
             );
         }
@@ -168,11 +220,24 @@ namespace Mype.Tests.Application.MovementEvidences.Queries
         {
             var fixture = new Fixture();
             var evidence = fixture.ActiveEvidence();
-            fixture.Evidences
-                .Setup(x => x.GetTrackedByIdMovementAndBusinessAsync(evidence.Id, fixture.MovementId, fixture.BusinessId, It.IsAny<CancellationToken>()))
+            fixture
+                .Evidences.Setup(x =>
+                    x.GetTrackedByIdMovementAndBusinessAsync(
+                        evidence.Id,
+                        fixture.MovementId,
+                        fixture.BusinessId,
+                        It.IsAny<CancellationToken>()
+                    )
+                )
                 .ReturnsAsync(evidence);
-            fixture.Storage
-                .Setup(x => x.CreateTemporaryReadAccessAsync(It.IsAny<string>(), It.IsAny<TimeSpan>(), It.IsAny<CancellationToken>()))
+            fixture
+                .Storage.Setup(x =>
+                    x.CreateTemporaryReadAccessAsync(
+                        It.IsAny<string>(),
+                        It.IsAny<TimeSpan>(),
+                        It.IsAny<CancellationToken>()
+                    )
+                )
                 .ThrowsAsync(new InvalidOperationException());
             var handler = new OpenMovementEvidenceQueryHandler(
                 fixture.Memberships.Object,
@@ -215,50 +280,68 @@ namespace Mype.Tests.Application.MovementEvidences.Queries
             public Fixture()
             {
                 Memberships
-                    .Setup(x => x.GetContextByBusinessAndUserAsync(BusinessId, UserId, It.IsAny<CancellationToken>()))
-                    .ReturnsAsync(new BusinessContextProjection(
-                        BusinessId,
-                        "Business",
-                        "PEN",
-                        BusinessStatus.Active,
-                        Guid.NewGuid(),
-                        BusinessMembershipStatus.Active,
-                        RoleId,
-                        "OWNER",
-                        true
-                    ));
+                    .Setup(x =>
+                        x.GetContextByBusinessAndUserAsync(
+                            BusinessId,
+                            UserId,
+                            It.IsAny<CancellationToken>()
+                        )
+                    )
+                    .ReturnsAsync(
+                        new BusinessContextProjection(
+                            BusinessId,
+                            "Business",
+                            "PEN",
+                            BusinessStatus.Active,
+                            Guid.NewGuid(),
+                            BusinessMembershipStatus.Active,
+                            RoleId,
+                            "OWNER",
+                            true
+                        )
+                    );
                 Permissions
-                    .Setup(x => x.ListActiveCodesByRoleIdAsync(RoleId, It.IsAny<CancellationToken>()))
+                    .Setup(x =>
+                        x.ListActiveCodesByRoleIdAsync(RoleId, It.IsAny<CancellationToken>())
+                    )
                     .ReturnsAsync(new[] { SystemPermissions.MovementRead.Code });
                 Movements
-                    .Setup(x => x.GetTrackedByIdAndBusinessAsync(MovementId, BusinessId, It.IsAny<CancellationToken>()))
+                    .Setup(x =>
+                        x.GetTrackedByIdAndBusinessAsync(
+                            MovementId,
+                            BusinessId,
+                            It.IsAny<CancellationToken>()
+                        )
+                    )
                     .ReturnsAsync(Movement());
             }
 
-            public MovementEvidence ActiveEvidence() => MovementEvidence.CreateActive(
-                Guid.NewGuid(),
-                BusinessId,
-                MovementId,
-                null,
-                "AzureBlob",
-                "evidences",
-                $"businesses/{BusinessId:N}/movements/{MovementId:N}/file.pdf",
-                "receipt.pdf",
-                "application/pdf",
-                100,
-                UserId,
-                Now
-            );
+            public MovementEvidence ActiveEvidence() =>
+                MovementEvidence.CreateActive(
+                    Guid.NewGuid(),
+                    BusinessId,
+                    MovementId,
+                    null,
+                    "AzureBlob",
+                    "evidences",
+                    $"businesses/{BusinessId:N}/movements/{MovementId:N}/file.pdf",
+                    "receipt.pdf",
+                    "application/pdf",
+                    100,
+                    UserId,
+                    Now
+                );
 
-            private FinancialMovement Movement() => FinancialMovement.CreateDraft(
-                BusinessId,
-                FinancialMovementType.Expense,
-                new DateOnly(2026, 10, 10),
-                null,
-                "PEN",
-                UserId,
-                Now
-            );
+            private FinancialMovement Movement() =>
+                FinancialMovement.CreateDraft(
+                    BusinessId,
+                    FinancialMovementType.Expense,
+                    new DateOnly(2026, 10, 10),
+                    null,
+                    "PEN",
+                    UserId,
+                    Now
+                );
         }
 
         private sealed class Settings : IEvidenceStorageSettings

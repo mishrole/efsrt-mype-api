@@ -75,11 +75,12 @@ namespace Mype.Tests.Application.MovementEvidences.Commands
             result.ShouldHaveValidationErrorFor(x => x.EvidenceVersion);
         }
 
-        private static EvidenceFile File() => new(
-            "receipt.pdf",
-            "application/pdf",
-            5,
-            new MemoryStream([0x25, 0x50, 0x44, 0x46, 0x2D])
-        );
+        private static EvidenceFile File() =>
+            new(
+                "receipt.pdf",
+                "application/pdf",
+                5,
+                new MemoryStream([0x25, 0x50, 0x44, 0x46, 0x2D])
+            );
     }
 }

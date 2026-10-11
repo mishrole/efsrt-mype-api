@@ -65,8 +65,14 @@ namespace Mype.Tests.Api.Middlewares
         }
 
         [Theory]
-        [InlineData("GET", "/api/v1/businesses/00000000-0000-0000-0000-000000000001/financial-movements/00000000-0000-0000-0000-000000000002/evidences")]
-        [InlineData("POST", "/api/v1/businesses/00000000-0000-0000-0000-000000000001/financial-movements/00000000-0000-0000-0000-000000000002/sale-items")]
+        [InlineData(
+            "GET",
+            "/api/v1/businesses/00000000-0000-0000-0000-000000000001/financial-movements/00000000-0000-0000-0000-000000000002/evidences"
+        )]
+        [InlineData(
+            "POST",
+            "/api/v1/businesses/00000000-0000-0000-0000-000000000001/financial-movements/00000000-0000-0000-0000-000000000002/sale-items"
+        )]
         public async Task InvokeAsync_Should_Ignore_NonUpload_Request(string method, string path)
         {
             var nextCalled = false;
@@ -92,7 +98,8 @@ namespace Mype.Tests.Api.Middlewares
         {
             var context = new DefaultHttpContext { TraceIdentifier = "trace" };
             context.Request.Method = method;
-            context.Request.Path = "/api/v1/businesses/00000000-0000-0000-0000-000000000001/financial-movements/00000000-0000-0000-0000-000000000002/evidences";
+            context.Request.Path =
+                "/api/v1/businesses/00000000-0000-0000-0000-000000000001/financial-movements/00000000-0000-0000-0000-000000000002/evidences";
             context.Request.ContentLength = contentLength;
             context.Response.Body = new MemoryStream();
             return context;

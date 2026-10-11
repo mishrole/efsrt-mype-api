@@ -72,17 +72,26 @@ namespace Mype.Tests.Domain.MovementEvidences
         {
             var evidence = CreateEvidence();
             var now = DateTimeOffset.UtcNow;
-            evidence.MarkPendingPurge(EvidenceRemovalReason.Removed, Guid.NewGuid(), now, now.AddDays(30));
-
-            var action = () => evidence.MarkPendingPurge(
-                EvidenceRemovalReason.Replaced,
+            evidence.MarkPendingPurge(
+                EvidenceRemovalReason.Removed,
                 Guid.NewGuid(),
-                now.AddMinutes(1),
-                now.AddDays(31)
+                now,
+                now.AddDays(30)
             );
 
-            action.Should().Throw<MovementEvidenceException>()
-                .Which.Error.Should().Be(MovementEvidenceError.EvidenceNotActive);
+            var action = () =>
+                evidence.MarkPendingPurge(
+                    EvidenceRemovalReason.Replaced,
+                    Guid.NewGuid(),
+                    now.AddMinutes(1),
+                    now.AddDays(31)
+                );
+
+            action
+                .Should()
+                .Throw<MovementEvidenceException>()
+                .Which.Error.Should()
+                .Be(MovementEvidenceError.EvidenceNotActive);
         }
 
         [Fact]
@@ -91,15 +100,14 @@ namespace Mype.Tests.Domain.MovementEvidences
             var evidence = CreateEvidence();
             var now = DateTimeOffset.UtcNow;
 
-            var action = () => evidence.MarkPendingPurge(
-                EvidenceRemovalReason.Removed,
-                Guid.NewGuid(),
-                now,
-                now
-            );
+            var action = () =>
+                evidence.MarkPendingPurge(EvidenceRemovalReason.Removed, Guid.NewGuid(), now, now);
 
-            action.Should().Throw<MovementEvidenceException>()
-                .Which.Error.Should().Be(MovementEvidenceError.InvalidPurgeAfter);
+            action
+                .Should()
+                .Throw<MovementEvidenceException>()
+                .Which.Error.Should()
+                .Be(MovementEvidenceError.InvalidPurgeAfter);
         }
 
         [Fact]
@@ -107,7 +115,12 @@ namespace Mype.Tests.Domain.MovementEvidences
         {
             var evidence = CreateEvidence();
             var now = DateTimeOffset.UtcNow;
-            evidence.MarkPendingPurge(EvidenceRemovalReason.Removed, Guid.NewGuid(), now, now.AddDays(30));
+            evidence.MarkPendingPurge(
+                EvidenceRemovalReason.Removed,
+                Guid.NewGuid(),
+                now,
+                now.AddDays(30)
+            );
             var purgeTime = now.AddDays(31);
             var actorId = Guid.NewGuid();
 
@@ -126,23 +139,27 @@ namespace Mype.Tests.Domain.MovementEvidences
 
             var action = () => evidence.MarkPurged(Guid.NewGuid(), DateTimeOffset.UtcNow);
 
-            action.Should().Throw<MovementEvidenceException>()
-                .Which.Error.Should().Be(MovementEvidenceError.EvidenceNotPendingPurge);
+            action
+                .Should()
+                .Throw<MovementEvidenceException>()
+                .Which.Error.Should()
+                .Be(MovementEvidenceError.EvidenceNotPendingPurge);
         }
 
-        private static MovementEvidence CreateEvidence() => MovementEvidence.CreateActive(
-            Guid.NewGuid(),
-            Guid.NewGuid(),
-            Guid.NewGuid(),
-            null,
-            "AzureBlob",
-            "evidences",
-            $"businesses/{Guid.NewGuid():N}.pdf",
-            "receipt.pdf",
-            "application/pdf",
-            128,
-            Guid.NewGuid(),
-            DateTimeOffset.UtcNow
-        );
+        private static MovementEvidence CreateEvidence() =>
+            MovementEvidence.CreateActive(
+                Guid.NewGuid(),
+                Guid.NewGuid(),
+                Guid.NewGuid(),
+                null,
+                "AzureBlob",
+                "evidences",
+                $"businesses/{Guid.NewGuid():N}.pdf",
+                "receipt.pdf",
+                "application/pdf",
+                128,
+                Guid.NewGuid(),
+                DateTimeOffset.UtcNow
+            );
     }
 }

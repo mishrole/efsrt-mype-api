@@ -144,10 +144,7 @@ namespace Mype.Api
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
 
             productGroup
-                .MapGet(
-                    "/{productId:guid}",
-                    GetProductDetailEndpoint.DoAsync
-                )
+                .MapGet("/{productId:guid}", GetProductDetailEndpoint.DoAsync)
                 .WithName("GetProductDetail")
                 .WithSummary("Consultar un producto")
                 .Produces<ProductDetailResult>(StatusCodes.Status200OK)
@@ -159,10 +156,7 @@ namespace Mype.Api
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
 
             productGroup
-                .MapPut(
-                    "/{productId:guid}",
-                    UpdateProductEndpoint.DoAsync
-                )
+                .MapPut("/{productId:guid}", UpdateProductEndpoint.DoAsync)
                 .WithName("UpdateProduct")
                 .WithSummary("Actualizar un producto")
                 .Produces<ProductMaintenanceResult>(StatusCodes.Status200OK)
@@ -175,10 +169,7 @@ namespace Mype.Api
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
 
             productGroup
-                .MapPatch(
-                    "/{productId:guid}/deactivate",
-                    DeactivateProductEndpoint.DoAsync
-                )
+                .MapPatch("/{productId:guid}/deactivate", DeactivateProductEndpoint.DoAsync)
                 .WithName("DeactivateProduct")
                 .WithSummary("Desactivar un producto")
                 .Produces<ProductMaintenanceResult>(StatusCodes.Status200OK)
@@ -190,10 +181,7 @@ namespace Mype.Api
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
 
             productGroup
-                .MapPatch(
-                    "/{productId:guid}/reactivate",
-                    ReactivateProductEndpoint.DoAsync
-                )
+                .MapPatch("/{productId:guid}/reactivate", ReactivateProductEndpoint.DoAsync)
                 .WithName("ReactivateProduct")
                 .WithSummary("Reactivar un producto")
                 .Produces<ProductMaintenanceResult>(StatusCodes.Status200OK)
@@ -210,10 +198,7 @@ namespace Mype.Api
                 .WithTags("FinancialMovements");
 
             financialMovementGroup
-                .MapPost(
-                    string.Empty,
-                    CreateFinancialMovementEndpoint.DoAsync
-                )
+                .MapPost(string.Empty, CreateFinancialMovementEndpoint.DoAsync)
                 .WithName("CreateFinancialMovement")
                 .WithSummary("Crear un movimiento financiero en borrador")
                 .Produces<CreateFinancialMovementResult>(StatusCodes.Status201Created)
@@ -224,10 +209,7 @@ namespace Mype.Api
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
 
             financialMovementGroup
-                .MapPut(
-                    "/{movementId:guid}",
-                    UpdateFinancialMovementDraftEndpoint.DoAsync
-                )
+                .MapPut("/{movementId:guid}", UpdateFinancialMovementDraftEndpoint.DoAsync)
                 .WithName("UpdateFinancialMovementDraft")
                 .WithSummary("Actualizar la cabecera de un borrador")
                 .Produces<UpdateFinancialMovementDraftResult>(StatusCodes.Status200OK)
@@ -239,10 +221,7 @@ namespace Mype.Api
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
 
             financialMovementGroup
-                .MapGet(
-                    "/{movementId:guid}",
-                    GetFinancialMovementDraftEndpoint.DoAsync
-                )
+                .MapGet("/{movementId:guid}", GetFinancialMovementDraftEndpoint.DoAsync)
                 .WithName("GetFinancialMovementDraft")
                 .WithSummary("Consultar un borrador financiero")
                 .Produces<FinancialMovementDraftDetailResult>(StatusCodes.Status200OK)
@@ -253,10 +232,7 @@ namespace Mype.Api
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
 
             financialMovementGroup
-                .MapGet(
-                    string.Empty,
-                    ListFinancialMovementDraftsEndpoint.DoAsync
-                )
+                .MapGet(string.Empty, ListFinancialMovementDraftsEndpoint.DoAsync)
                 .WithName("ListFinancialMovementDrafts")
                 .WithSummary("Listar borradores financieros")
                 .Produces<IReadOnlyCollection<FinancialMovementDraftListItemResult>>(
@@ -272,10 +248,7 @@ namespace Mype.Api
                 .WithTags("FinancialMovementItems");
 
             financialMovementItemGroup
-                .MapPost(
-                    "/sale-items",
-                    AddSaleItemEndpoint.DoAsync
-                )
+                .MapPost("/sale-items", AddSaleItemEndpoint.DoAsync)
                 .WithName("AddSaleItem")
                 .WithSummary("Agregar un producto a una venta")
                 .Produces<FinancialMovementItemMaintenanceResult>(StatusCodes.Status201Created)
@@ -288,10 +261,7 @@ namespace Mype.Api
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
 
             financialMovementItemGroup
-                .MapPut(
-                    "/sale-items/{itemId:guid}",
-                    UpdateSaleItemEndpoint.DoAsync
-                )
+                .MapPut("/sale-items/{itemId:guid}", UpdateSaleItemEndpoint.DoAsync)
                 .WithName("UpdateSaleItem")
                 .WithSummary("Modificar un producto de una venta")
                 .Produces<FinancialMovementItemMaintenanceResult>(StatusCodes.Status200OK)
@@ -304,10 +274,7 @@ namespace Mype.Api
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
 
             financialMovementItemGroup
-                .MapPost(
-                    "/expense-items",
-                    AddExpenseItemEndpoint.DoAsync
-                )
+                .MapPost("/expense-items", AddExpenseItemEndpoint.DoAsync)
                 .WithName("AddExpenseItem")
                 .WithSummary("Agregar un concepto a un gasto")
                 .Produces<ExpenseMovementItemMaintenanceResult>(StatusCodes.Status201Created)
@@ -320,10 +287,7 @@ namespace Mype.Api
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
 
             financialMovementItemGroup
-                .MapPut(
-                    "/expense-items/{itemId:guid}",
-                    UpdateExpenseItemEndpoint.DoAsync
-                )
+                .MapPut("/expense-items/{itemId:guid}", UpdateExpenseItemEndpoint.DoAsync)
                 .WithName("UpdateExpenseItem")
                 .WithSummary("Modificar un concepto de gasto")
                 .Produces<ExpenseMovementItemMaintenanceResult>(StatusCodes.Status200OK)
@@ -355,10 +319,7 @@ namespace Mype.Api
                 .WithTags("MovementEvidences");
 
             evidenceGroup
-                .MapPost(
-                    string.Empty,
-                    AttachMovementEvidenceEndpoint.DoAsync
-                )
+                .MapPost(string.Empty, AttachMovementEvidenceEndpoint.DoAsync)
                 .WithName("AttachMovementEvidence")
                 .WithSummary("Adjuntar evidencia a un movimiento")
                 .Produces<MovementEvidenceResult>(StatusCodes.Status201Created)
@@ -372,10 +333,7 @@ namespace Mype.Api
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
 
             evidenceGroup
-                .MapPut(
-                    "/{evidenceId:guid}",
-                    ReplaceMovementEvidenceEndpoint.DoAsync
-                )
+                .MapPut("/{evidenceId:guid}", ReplaceMovementEvidenceEndpoint.DoAsync)
                 .WithName("ReplaceMovementEvidence")
                 .WithSummary("Sustituir una evidencia activa")
                 .Produces<MovementEvidenceResult>(StatusCodes.Status200OK)
@@ -389,10 +347,7 @@ namespace Mype.Api
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
 
             evidenceGroup
-                .MapPatch(
-                    "/{evidenceId:guid}/remove",
-                    RemoveMovementEvidenceEndpoint.DoAsync
-                )
+                .MapPatch("/{evidenceId:guid}/remove", RemoveMovementEvidenceEndpoint.DoAsync)
                 .WithName("RemoveMovementEvidence")
                 .WithSummary("Retirar lógicamente una evidencia")
                 .Produces(StatusCodes.Status204NoContent)
@@ -403,10 +358,7 @@ namespace Mype.Api
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
 
             evidenceGroup
-                .MapGet(
-                    string.Empty,
-                    ListMovementEvidencesEndpoint.DoAsync
-                )
+                .MapGet(string.Empty, ListMovementEvidencesEndpoint.DoAsync)
                 .WithName("ListMovementEvidences")
                 .WithSummary("Listar evidencias activas de un movimiento")
                 .Produces<IReadOnlyCollection<MovementEvidenceResult>>(StatusCodes.Status200OK)
@@ -416,10 +368,7 @@ namespace Mype.Api
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
 
             evidenceGroup
-                .MapGet(
-                    "/{evidenceId:guid}/content",
-                    OpenMovementEvidenceEndpoint.DoAsync
-                )
+                .MapGet("/{evidenceId:guid}/content", OpenMovementEvidenceEndpoint.DoAsync)
                 .WithName("OpenMovementEvidence")
                 .WithSummary("Obtener acceso temporal a una evidencia")
                 .Produces<TemporaryEvidenceAccessResult>(StatusCodes.Status200OK)
