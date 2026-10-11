@@ -91,10 +91,7 @@ namespace Mype.Infrastructure.Storage
             return new TemporaryObjectAccessResult(uriBuilder.ToUri(), expiresAt);
         }
 
-        public async Task DeleteIfExistsAsync(
-            string objectKey,
-            CancellationToken cancellationToken
-        )
+        public async Task DeleteIfExistsAsync(string objectKey, CancellationToken cancellationToken)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(objectKey);
 

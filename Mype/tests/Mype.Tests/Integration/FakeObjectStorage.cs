@@ -48,10 +48,7 @@ namespace Mype.Tests.Integration
             );
         }
 
-        public Task DeleteIfExistsAsync(
-            string objectKey,
-            CancellationToken cancellationToken
-        )
+        public Task DeleteIfExistsAsync(string objectKey, CancellationToken cancellationToken)
         {
             _objects.TryRemove(objectKey, out _);
             return Task.CompletedTask;

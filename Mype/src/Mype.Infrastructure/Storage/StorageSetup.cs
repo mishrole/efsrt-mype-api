@@ -20,9 +20,10 @@ namespace Mype.Infrastructure.Storage
             var options = ReadOptions(configuration);
 
             services.AddSingleton(options);
-            services.AddSingleton(_ =>
-                new BlobServiceClient(new Uri(options.ServiceUri), new DefaultAzureCredential())
-            );
+            services.AddSingleton(_ => new BlobServiceClient(
+                new Uri(options.ServiceUri),
+                new DefaultAzureCredential()
+            ));
             services.AddSingleton(provider =>
                 provider
                     .GetRequiredService<BlobServiceClient>()
@@ -60,18 +61,9 @@ namespace Mype.Infrastructure.Storage
             {
                 Provider = provider,
                 ServiceUri = parsedServiceUri.AbsoluteUri.TrimEnd('/'),
-                ContainerName = Required(
-                    configuration,
-                    Env.EvidenceStorageContainerStringKey
-                ),
-                MaxSizeBytes = PositiveLong(
-                    configuration,
-                    Env.EvidenceMaxSizeBytesStringKey
-                ),
-                ReadUriMinutes = PositiveInt(
-                    configuration,
-                    Env.EvidenceReadUriMinutesStringKey
-                ),
+                ContainerName = Required(configuration, Env.EvidenceStorageContainerStringKey),
+                MaxSizeBytes = PositiveLong(configuration, Env.EvidenceMaxSizeBytesStringKey),
+                ReadUriMinutes = PositiveInt(configuration, Env.EvidenceReadUriMinutesStringKey),
                 PurgeRetentionDays = PositiveInt(
                     configuration,
                     Env.EvidencePurgeRetentionDaysStringKey

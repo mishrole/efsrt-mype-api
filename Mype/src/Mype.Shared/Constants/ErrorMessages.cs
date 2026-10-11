@@ -71,7 +71,8 @@ namespace Mype.Shared.Constants
 
         #region Categories
 
-        public const string CategoryAccessForbidden = "No tiene permiso para consultar las categorías del negocio.";
+        public const string CategoryAccessForbidden =
+            "No tiene permiso para consultar las categorías del negocio.";
 
         #endregion
 
