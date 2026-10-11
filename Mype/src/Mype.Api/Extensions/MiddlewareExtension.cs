@@ -1,4 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.Builder;
 using Mype.Api.Middlewares;
 
@@ -10,6 +10,8 @@ namespace Mype.Api.Extensions
         public static IApplicationBuilder AddMiddleware(this IApplicationBuilder app)
         {
             app.UseMiddleware<ExceptionHandlingMiddleware>();
+
+            app.UseMiddleware<EvidenceUploadSizeLimitMiddleware>();
 
             app.UseMiddleware<AuthenticationHandlingMiddleware>();
 

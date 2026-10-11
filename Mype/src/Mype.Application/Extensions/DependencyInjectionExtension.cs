@@ -1,8 +1,10 @@
-﻿using FluentValidation;
+using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 using Mype.Application.Common.Behaviors;
 using Mype.Application.Common.Interfaces;
 using Mype.Application.Common.Normalizers;
+using Mype.Application.MovementEvidences.Common;
+using Mype.Application.MovementEvidences.Interfaces;
 
 namespace Mype.Application.Extensions
 {
@@ -15,14 +17,12 @@ namespace Mype.Application.Extensions
                 configuration.RegisterServicesFromAssembly(
                     typeof(DependencyInjectionExtension).Assembly
                 );
-
                 configuration.AddOpenBehavior(typeof(ValidationBehavior<,>));
             });
-
             services.AddValidatorsFromAssembly(typeof(DependencyInjectionExtension).Assembly);
-
             services.AddSingleton<IEmailNormalizer, EmailNormalizer>();
-
+            services.AddSingleton<IEvidenceFileValidator, EvidenceFileValidator>();
+            services.AddSingleton<IStorageObjectKeyGenerator, StorageObjectKeyGenerator>();
             return services;
         }
     }

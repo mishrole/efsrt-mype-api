@@ -155,6 +155,12 @@ namespace Mype.Domain.FinancialMovements
             return item;
         }
 
+        public void RegisterEvidenceChange(Guid userId, DateTimeOffset utcNow)
+        {
+            EnsureEditable();
+            Touch(userId, utcNow);
+        }
+
         public FinancialMovementItem RetireItem(Guid itemId, Guid userId, DateTimeOffset utcNow)
         {
             EnsureEditable();

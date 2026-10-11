@@ -64,6 +64,7 @@ namespace Mype.Domain.MovementEvidences
         public bool IsActive() => Status == MovementEvidenceStatus.Active;
 
         public static MovementEvidence CreateActive(
+            Guid id,
             Guid businessId,
             Guid movementId,
             Guid? replacesEvidenceId,
@@ -77,7 +78,7 @@ namespace Mype.Domain.MovementEvidences
             DateTimeOffset utcNow
         ) =>
             new(
-                Guid.NewGuid(),
+                id,
                 businessId,
                 movementId,
                 replacesEvidenceId,

@@ -136,6 +136,22 @@ namespace Mype.Shared.Constants
         public const string MovementItemOperationFailed =
             "No fue posible procesar el ítem del movimiento.";
 
+        public const string EvidenceNotFound = "La evidencia solicitada no fue encontrada.";
+
+        public const string EvidenceNotActive = "La evidencia ya no se encuentra activa.";
+
+        public const string InvalidEvidenceFile = "El archivo de evidencia no es válido.";
+
+        public const string UnsupportedEvidenceFormat =
+            "El formato de la evidencia no está permitido.";
+
+        public const string InvalidEvidenceSize = "El tamaño de la evidencia no está permitido.";
+
+        public const string EvidenceStorageError =
+            "No fue posible almacenar o recuperar la evidencia.";
+
+        public const string EvidenceOperationFailed =
+            "No fue posible procesar la evidencia del movimiento.";
         #endregion
 
         #region Results

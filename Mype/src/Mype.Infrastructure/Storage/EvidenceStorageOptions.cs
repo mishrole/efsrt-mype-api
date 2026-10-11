@@ -1,6 +1,8 @@
+using Mype.Application.MovementEvidences.Interfaces;
+
 namespace Mype.Infrastructure.Storage
 {
-    public sealed class EvidenceStorageOptions
+    public sealed class EvidenceStorageOptions : IEvidenceStorageSettings
     {
         public string Provider { get; init; } = string.Empty;
         public string ServiceUri { get; init; } = string.Empty;

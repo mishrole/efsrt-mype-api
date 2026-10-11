@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -18,6 +18,7 @@ using Mype.Application.FinancialMovements.Commands.UpdateFinancialMovementDraft;
 using Mype.Application.FinancialMovements.Models;
 using Mype.Application.FinancialMovements.Queries.GetFinancialMovementDraft;
 using Mype.Application.FinancialMovements.Queries.ListFinancialMovementDrafts;
+using Mype.Application.MovementEvidences.Models;
 using Mype.Application.Products.Commands.Common;
 using Mype.Application.Products.Commands.CreateProduct;
 using Mype.Application.Products.Queries.GetProductDetail;
@@ -318,6 +319,80 @@ namespace Mype.Api
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status403Forbidden)
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status404NotFound)
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status409Conflict)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
+            businessGroup
+                .MapPost(
+                    "/{businessId:guid}/financial-movements/{movementId:guid}/evidences",
+                    AttachMovementEvidenceEndpoint.DoAsync
+                )
+                .WithName("AttachMovementEvidence")
+                .WithSummary("Adjuntar evidencia a un movimiento")
+                .Produces<MovementEvidenceResult>(StatusCodes.Status201Created)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status400BadRequest)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status403Forbidden)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status404NotFound)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status409Conflict)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status413PayloadTooLarge)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status422UnprocessableEntity)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status502BadGateway)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
+
+            businessGroup
+                .MapPut(
+                    "/{businessId:guid}/financial-movements/{movementId:guid}/evidences/{evidenceId:guid}",
+                    ReplaceMovementEvidenceEndpoint.DoAsync
+                )
+                .WithName("ReplaceMovementEvidence")
+                .WithSummary("Sustituir una evidencia activa")
+                .Produces<MovementEvidenceResult>(StatusCodes.Status200OK)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status400BadRequest)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status403Forbidden)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status404NotFound)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status409Conflict)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status413PayloadTooLarge)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status422UnprocessableEntity)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status502BadGateway)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
+
+            businessGroup
+                .MapPatch(
+                    "/{businessId:guid}/financial-movements/{movementId:guid}/evidences/{evidenceId:guid}/remove",
+                    RemoveMovementEvidenceEndpoint.DoAsync
+                )
+                .WithName("RemoveMovementEvidence")
+                .WithSummary("Retirar lógicamente una evidencia")
+                .Produces(StatusCodes.Status204NoContent)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status400BadRequest)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status403Forbidden)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status404NotFound)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status409Conflict)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
+
+            businessGroup
+                .MapGet(
+                    "/{businessId:guid}/financial-movements/{movementId:guid}/evidences",
+                    ListMovementEvidencesEndpoint.DoAsync
+                )
+                .WithName("ListMovementEvidences")
+                .WithSummary("Listar evidencias activas de un movimiento")
+                .Produces<IReadOnlyCollection<MovementEvidenceResult>>(StatusCodes.Status200OK)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status403Forbidden)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status404NotFound)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status409Conflict)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
+
+            businessGroup
+                .MapGet(
+                    "/{businessId:guid}/financial-movements/{movementId:guid}/evidences/{evidenceId:guid}/content",
+                    OpenMovementEvidenceEndpoint.DoAsync
+                )
+                .WithName("OpenMovementEvidence")
+                .WithSummary("Obtener acceso temporal a una evidencia")
+                .Produces<TemporaryEvidenceAccessResult>(StatusCodes.Status200OK)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status403Forbidden)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status404NotFound)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status409Conflict)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status502BadGateway)
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
             #endregion
         }

@@ -9,6 +9,8 @@
 @MovementItemId = MOVEMENT_ITEM_ID
 @MovementItemVersion = 1
 @ProductVersion = 1
+@EvidenceId = EVIDENCE_ID
+@EvidenceVersion = 1
 
 # Comprueba que la API y la conexión con la base de datos estén disponibles.
 GET {{Mype.Api_HostAddress}}/health
@@ -325,4 +327,73 @@ Accept: application/json
 {
   "movementVersion": {{MovementVersion}},
   "itemVersion": {{MovementItemVersion}}
+}
+
+###
+
+# Adjunta una evidencia PDF, JPG o PNG a un movimiento financiero en borrador.
+POST {{Mype.Api_HostAddress}}/api/v1/businesses/{{BusinessId}}/financial-movements/{{MovementId}}/evidences
+Authorization: Bearer {{AccessToken}}
+Accept: application/json
+Content-Type: multipart/form-data; boundary=MypeEvidenceBoundary
+
+--MypeEvidenceBoundary
+Content-Disposition: form-data; name="movementVersion"
+
+{{MovementVersion}}
+--MypeEvidenceBoundary
+Content-Disposition: form-data; name="file"; filename="evidence.pdf"
+Content-Type: application/pdf
+
+< ./evidence.pdf
+--MypeEvidenceBoundary--
+
+###
+
+# Lista las evidencias activas asociadas con el movimiento financiero.
+GET {{Mype.Api_HostAddress}}/api/v1/businesses/{{BusinessId}}/financial-movements/{{MovementId}}/evidences
+Authorization: Bearer {{AccessToken}}
+Accept: application/json
+
+###
+
+# Obtiene una URL temporal para consultar el contenido de una evidencia activa.
+GET {{Mype.Api_HostAddress}}/api/v1/businesses/{{BusinessId}}/financial-movements/{{MovementId}}/evidences/{{EvidenceId}}/content
+Authorization: Bearer {{AccessToken}}
+Accept: application/json
+
+###
+
+# Sustituye una evidencia activa por un nuevo archivo.
+PUT {{Mype.Api_HostAddress}}/api/v1/businesses/{{BusinessId}}/financial-movements/{{MovementId}}/evidences/{{EvidenceId}}
+Authorization: Bearer {{AccessToken}}
+Accept: application/json
+Content-Type: multipart/form-data; boundary=MypeEvidenceBoundary
+
+--MypeEvidenceBoundary
+Content-Disposition: form-data; name="movementVersion"
+
+{{MovementVersion}}
+--MypeEvidenceBoundary
+Content-Disposition: form-data; name="evidenceVersion"
+
+{{EvidenceVersion}}
+--MypeEvidenceBoundary
+Content-Disposition: form-data; name="file"; filename="replacement.pdf"
+Content-Type: application/pdf
+
+< ./replacement.pdf
+--MypeEvidenceBoundary--
+
+###
+
+# Retira lógicamente una evidencia activa y la marca para purga posterior.
+PATCH {{Mype.Api_HostAddress}}/api/v1/businesses/{{BusinessId}}/financial-movements/{{MovementId}}/evidences/{{EvidenceId}}/remove
+Authorization: Bearer {{AccessToken}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "movementVersion": {{MovementVersion}},
+  "evidenceVersion": {{EvidenceVersion}}
 }

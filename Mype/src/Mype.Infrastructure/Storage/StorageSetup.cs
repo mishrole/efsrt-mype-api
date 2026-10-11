@@ -5,6 +5,7 @@ using Azure.Storage.Blobs;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Mype.Application.Common.Interfaces;
+using Mype.Application.MovementEvidences.Interfaces;
 using Mype.Shared.Constants;
 
 namespace Mype.Infrastructure.Storage
@@ -20,6 +21,7 @@ namespace Mype.Infrastructure.Storage
             var options = ReadOptions(configuration);
 
             services.AddSingleton(options);
+            services.AddSingleton<IEvidenceStorageSettings>(options);
             services.AddSingleton(_ => new BlobServiceClient(
                 new Uri(options.ServiceUri),
                 new DefaultAzureCredential()
@@ -84,7 +86,6 @@ namespace Mype.Infrastructure.Storage
                 throw new InvalidOperationException(
                     string.Format(ErrorMessages.VariableNotValid, key)
                 );
-
             return parsed;
         }
 
@@ -95,7 +96,6 @@ namespace Mype.Infrastructure.Storage
                 throw new InvalidOperationException(
                     string.Format(ErrorMessages.VariableNotValid, key)
                 );
-
             return parsed;
         }
     }
