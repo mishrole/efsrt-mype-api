@@ -194,6 +194,14 @@ namespace Mype.Domain.FinancialMovements
             );
         }
 
+        public void Discard(Guid userId, DateTimeOffset utcNow)
+        {
+            EnsureEditable();
+            Status = FinancialMovementStatus.Discarded;
+            DiscardedAt = utcNow;
+            Touch(userId, utcNow);
+        }
+
         public void RegisterEvidenceChange(Guid userId, DateTimeOffset utcNow)
         {
             EnsureEditable();

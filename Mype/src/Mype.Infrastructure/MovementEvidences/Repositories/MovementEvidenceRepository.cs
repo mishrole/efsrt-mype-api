@@ -53,7 +53,32 @@ namespace Mype.Infrastructure.MovementEvidences.Repositories
                 .OrderByDescending(evidence => evidence.UploadedAt)
                 .ToArrayAsync(cancellationToken);
 
+        public async Task<
+            IReadOnlyCollection<MovementEvidence>
+        > ListActiveTrackedByMovementAndBusinessAsync(
+            Guid movementId,
+            Guid businessId,
+            CancellationToken cancellationToken
+        ) =>
+            await _dbContext
+                .MovementEvidences.Where(evidence =>
+                    evidence.MovementId == movementId
+                    && evidence.BusinessId == businessId
+                    && evidence.Status == MovementEvidenceStatus.Active
+                )
+                .OrderBy(evidence => evidence.Id)
+                .ToArrayAsync(cancellationToken);
+
         public void SetOriginalVersion(MovementEvidence evidence, uint version) =>
             _dbContext.Entry(evidence).Property(current => current.Version).OriginalValue = version;
+
+        public void SetOriginalVersions(
+            IReadOnlyCollection<MovementEvidence> evidences,
+            IReadOnlyDictionary<Guid, uint> versions
+        )
+        {
+            foreach (var evidence in evidences)
+                SetOriginalVersion(evidence, versions[evidence.Id]);
+        }
     }
 }
