@@ -17,6 +17,9 @@ namespace Mype.Tests.Application.Businesses.Commands.CreateBusiness
 
         private const string ValidCurrencyCode = "PEN";
 
+        private static readonly DateOnly OpeningBalanceDate = new(2026, 10, 1);
+        private const decimal OpeningBalanceAmount = 1000m;
+
         private readonly CreateBusinessCommandValidator _validator = new();
 
         [Fact]
@@ -40,6 +43,17 @@ namespace Mype.Tests.Application.Businesses.Commands.CreateBusiness
             var result = await _validator.TestValidateAsync(command);
 
             result.ShouldNotHaveAnyValidationErrors();
+        }
+
+        [Fact]
+        public void Validate_Should_Have_Error_When_OpeningBalanceDate_Is_Empty()
+        {
+            var command = CreateValidCommand();
+            command.OpeningBalanceDate = default;
+
+            var result = _validator.TestValidate(command);
+
+            result.ShouldHaveValidationErrorFor(current => current.OpeningBalanceDate);
         }
 
         [Theory]
@@ -161,6 +175,8 @@ namespace Mype.Tests.Application.Businesses.Commands.CreateBusiness
                 Ruc = ValidRuc,
                 CurrencyCode = ValidCurrencyCode,
                 CurrentUserId = Guid.NewGuid(),
+                OpeningBalanceDate = OpeningBalanceDate,
+                OpeningBalanceAmount = OpeningBalanceAmount,
             };
         }
     }

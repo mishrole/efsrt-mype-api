@@ -13,6 +13,7 @@ using Mype.Application.BusinessRoles.Interfaces;
 using Mype.Application.Categories.Interfaces;
 using Mype.Application.Common.Interfaces;
 using Mype.Application.Currencies.Interfaces;
+using Mype.Application.FinancialMovements.Interfaces;
 using Mype.Application.Users.Interfaces;
 using Mype.Domain.Businesses;
 using Mype.Domain.BusinessMemberships;
@@ -61,6 +62,7 @@ namespace Mype.Tests.Application.Businesses.Commands.CreateBusiness
         private readonly Mock<IUnitOfWork> _unitOfWorkMock = new();
 
         private readonly Mock<IClock> _clockMock = new();
+        private readonly Mock<IFinancialMovementRepository> _movementRepositoryMock = new();
 
         private readonly DefaultCategoryProvider _defaultCategoryProvider = new();
 
@@ -77,6 +79,7 @@ namespace Mype.Tests.Application.Businesses.Commands.CreateBusiness
                 _businessRepositoryMock.Object,
                 _membershipRepositoryMock.Object,
                 _categoryRepositoryMock.Object,
+                _movementRepositoryMock.Object,
                 _defaultCategoryProvider,
                 _unitOfWorkMock.Object,
                 _clockMock.Object
