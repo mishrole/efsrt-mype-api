@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace Mype.Application.Businesses.Commands.CreateBusiness
@@ -18,6 +18,9 @@ namespace Mype.Application.Businesses.Commands.CreateBusiness
         public IReadOnlyCollection<CategoryResult> DefaultCategories { get; set; } =
             Array.Empty<CategoryResult>();
 
+        public Guid OpeningBalanceMovementId { get; set; }
+        public decimal OpeningBalanceAmount { get; set; }
+        public DateOnly OpeningBalanceDate { get; set; }
         public uint Version { get; set; }
     }
 }

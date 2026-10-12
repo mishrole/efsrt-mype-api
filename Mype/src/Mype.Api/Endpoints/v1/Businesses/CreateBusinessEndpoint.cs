@@ -1,4 +1,5 @@
-﻿using System.Threading;
+using System;
+using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Http;
@@ -15,7 +16,9 @@ namespace Mype.Api.Endpoints.v1.Businesses
             string DisplayName,
             string LegalName,
             string Ruc,
-            string CurrencyCode
+            string CurrencyCode,
+            decimal OpeningBalanceAmount,
+            DateOnly OpeningBalanceDate
         );
 
         public static async Task<IResult> DoAsync(
@@ -32,6 +35,8 @@ namespace Mype.Api.Endpoints.v1.Businesses
                 LegalName = request.LegalName,
                 Ruc = request.Ruc,
                 CurrencyCode = request.CurrencyCode,
+                OpeningBalanceAmount = request.OpeningBalanceAmount,
+                OpeningBalanceDate = request.OpeningBalanceDate,
                 CurrentUserId = userContextProvider.GetCurrentUserId(),
             };
 

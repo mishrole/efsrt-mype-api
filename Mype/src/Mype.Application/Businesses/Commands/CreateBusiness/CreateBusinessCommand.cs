@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using MediatR;
 using Mype.Application.Common;
 
@@ -14,6 +14,8 @@ namespace Mype.Application.Businesses.Commands.CreateBusiness
 
         public string CurrencyCode { get; set; } = string.Empty;
 
+        public decimal OpeningBalanceAmount { get; set; }
+        public DateOnly OpeningBalanceDate { get; set; }
         public Guid CurrentUserId { get; set; }
     }
 }

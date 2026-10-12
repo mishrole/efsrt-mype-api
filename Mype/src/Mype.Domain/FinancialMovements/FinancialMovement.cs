@@ -50,6 +50,9 @@ namespace Mype.Domain.FinancialMovements
         public Guid? ConfirmedByUserId { get; private set; }
         public Guid? CancelledByUserId { get; private set; }
         public string CancellationReason { get; private set; }
+        public Guid? ReplacesMovementId { get; private set; }
+        public string ReplacementReason { get; private set; }
+        public bool IsCurrentOpeningBalance { get; private set; }
         public DateTimeOffset? ConfirmedAt { get; private set; }
         public DateTimeOffset? CancelledAt { get; private set; }
         public DateTimeOffset? DiscardedAt { get; private set; }
@@ -239,6 +242,45 @@ namespace Mype.Domain.FinancialMovements
             RecalculateTotal();
             Touch(userId, utcNow);
             return item;
+        }
+
+        public static FinancialMovement CreateOpeningBalance(
+            Guid businessId,
+            DateOnly movementDate,
+            decimal amount,
+            string currencyCode,
+            Guid userId,
+            DateTimeOffset utcNow,
+            Guid? replacesMovementId = null,
+            string replacementReason = null
+        )
+        {
+            var movement = new FinancialMovement(
+                Guid.NewGuid(),
+                businessId,
+                FinancialMovementType.OpeningBalance,
+                movementDate,
+                "Saldo de apertura",
+                currencyCode,
+                userId,
+                utcNow
+            );
+            movement.Status = FinancialMovementStatus.Confirmed;
+            movement.TotalAmount = decimal.Round(amount, 2, MidpointRounding.AwayFromZero);
+            movement.ConfirmedByUserId = userId;
+            movement.ConfirmedAt = utcNow;
+            movement.ReplacesMovementId = replacesMovementId;
+            movement.ReplacementReason = NormalizeOptionalValue(replacementReason);
+            movement.IsCurrentOpeningBalance = true;
+            return movement;
+        }
+
+        public void SupersedeOpeningBalance(Guid userId, DateTimeOffset utcNow)
+        {
+            if (Type != FinancialMovementType.OpeningBalance || !IsCurrentOpeningBalance)
+                throw new InvalidOperationException("OpeningBalanceNotCurrent");
+            IsCurrentOpeningBalance = false;
+            Touch(userId, utcNow);
         }
 
         public static FinancialMovement CreateDraft(

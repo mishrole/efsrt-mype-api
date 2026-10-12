@@ -1,3 +1,4 @@
+
 @Mype.Api_HostAddress = http://localhost:5010
 @AccessToken = ACCESS_TOKEN
 @BusinessId = BUSINESS_ID
@@ -54,7 +55,9 @@ Accept: application/json
   "displayName": "Bodega Central",
   "legalName": "Comercial Central E.I.R.L.",
   "ruc": "20123456786",
-  "currencyCode": "PEN"
+  "currencyCode": "PEN",
+  "openingBalanceAmount": 1500.00,
+  "openingBalanceDate": "2026-10-01"
 }
 
 ###

@@ -4,5 +4,6 @@ namespace Mype.Domain.FinancialMovements
     {
         Sale = 1,
         Expense = 2,
+        OpeningBalance = 3,
     }
 }

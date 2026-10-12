@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -12,11 +12,13 @@ using Mype.Application.Categories.Interfaces;
 using Mype.Application.Common;
 using Mype.Application.Common.Interfaces;
 using Mype.Application.Currencies.Interfaces;
+using Mype.Application.FinancialMovements.Interfaces;
 using Mype.Application.Users.Interfaces;
 using Mype.Domain.Businesses;
 using Mype.Domain.BusinessMemberships;
 using Mype.Domain.BusinessRoles.Constants;
 using Mype.Domain.Categories;
+using Mype.Domain.FinancialMovements;
 
 namespace Mype.Application.Businesses.Commands.CreateBusiness
 {
@@ -29,6 +31,7 @@ namespace Mype.Application.Businesses.Commands.CreateBusiness
         private readonly IBusinessRepository _businessRepository;
         private readonly IBusinessMembershipRepository _membershipRepository;
         private readonly ICategoryRepository _categoryRepository;
+        private readonly IFinancialMovementRepository _movementRepository;
         private readonly IDefaultCategoryProvider _defaultCategoryProvider;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IClock _clock;
@@ -40,6 +43,7 @@ namespace Mype.Application.Businesses.Commands.CreateBusiness
             IBusinessRepository businessRepository,
             IBusinessMembershipRepository membershipRepository,
             ICategoryRepository categoryRepository,
+            IFinancialMovementRepository movementRepository,
             IDefaultCategoryProvider defaultCategoryProvider,
             IUnitOfWork unitOfWork,
             IClock clock
@@ -51,6 +55,7 @@ namespace Mype.Application.Businesses.Commands.CreateBusiness
             _businessRepository = businessRepository;
             _membershipRepository = membershipRepository;
             _categoryRepository = categoryRepository;
+            _movementRepository = movementRepository;
             _defaultCategoryProvider = defaultCategoryProvider;
             _unitOfWork = unitOfWork;
             _clock = clock;
@@ -125,10 +130,19 @@ namespace Mype.Application.Businesses.Commands.CreateBusiness
             );
 
             var categories = CreateDefaultCategories(business.Id, request.CurrentUserId, utcNow);
+            var openingBalance = FinancialMovement.CreateOpeningBalance(
+                business.Id,
+                request.OpeningBalanceDate,
+                request.OpeningBalanceAmount,
+                currency.Code,
+                request.CurrentUserId,
+                utcNow
+            );
 
             await _businessRepository.AddAsync(business, cancellationToken);
 
             await _membershipRepository.AddAsync(membership, cancellationToken);
+            await _movementRepository.AddAsync(openingBalance, cancellationToken);
 
             foreach (var category in categories)
             {
@@ -168,6 +182,9 @@ namespace Mype.Application.Businesses.Commands.CreateBusiness
                             IsActive = category.IsActive,
                         })
                         .ToArray(),
+                    OpeningBalanceMovementId = openingBalance.Id,
+                    OpeningBalanceAmount = openingBalance.TotalAmount,
+                    OpeningBalanceDate = openingBalance.MovementDate,
                     Version = business.Version,
                 }
             );
