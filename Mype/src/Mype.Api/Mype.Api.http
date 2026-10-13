@@ -1,4 +1,5 @@
 
+
 @Mype.Api_HostAddress = http://localhost:5010
 @AccessToken = ACCESS_TOKEN
 @BusinessId = BUSINESS_ID
@@ -476,3 +477,9 @@ Accept: application/json
   "reason": "La operación fue registrada por duplicado.",
   "movementVersion": {{MovementVersion}}
 }
+
+###
+# Consulta el dashboard financiero del negocio por periodo.
+GET {{Mype.Api_HostAddress}}/api/v1/businesses/{{BusinessId}}/financial-movements/dashboard?dateFrom=2026-01-01&dateTo=2026-12-31&granularity=3
+Authorization: Bearer {{AccessToken}}
+Accept: application/json

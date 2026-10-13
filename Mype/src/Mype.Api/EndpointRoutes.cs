@@ -20,6 +20,7 @@ using Mype.Application.FinancialMovements.Commands.CreateFinancialMovement;
 using Mype.Application.FinancialMovements.Commands.DiscardFinancialMovement;
 using Mype.Application.FinancialMovements.Commands.UpdateFinancialMovementDraft;
 using Mype.Application.FinancialMovements.Models;
+using Mype.Application.FinancialMovements.Queries.GetFinancialDashboard;
 using Mype.Application.FinancialMovements.Queries.GetFinancialMovementDraft;
 using Mype.Application.FinancialMovements.Queries.GetFinancialMovementHistoryDetail;
 using Mype.Application.FinancialMovements.Queries.ListFinancialMovementDrafts;
@@ -238,6 +239,15 @@ namespace Mype.Api
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status409Conflict)
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
 
+            financialMovementGroup
+                .MapGet("/dashboard", GetFinancialDashboardEndpoint.DoAsync)
+                .WithName("GetFinancialDashboard")
+                .WithSummary("Consultar dashboard financiero por periodo")
+                .Produces<FinancialDashboardResult>(StatusCodes.Status200OK)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status400BadRequest)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status403Forbidden)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status409Conflict)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
             financialMovementGroup
                 .MapGet("/history", ListFinancialMovementHistoryEndpoint.DoAsync)
                 .WithName("ListFinancialMovementHistory")

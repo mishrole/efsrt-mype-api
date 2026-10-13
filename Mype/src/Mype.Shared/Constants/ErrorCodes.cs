@@ -86,5 +86,8 @@ namespace Mype.Shared.Constants
         public const string EvidenceOperationFailed = "EVIDENCE_OPERATION_FAILED";
 
         #endregion
+        public const string DashboardAccessForbidden = "DASHBOARD_ACCESS_FORBIDDEN";
+        public const string OpeningBalanceNotFound = "OPENING_BALANCE_NOT_FOUND";
+        public const string FinancialDashboardQueryFailed = "FINANCIAL_DASHBOARD_QUERY_FAILED";
     }
 }

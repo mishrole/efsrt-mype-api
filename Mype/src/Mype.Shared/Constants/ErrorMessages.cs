@@ -144,5 +144,11 @@ namespace Mype.Shared.Constants
             "Un resultado fallido debe contener un error.";
 
         #endregion
+        public const string DashboardAccessForbidden =
+            "No tiene permiso para consultar el dashboard financiero.";
+        public const string OpeningBalanceNotFound =
+            "El negocio no tiene un saldo de apertura vigente.";
+        public const string FinancialDashboardQueryFailed =
+            "No fue posible consultar el dashboard financiero.";
     }
 }

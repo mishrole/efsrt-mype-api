@@ -20,6 +20,80 @@ namespace Mype.Infrastructure.FinancialMovements.Repositories
             _dbContext = dbContext;
         }
 
+        public async Task<FinancialDashboardProjection> GetFinancialDashboardAsync(
+            Guid businessId,
+            DateOnly dateTo,
+            CancellationToken cancellationToken
+        )
+        {
+            var opening = await _dbContext
+                .FinancialMovements.AsNoTracking()
+                .Where(m =>
+                    m.BusinessId == businessId
+                    && m.Type == FinancialMovementType.OpeningBalance
+                    && m.IsCurrentOpeningBalance
+                )
+                .Select(m => new { m.TotalAmount, m.MovementDate })
+                .SingleOrDefaultAsync(cancellationToken);
+            if (opening == null)
+                return null;
+            var movements = await _dbContext
+                .FinancialMovements.AsNoTracking()
+                .Where(m =>
+                    m.BusinessId == businessId
+                    && m.Status == FinancialMovementStatus.Confirmed
+                    && (
+                        m.Type == FinancialMovementType.Sale
+                        || m.Type == FinancialMovementType.Expense
+                    )
+                    && m.MovementDate <= dateTo
+                )
+                .Select(m => new FinancialDashboardMovementProjection(
+                    m.MovementDate,
+                    (int)m.Type,
+                    m.TotalAmount,
+                    m.Type == FinancialMovementType.Sale
+                        ? m
+                            .Items.Where(i => i.IsActive)
+                            .Sum(i => i.Quantity * i.UnitCostSnapshot.GetValueOrDefault())
+                        : 0m
+                ))
+                .ToArrayAsync(cancellationToken);
+            var categories = await (
+                from item in _dbContext.FinancialMovementItems.AsNoTracking()
+                join movement in _dbContext.FinancialMovements.AsNoTracking()
+                    on new { item.MovementId, item.BusinessId } equals new
+                    {
+                        MovementId = movement.Id,
+                        movement.BusinessId,
+                    }
+                join category in _dbContext.Categories.AsNoTracking()
+                    on new { item.CategoryId, item.BusinessId } equals new
+                    {
+                        CategoryId = category.Id,
+                        category.BusinessId,
+                    }
+                where
+                    item.BusinessId == businessId
+                    && item.IsActive
+                    && movement.Status == FinancialMovementStatus.Confirmed
+                    && (
+                        movement.Type == FinancialMovementType.Sale
+                        || movement.Type == FinancialMovementType.Expense
+                    )
+                    && movement.MovementDate <= dateTo
+                select new FinancialDashboardCategoryProjection(
+                    category.Id,
+                    category.Name,
+                    category.IsActive,
+                    (int)movement.Type,
+                    movement.MovementDate,
+                    item.SubtotalAmount
+                )
+            ).ToArrayAsync(cancellationToken);
+            return new(opening.TotalAmount, opening.MovementDate, movements, categories);
+        }
+
         public Task AddAsync(FinancialMovement movement, CancellationToken cancellationToken) =>
             _dbContext.FinancialMovements.AddAsync(movement, cancellationToken).AsTask();
 
