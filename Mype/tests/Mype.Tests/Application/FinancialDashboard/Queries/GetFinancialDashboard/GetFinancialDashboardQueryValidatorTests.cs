@@ -1,10 +1,10 @@
 using System;
 using FluentAssertions;
 using FluentValidation.TestHelper;
-using Mype.Application.FinancialMovements.Models;
-using Mype.Application.FinancialMovements.Queries.GetFinancialDashboard;
+using Mype.Application.FinancialDashboard.Enums;
+using Mype.Application.FinancialDashboard.Queries.GetFinancialDashboard;
 
-namespace Mype.Tests.Application.FinancialMovements.Queries.GetFinancialDashboard
+namespace Mype.Tests.Application.FinancialDashboard.Queries.GetFinancialDashboard
 {
     public sealed class GetFinancialDashboardQueryValidatorTests
     {

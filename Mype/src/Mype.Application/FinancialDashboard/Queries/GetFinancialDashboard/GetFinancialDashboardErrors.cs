@@ -2,7 +2,7 @@ using Mype.Application.Common;
 using Mype.Application.Common.Exceptions;
 using Mype.Shared.Constants;
 
-namespace Mype.Application.FinancialMovements.Queries.GetFinancialDashboard
+namespace Mype.Application.FinancialDashboard.Queries.GetFinancialDashboard
 {
     public static class GetFinancialDashboardErrors
     {
@@ -10,11 +10,6 @@ namespace Mype.Application.FinancialMovements.Queries.GetFinancialDashboard
             ErrorCodes.BusinessAccessForbidden,
             ErrorMessages.BusinessAccessForbidden,
             ApplicationErrorType.Forbidden
-        );
-        public static readonly ApplicationError BusinessUnavailable = new(
-            ErrorCodes.BusinessUnavailable,
-            ErrorMessages.BusinessUnavailable,
-            ApplicationErrorType.Conflict
         );
         public static readonly ApplicationError DashboardAccessForbidden = new(
             ErrorCodes.DashboardAccessForbidden,

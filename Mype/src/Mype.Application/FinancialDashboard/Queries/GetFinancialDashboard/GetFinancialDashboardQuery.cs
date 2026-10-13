@@ -1,9 +1,9 @@
 using System;
 using MediatR;
 using Mype.Application.Common;
-using Mype.Application.FinancialMovements.Models;
+using Mype.Application.FinancialDashboard.Enums;
 
-namespace Mype.Application.FinancialMovements.Queries.GetFinancialDashboard
+namespace Mype.Application.FinancialDashboard.Queries.GetFinancialDashboard
 {
     public sealed class GetFinancialDashboardQuery : IRequest<Result<FinancialDashboardResult>>
     {

@@ -1,17 +1,8 @@
 using System;
 using System.Collections.Generic;
 
-namespace Mype.Application.FinancialMovements.Models
+namespace Mype.Application.FinancialDashboard.Models
 {
-    public enum FinancialDashboardGranularity
-    {
-        Auto = 0,
-        Day = 1,
-        Week = 2,
-        Month = 3,
-        Year = 4,
-    }
-
     public sealed record FinancialDashboardPeriod(DateOnly DateFrom, DateOnly DateTo);
 
     public sealed record FinancialDashboardMovementProjection(

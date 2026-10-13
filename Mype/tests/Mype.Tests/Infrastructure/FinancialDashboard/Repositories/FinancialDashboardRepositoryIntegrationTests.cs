@@ -9,7 +9,7 @@ using Mype.Infrastructure.Persistence;
 using Mype.Tests.Infrastructure.Common;
 using Mype.Tests.Integration;
 
-namespace Mype.Tests.Infrastructure.FinancialDashboard
+namespace Mype.Tests.Infrastructure.FinancialDashboard.Repositories
 {
     [Collection(PostgreSqlCollection.Name)]
     public sealed class FinancialDashboardRepositoryIntegrationTests

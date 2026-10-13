@@ -6,10 +6,10 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Mype.Api.Context;
 using Mype.Api.Extensions;
-using Mype.Application.FinancialMovements.Models;
-using Mype.Application.FinancialMovements.Queries.GetFinancialDashboard;
+using Mype.Application.FinancialDashboard.Enums;
+using Mype.Application.FinancialDashboard.Queries.GetFinancialDashboard;
 
-namespace Mype.Api.Endpoints.v1.FinancialMovements
+namespace Mype.Api.Endpoints.v1.FinancialDashboard
 {
     public static class GetFinancialDashboardEndpoint
     {

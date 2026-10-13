@@ -6,12 +6,12 @@ using MediatR;
 using Microsoft.AspNetCore.Http;
 using Moq;
 using Mype.Api.Context;
-using Mype.Api.Endpoints.v1.FinancialMovements;
+using Mype.Api.Endpoints.v1.FinancialDashboard;
 using Mype.Application.Common;
-using Mype.Application.FinancialMovements.Models;
-using Mype.Application.FinancialMovements.Queries.GetFinancialDashboard;
+using Mype.Application.FinancialDashboard.Enums;
+using Mype.Application.FinancialDashboard.Queries.GetFinancialDashboard;
 
-namespace Mype.Tests.Api.Endpoints.v1.FinancialMovements
+namespace Mype.Tests.Api.Endpoints.v1.FinancialDashboard
 {
     public sealed class GetFinancialDashboardEndpointTests
     {

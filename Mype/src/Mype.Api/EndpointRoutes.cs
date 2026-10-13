@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Mype.Api.Endpoints.v1.Auth;
 using Mype.Api.Endpoints.v1.Businesses;
 using Mype.Api.Endpoints.v1.Categories;
+using Mype.Api.Endpoints.v1.FinancialDashboard;
 using Mype.Api.Endpoints.v1.FinancialMovements;
 using Mype.Api.Endpoints.v1.Products;
 using Mype.Application.Auth.Commands.Login;
@@ -14,13 +15,13 @@ using Mype.Application.Businesses.Commands.ReplaceOpeningBalance;
 using Mype.Application.Businesses.Queries.GetBusinessContext;
 using Mype.Application.Businesses.Queries.ListUserBusinesses;
 using Mype.Application.Categories.Queries.ListCategories;
+using Mype.Application.FinancialDashboard.Queries.GetFinancialDashboard;
 using Mype.Application.FinancialMovements.Commands.CancelFinancialMovement;
 using Mype.Application.FinancialMovements.Commands.ConfirmFinancialMovement;
 using Mype.Application.FinancialMovements.Commands.CreateFinancialMovement;
 using Mype.Application.FinancialMovements.Commands.DiscardFinancialMovement;
 using Mype.Application.FinancialMovements.Commands.UpdateFinancialMovementDraft;
 using Mype.Application.FinancialMovements.Models;
-using Mype.Application.FinancialMovements.Queries.GetFinancialDashboard;
 using Mype.Application.FinancialMovements.Queries.GetFinancialMovementDraft;
 using Mype.Application.FinancialMovements.Queries.GetFinancialMovementHistoryDetail;
 using Mype.Application.FinancialMovements.Queries.ListFinancialMovementDrafts;
@@ -114,6 +115,16 @@ namespace Mype.Api
                 .WithSummary("Obtener el contexto autorizado de un negocio")
                 .Produces<BusinessContextResult>(StatusCodes.Status200OK)
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status401Unauthorized)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status403Forbidden)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status409Conflict)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
+
+            businessGroup
+                .MapGet("/{businessId:guid}/dashboard", GetFinancialDashboardEndpoint.DoAsync)
+                .WithName("GetFinancialDashboard")
+                .WithSummary("Consultar dashboard financiero por periodo")
+                .Produces<FinancialDashboardResult>(StatusCodes.Status200OK)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status400BadRequest)
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status403Forbidden)
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status409Conflict)
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
@@ -239,15 +250,6 @@ namespace Mype.Api
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status409Conflict)
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
 
-            financialMovementGroup
-                .MapGet("/dashboard", GetFinancialDashboardEndpoint.DoAsync)
-                .WithName("GetFinancialDashboard")
-                .WithSummary("Consultar dashboard financiero por periodo")
-                .Produces<FinancialDashboardResult>(StatusCodes.Status200OK)
-                .Produces<HttpStatusCodeInfo>(StatusCodes.Status400BadRequest)
-                .Produces<HttpStatusCodeInfo>(StatusCodes.Status403Forbidden)
-                .Produces<HttpStatusCodeInfo>(StatusCodes.Status409Conflict)
-                .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
             financialMovementGroup
                 .MapGet("/history", ListFinancialMovementHistoryEndpoint.DoAsync)
                 .WithName("ListFinancialMovementHistory")

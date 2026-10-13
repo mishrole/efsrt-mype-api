@@ -7,34 +7,34 @@ using MediatR;
 using Mype.Application.BusinessMemberships.Interfaces;
 using Mype.Application.Common;
 using Mype.Application.Common.Interfaces;
-using Mype.Application.FinancialMovements.Interfaces;
-using Mype.Application.FinancialMovements.Models;
+using Mype.Application.FinancialDashboard.Enums;
+using Mype.Application.FinancialDashboard.Interfaces;
+using Mype.Application.FinancialDashboard.Models;
 using Mype.Application.Permissions.Interfaces;
-using Mype.Domain.Businesses;
 using Mype.Domain.BusinessMemberships;
 using Mype.Domain.FinancialMovements;
 using Mype.Domain.Permissions.Constants;
 
-namespace Mype.Application.FinancialMovements.Queries.GetFinancialDashboard
+namespace Mype.Application.FinancialDashboard.Queries.GetFinancialDashboard
 {
     public sealed class GetFinancialDashboardQueryHandler
         : IRequestHandler<GetFinancialDashboardQuery, Result<FinancialDashboardResult>>
     {
         private readonly IBusinessMembershipRepository _memberships;
         private readonly IPermissionRepository _permissions;
-        private readonly IFinancialMovementRepository _movements;
+        private readonly IFinancialDashboardRepository _dashboard;
         private readonly IClock _clock;
 
         public GetFinancialDashboardQueryHandler(
             IBusinessMembershipRepository memberships,
             IPermissionRepository permissions,
-            IFinancialMovementRepository movements,
+            IFinancialDashboardRepository dashboard,
             IClock clock
         )
         {
             _memberships = memberships;
             _permissions = permissions;
-            _movements = movements;
+            _dashboard = dashboard;
             _clock = clock;
         }
 
@@ -56,10 +56,7 @@ namespace Mype.Application.FinancialMovements.Queries.GetFinancialDashboard
                 return Result<FinancialDashboardResult>.Failure(
                     GetFinancialDashboardErrors.BusinessAccessForbidden
                 );
-            if (context.BusinessStatus != BusinessStatus.Active)
-                return Result<FinancialDashboardResult>.Failure(
-                    GetFinancialDashboardErrors.BusinessUnavailable
-                );
+
             var permissions = await _permissions.ListActiveCodesByRoleIdAsync(
                 context.RoleId,
                 cancellationToken
@@ -74,7 +71,7 @@ namespace Mype.Application.FinancialMovements.Queries.GetFinancialDashboard
             var granularity = ResolveGranularity(request.Granularity, dateFrom, dateTo);
             try
             {
-                var source = await _movements.GetFinancialDashboardAsync(
+                var source = await _dashboard.GetAsync(
                     request.BusinessId,
                     dateTo,
                     cancellationToken

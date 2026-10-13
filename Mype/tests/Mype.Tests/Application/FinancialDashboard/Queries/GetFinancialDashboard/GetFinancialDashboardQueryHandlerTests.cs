@@ -7,9 +7,10 @@ using Moq;
 using Mype.Application.BusinessMemberships.Interfaces;
 using Mype.Application.BusinessMemberships.Models;
 using Mype.Application.Common.Interfaces;
+using Mype.Application.FinancialDashboard.Enums;
 using Mype.Application.FinancialDashboard.Interfaces;
-using Mype.Application.FinancialMovements.Models;
-using Mype.Application.FinancialMovements.Queries.GetFinancialDashboard;
+using Mype.Application.FinancialDashboard.Models;
+using Mype.Application.FinancialDashboard.Queries.GetFinancialDashboard;
 using Mype.Application.Permissions.Interfaces;
 using Mype.Domain.Businesses;
 using Mype.Domain.BusinessMemberships;
@@ -17,7 +18,7 @@ using Mype.Domain.FinancialMovements;
 using Mype.Domain.Permissions.Constants;
 using Mype.Shared.Constants;
 
-namespace Mype.Tests.Application.FinancialMovements.Queries.GetFinancialDashboard
+namespace Mype.Tests.Application.FinancialDashboard.Queries.GetFinancialDashboard
 {
     public sealed class GetFinancialDashboardQueryHandlerTests
     {
