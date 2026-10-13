@@ -490,3 +490,16 @@ Accept: application/json
 GET {{Mype.Api_HostAddress}}/api/v1/businesses/{{BusinessId}}/dashboard?dateFrom=2026-01-01&dateTo=2026-12-31
 Authorization: Bearer {{AccessToken}}
 Accept: application/json
+
+###
+# Corrige el saldo de apertura vigente del negocio.
+POST {{Mype.Api_HostAddress}}/api/v1/businesses/{{BusinessId}}/opening-balance/replace
+Authorization: Bearer {{AccessToken}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "amount": 1800.00,
+  "reason": "Ajuste del saldo inicial después de la conciliación.",
+  "movementVersion": {{MovementVersion}}
+}

@@ -99,6 +99,7 @@ namespace Mype.Api
                 .WithSummary("Corregir el saldo de apertura")
                 .Produces<ReplaceOpeningBalanceResult>(StatusCodes.Status200OK)
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status400BadRequest)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status401Unauthorized)
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status403Forbidden)
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status404NotFound)
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status409Conflict);
@@ -126,6 +127,7 @@ namespace Mype.Api
                 .WithSummary("Consultar dashboard financiero por periodo")
                 .Produces<FinancialDashboardResult>(StatusCodes.Status200OK)
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status400BadRequest)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status401Unauthorized)
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status403Forbidden)
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status409Conflict)
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
