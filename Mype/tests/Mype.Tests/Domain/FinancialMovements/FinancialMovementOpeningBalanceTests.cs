@@ -113,5 +113,25 @@ namespace Mype.Tests.Domain.FinancialMovements
 
             action.Should().Throw<InvalidOperationException>();
         }
+
+        [Fact]
+        public void CreateOpeningBalance_Should_Allow_ReplacementId_Without_ReplacementReason()
+        {
+            var originalId = Guid.NewGuid();
+
+            var movement = FinancialMovement.CreateOpeningBalance(
+                BusinessId,
+                OpeningDate,
+                1_500m,
+                "PEN",
+                UserId,
+                UtcNow,
+                originalId
+            );
+
+            movement.ReplacesMovementId.Should().Be(originalId);
+            movement.ReplacementReason.Should().BeNull();
+            movement.IsCurrentOpeningBalance.Should().BeTrue();
+        }
     }
 }
