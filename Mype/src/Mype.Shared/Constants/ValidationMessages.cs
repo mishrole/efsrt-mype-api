@@ -27,5 +27,11 @@
 
         public const string DecimalPrecision =
             "{PropertyName} excede la precisión máxima permitida.";
+
+        public const string BothValuesMustBeProvidedOrOmitted =
+            "Ambos valores deben proporcionarse juntos o ambos deben omitirse.";
+
+        public const string StartDateMustNotBeAfterEndDate =
+            "La fecha inicial no puede ser posterior a la fecha final.";
     }
 }
