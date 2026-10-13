@@ -55,6 +55,7 @@ namespace Mype.Api
                 .WithSummary("Registrar usuario")
                 .Produces<RegisterUserResult>(StatusCodes.Status201Created)
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status400BadRequest)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status401Unauthorized)
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status409Conflict)
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
 

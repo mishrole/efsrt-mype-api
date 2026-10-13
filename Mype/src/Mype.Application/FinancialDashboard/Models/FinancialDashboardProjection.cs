@@ -3,8 +3,6 @@ using System.Collections.Generic;
 
 namespace Mype.Application.FinancialDashboard.Models
 {
-    public sealed record FinancialDashboardPeriod(DateOnly DateFrom, DateOnly DateTo);
-
     public sealed record FinancialDashboardMovementProjection(
         DateOnly MovementDate,
         int Type,

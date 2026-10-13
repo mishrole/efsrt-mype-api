@@ -17,7 +17,7 @@ namespace Mype.Api.Endpoints.v1.FinancialDashboard
             Guid businessId,
             DateOnly? dateFrom,
             DateOnly? dateTo,
-            FinancialDashboardGranularity granularity,
+            FinancialDashboardGranularity? granularity,
             [FromServices] ISender sender,
             [FromServices] IUserContextProvider user,
             HttpContext context,
@@ -31,7 +31,7 @@ namespace Mype.Api.Endpoints.v1.FinancialDashboard
                     CurrentUserId = user.GetCurrentUserId(),
                     DateFrom = dateFrom,
                     DateTo = dateTo,
-                    Granularity = granularity,
+                    Granularity = granularity ?? FinancialDashboardGranularity.Auto,
                 },
                 cancellationToken
             );

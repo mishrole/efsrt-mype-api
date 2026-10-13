@@ -45,6 +45,8 @@ namespace Mype.Infrastructure.FinancialDashboard.Repositories
                         movement.Type == FinancialMovementType.Sale
                         || movement.Type == FinancialMovementType.Expense
                     )
+                    && movement.MovementDate >= opening.MovementDate
+                    && movement.MovementDate >= opening.MovementDate
                     && movement.MovementDate <= dateTo
                 )
                 .Select(movement => new FinancialDashboardMovementProjection(

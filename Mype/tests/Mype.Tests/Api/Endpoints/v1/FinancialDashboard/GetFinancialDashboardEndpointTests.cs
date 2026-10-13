@@ -76,5 +76,61 @@ namespace Mype.Tests.Api.Endpoints.v1.FinancialDashboard
             captured.DateTo.Should().Be(to);
             captured.Granularity.Should().Be(FinancialDashboardGranularity.Month);
         }
+
+        [Fact]
+        public async Task DoAsync_Should_Default_Granularity_To_Auto_When_Omitted()
+        {
+            var sender = new Mock<ISender>();
+            var user = new Mock<IUserContextProvider>();
+            GetFinancialDashboardQuery captured = null;
+            var businessId = Guid.NewGuid();
+            var userId = Guid.NewGuid();
+            user.Setup(provider => provider.GetCurrentUserId()).Returns(userId);
+            var payload = new FinancialDashboardResult(
+                businessId,
+                "PEN",
+                new DateOnly(2026, 10, 1),
+                new DateOnly(2026, 10, 31),
+                FinancialDashboardGranularity.Auto,
+                0m,
+                0m,
+                0m,
+                0m,
+                0m,
+                0m,
+                0m,
+                0,
+                0,
+                0m,
+                [],
+                [],
+                []
+            );
+            sender
+                .Setup(service =>
+                    service.Send(
+                        It.IsAny<GetFinancialDashboardQuery>(),
+                        It.IsAny<CancellationToken>()
+                    )
+                )
+                .Callback(
+                    (IRequest<Result<FinancialDashboardResult>> request, CancellationToken _) =>
+                        captured = (GetFinancialDashboardQuery)request
+                )
+                .ReturnsAsync(Result<FinancialDashboardResult>.Success(payload));
+
+            await GetFinancialDashboardEndpoint.DoAsync(
+                businessId,
+                null,
+                null,
+                null,
+                sender.Object,
+                user.Object,
+                new DefaultHttpContext(),
+                CancellationToken.None
+            );
+
+            captured.Granularity.Should().Be(FinancialDashboardGranularity.Auto);
+        }
     }
 }
