@@ -112,6 +112,7 @@ namespace Mype.Application.FinancialDashboard.Queries.GetFinancialDashboard
                         g.Sum(x => x.Amount)
                     ))
                     .ToArray();
+                var averageSaleAmount = CalculateAverageSaleAmount(inflow, sales);
                 return Result<FinancialDashboardResult>.Success(
                     new(
                         request.BusinessId,
@@ -128,12 +129,10 @@ namespace Mype.Application.FinancialDashboard.Queries.GetFinancialDashboard
                         inflow - cost,
                         sales,
                         expenses,
-                        sales == 0
-                            ? 0m
-                            : decimal.Round(inflow / sales, 2, MidpointRounding.AwayFromZero),
+                        averageSaleAmount,
                         trend,
-                        MapCategories(categories, 1),
-                        MapCategories(categories, 2)
+                        MapCategories(categories, FinancialMovementType.Sale),
+                        MapCategories(categories, FinancialMovementType.Expense)
                     )
                 );
             }
@@ -149,30 +148,66 @@ namespace Mype.Application.FinancialDashboard.Queries.GetFinancialDashboard
             }
         }
 
+        private static decimal CalculateAverageSaleAmount(decimal inflow, int sales)
+        {
+            if (sales == 0)
+            {
+                return 0m;
+            }
+
+            return decimal.Round(inflow / sales, 2, MidpointRounding.AwayFromZero);
+        }
+
         private static bool IsSale(FinancialDashboardMovementProjection m) =>
             m.Type == (int)FinancialMovementType.Sale;
 
         private static bool IsExpense(FinancialDashboardMovementProjection m) =>
             m.Type == (int)FinancialMovementType.Expense;
 
-        private static decimal SignedAmount(FinancialDashboardMovementProjection m) =>
-            IsSale(m) ? m.TotalAmount
-            : IsExpense(m) ? -m.TotalAmount
-            : 0m;
+        private static decimal SignedAmount(FinancialDashboardMovementProjection movement)
+        {
+            if (IsSale(movement))
+            {
+                return movement.TotalAmount;
+            }
+
+            if (IsExpense(movement))
+            {
+                return -movement.TotalAmount;
+            }
+
+            return 0m;
+        }
 
         private static FinancialDashboardGranularity ResolveGranularity(
-            FinancialDashboardGranularity value,
-            DateOnly from,
-            DateOnly to
+            FinancialDashboardGranularity requestedGranularity,
+            DateOnly dateFrom,
+            DateOnly dateTo
         )
         {
-            if (value != FinancialDashboardGranularity.Auto)
-                return value;
-            var days = to.DayNumber - from.DayNumber + 1;
-            return days <= 31 ? FinancialDashboardGranularity.Day
-                : days <= 180 ? FinancialDashboardGranularity.Week
-                : days <= 1095 ? FinancialDashboardGranularity.Month
-                : FinancialDashboardGranularity.Year;
+            if (requestedGranularity != FinancialDashboardGranularity.Auto)
+            {
+                return requestedGranularity;
+            }
+
+            var inclusiveDays = dateTo.DayNumber - dateFrom.DayNumber + 1;
+
+            if (inclusiveDays <= 31)
+            {
+                return FinancialDashboardGranularity.Day;
+            }
+
+            if (inclusiveDays <= 180)
+            {
+                return FinancialDashboardGranularity.Week;
+            }
+
+            if (inclusiveDays <= 1095)
+            {
+                return FinancialDashboardGranularity.Month;
+            }
+
+            return FinancialDashboardGranularity.Year;
         }
 
         private static IReadOnlyCollection<FinancialTrendPointResult> BuildTrend(
@@ -204,45 +239,99 @@ namespace Mype.Application.FinancialDashboard.Queries.GetFinancialDashboard
         private static DateOnly PeriodEnd(
             DateOnly start,
             DateOnly limit,
-            FinancialDashboardGranularity g
+            FinancialDashboardGranularity granularity
         )
         {
-            DateOnly end = g switch
+            DateOnly end;
+
+            switch (granularity)
             {
-                FinancialDashboardGranularity.Day => start,
-                FinancialDashboardGranularity.Week => start.AddDays(6),
-                FinancialDashboardGranularity.Month => new DateOnly(
-                    start.Year,
-                    start.Month,
-                    DateTime.DaysInMonth(start.Year, start.Month)
-                ),
-                FinancialDashboardGranularity.Year => new DateOnly(start.Year, 12, 31),
-                _ => start,
-            };
-            return end > limit ? limit : end;
+                case FinancialDashboardGranularity.Day:
+                    end = start;
+                    break;
+
+                case FinancialDashboardGranularity.Week:
+                    end = CalculateWeekEnd(start);
+                    break;
+
+                case FinancialDashboardGranularity.Month:
+                    end = new DateOnly(
+                        start.Year,
+                        start.Month,
+                        DateTime.DaysInMonth(start.Year, start.Month)
+                    );
+                    break;
+
+                case FinancialDashboardGranularity.Year:
+                    end = new DateOnly(start.Year, 12, 31);
+                    break;
+
+                default:
+                    end = start;
+                    break;
+            }
+
+            if (end > limit)
+            {
+                return limit;
+            }
+
+            return end;
+        }
+
+        private static DateOnly CalculateWeekEnd(DateOnly start)
+        {
+            const int DaysInWeek = 7;
+
+            var daysFromMonday = ((int)start.DayOfWeek + 6) % DaysInWeek;
+
+            var daysUntilSunday = DaysInWeek - 1 - daysFromMonday;
+
+            return start.AddDays(daysUntilSunday);
         }
 
         private static IReadOnlyCollection<CategoryAmountResult> MapCategories(
             IEnumerable<FinancialDashboardCategoryProjection> categories,
-            int type
+            FinancialMovementType movementType
         )
         {
-            var data = categories
-                .Where(c => c.Type == type)
-                .OrderByDescending(c => c.Amount)
-                .ThenBy(c => c.CategoryId)
+            var categoriesByAmount = categories
+                .Where(category => category.Type == (int)movementType)
+                .OrderByDescending(category => category.Amount)
+                .ThenBy(category => category.CategoryId)
                 .ToArray();
-            var total = data.Sum(c => c.Amount);
-            return data.Select(c => new CategoryAmountResult(
-                    c.CategoryId,
-                    c.CategoryName,
-                    c.CategoryIsActive,
-                    c.Amount,
-                    total == 0m
-                        ? 0m
-                        : decimal.Round(c.Amount / total * 100m, 2, MidpointRounding.AwayFromZero)
-                ))
+
+            var totalAmount = categoriesByAmount.Sum(category => category.Amount);
+
+            return categoriesByAmount
+                .Select(category => MapCategory(category, totalAmount))
                 .ToArray();
+        }
+
+        private static CategoryAmountResult MapCategory(
+            FinancialDashboardCategoryProjection category,
+            decimal totalAmount
+        )
+        {
+            var percentage = CalculatePercentage(category.Amount, totalAmount);
+
+            return new CategoryAmountResult(
+                category.CategoryId,
+                category.CategoryName,
+                category.CategoryIsActive,
+                category.Amount,
+                percentage
+            );
+        }
+
+        private static decimal CalculatePercentage(decimal amount, decimal totalAmount)
+        {
+            if (totalAmount == 0m)
+            {
+                return 0m;
+            }
+
+            return decimal.Round(amount / totalAmount * 100m, 2, MidpointRounding.AwayFromZero);
         }
     }
 }
