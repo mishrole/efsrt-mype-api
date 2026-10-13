@@ -23,6 +23,54 @@ namespace Mype.Infrastructure.FinancialMovements.Repositories
         public Task AddAsync(FinancialMovement movement, CancellationToken cancellationToken) =>
             _dbContext.FinancialMovements.AddAsync(movement, cancellationToken).AsTask();
 
+        public Task<FinancialMovement> GetCurrentOpeningBalanceTrackedAsync(
+            Guid businessId,
+            CancellationToken cancellationToken
+        ) =>
+            _dbContext.FinancialMovements.SingleOrDefaultAsync(
+                movement =>
+                    movement.BusinessId == businessId
+                    && movement.Type == FinancialMovementType.OpeningBalance
+                    && movement.IsCurrentOpeningBalance,
+                cancellationToken
+            );
+
+        public Task<FinancialMovementHistoryDetailProjection> GetCurrentOpeningBalanceAsync(
+            Guid businessId,
+            CancellationToken cancellationToken
+        ) =>
+            _dbContext
+                .FinancialMovements.AsNoTracking()
+                .Where(movement =>
+                    movement.BusinessId == businessId
+                    && movement.Type == FinancialMovementType.OpeningBalance
+                    && movement.IsCurrentOpeningBalance
+                )
+                .Select(movement => new FinancialMovementHistoryDetailProjection(
+                    movement.Id,
+                    movement.BusinessId,
+                    movement.Type,
+                    movement.Status,
+                    movement.MovementDate,
+                    movement.Description,
+                    movement.CurrencyCode,
+                    movement.TotalAmount,
+                    movement.CreatedByUserId,
+                    movement.UpdatedByUserId,
+                    movement.ConfirmedByUserId,
+                    movement.CancelledByUserId,
+                    movement.CancellationReason,
+                    movement.CreatedAt,
+                    movement.UpdatedAt,
+                    movement.ConfirmedAt,
+                    movement.CancelledAt,
+                    movement.DiscardedAt,
+                    movement.Version,
+                    Array.Empty<FinancialMovementHistoryItemDetailProjection>(),
+                    Array.Empty<FinancialMovementHistoryEvidenceProjection>()
+                ))
+                .SingleOrDefaultAsync(cancellationToken);
+
         public Task<FinancialMovement> GetTrackedByIdAndBusinessAsync(
             Guid movementId,
             Guid businessId,

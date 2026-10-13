@@ -257,6 +257,18 @@ namespace Mype.Infrastructure.Persistence.Migrations
                             BusinessRoleId = new Guid("20000000-0000-0000-0000-000000000001"),
                             PermissionId = new Guid("30000000-0000-0000-0000-000000000022"),
                             CreatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0))
+                        },
+                        new
+                        {
+                            BusinessRoleId = new Guid("20000000-0000-0000-0000-000000000001"),
+                            PermissionId = new Guid("30000000-0000-0000-0000-000000000023"),
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0))
+                        },
+                        new
+                        {
+                            BusinessRoleId = new Guid("20000000-0000-0000-0000-000000000001"),
+                            PermissionId = new Guid("30000000-0000-0000-0000-000000000024"),
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0))
                         });
                 });
 
@@ -600,9 +612,22 @@ namespace Mype.Infrastructure.Persistence.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("discarded_at");
 
+                    b.Property<bool>("IsCurrentOpeningBalance")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_current_opening_balance");
+
                     b.Property<DateOnly>("MovementDate")
                         .HasColumnType("date")
                         .HasColumnName("movement_date");
+
+                    b.Property<string>("ReplacementReason")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("replacement_reason");
+
+                    b.Property<Guid?>("ReplacesMovementId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("replaces_movement_id");
 
                     b.Property<int>("Status")
                         .HasColumnType("integer")
@@ -636,6 +661,11 @@ namespace Mype.Infrastructure.Persistence.Migrations
 
                     b.HasAlternateKey("Id", "BusinessId")
                         .HasName("ux_financial_movements_id_business");
+
+                    b.HasIndex("BusinessId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_financial_movements_business_id")
+                        .HasFilter("type = 3 AND is_current_opening_balance");
 
                     b.HasIndex("CancelledByUserId")
                         .HasDatabaseName("ix_financial_movements_cancelled_by_user_id");
@@ -1211,6 +1241,28 @@ namespace Mype.Infrastructure.Persistence.Migrations
                             IsActive = true,
                             IsSystem = true,
                             Name = "Consultar dashboard financiero",
+                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0))
+                        },
+                        new
+                        {
+                            Id = new Guid("30000000-0000-0000-0000-000000000023"),
+                            Code = "OPENING_BALANCE_CREATE",
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Description = "Permite crear el saldo de apertura al crear el negocio.",
+                            IsActive = true,
+                            IsSystem = true,
+                            Name = "Crear saldo de apertura",
+                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0))
+                        },
+                        new
+                        {
+                            Id = new Guid("30000000-0000-0000-0000-000000000024"),
+                            Code = "OPENING_BALANCE_REPLACE",
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Description = "Permite sustituir el saldo de apertura con auditoría.",
+                            IsActive = true,
+                            IsSystem = true,
+                            Name = "Corregir saldo de apertura",
                             UpdatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0))
                         });
                 });

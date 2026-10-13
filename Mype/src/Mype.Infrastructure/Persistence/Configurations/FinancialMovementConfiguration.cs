@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Mype.Domain.Businesses;
 using Mype.Domain.FinancialMovements;
@@ -34,6 +34,17 @@ namespace Mype.Infrastructure.Persistence.Configurations
                     FinancialMovementConstraints.AmountScale
                 )
                 .IsRequired();
+            builder.Property(m => m.IsCurrentOpeningBalance).IsRequired();
+            builder.Property(m => m.ReplacesMovementId);
+            builder
+                .Property(m => m.ReplacementReason)
+                .HasMaxLength(
+                    FinancialMovementConstraints.OpeningBalanceReplacementReasonMaxLength
+                );
+            builder
+                .HasIndex(m => m.BusinessId)
+                .IsUnique()
+                .HasFilter("type = 3 AND is_current_opening_balance");
             builder
                 .Property(m => m.CancellationReason)
                 .HasMaxLength(FinancialMovementConstraints.CancellationReasonMaxLength);

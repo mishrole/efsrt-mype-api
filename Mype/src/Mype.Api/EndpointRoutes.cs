@@ -10,6 +10,7 @@ using Mype.Api.Endpoints.v1.Products;
 using Mype.Application.Auth.Commands.Login;
 using Mype.Application.Auth.Commands.RegisterUser;
 using Mype.Application.Businesses.Commands.CreateBusiness;
+using Mype.Application.Businesses.Commands.ReplaceOpeningBalance;
 using Mype.Application.Businesses.Queries.GetBusinessContext;
 using Mype.Application.Businesses.Queries.ListUserBusinesses;
 using Mype.Application.Categories.Queries.ListCategories;
@@ -86,6 +87,18 @@ namespace Mype.Api
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status422UnprocessableEntity)
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
 
+            businessGroup
+                .MapPost(
+                    "/{businessId:guid}/opening-balance/replace",
+                    ReplaceOpeningBalanceEndpoint.DoAsync
+                )
+                .WithName("ReplaceOpeningBalance")
+                .WithSummary("Corregir el saldo de apertura")
+                .Produces<ReplaceOpeningBalanceResult>(StatusCodes.Status200OK)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status400BadRequest)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status403Forbidden)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status404NotFound)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status409Conflict);
             businessGroup
                 .MapGet(string.Empty, ListUserBusinessesEndpoint.DoAsync)
                 .WithName("ListUserBusinesses")

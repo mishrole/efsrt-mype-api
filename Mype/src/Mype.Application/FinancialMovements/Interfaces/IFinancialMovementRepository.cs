@@ -10,6 +10,14 @@ namespace Mype.Application.FinancialMovements.Interfaces
     public interface IFinancialMovementRepository
     {
         Task AddAsync(FinancialMovement movement, CancellationToken cancellationToken);
+        Task<FinancialMovement> GetCurrentOpeningBalanceTrackedAsync(
+            Guid businessId,
+            CancellationToken cancellationToken
+        );
+        Task<FinancialMovementHistoryDetailProjection> GetCurrentOpeningBalanceAsync(
+            Guid businessId,
+            CancellationToken cancellationToken
+        );
         Task<FinancialMovement> GetTrackedByIdAndBusinessAsync(
             Guid movementId,
             Guid businessId,

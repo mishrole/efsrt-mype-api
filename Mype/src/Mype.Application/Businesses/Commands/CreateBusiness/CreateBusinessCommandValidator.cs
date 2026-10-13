@@ -1,4 +1,4 @@
-﻿using FluentValidation;
+using FluentValidation;
 using Mype.Application.Businesses.Validation;
 using Mype.Domain.Businesses.Constraints;
 using Mype.Domain.Currencies.Constraints;
@@ -36,6 +36,10 @@ namespace Mype.Application.Businesses.Commands.CreateBusiness
                 .WithMessage(ValidationMessages.Invalid)
                 .WithName("Moneda");
 
+            RuleFor(command => command.OpeningBalanceDate)
+                .NotEmpty()
+                .WithMessage(ValidationMessages.Required)
+                .WithName("Fecha de saldo de apertura");
             RuleFor(command => command.CurrentUserId)
                 .NotEmpty()
                 .WithMessage(ValidationMessages.Required)

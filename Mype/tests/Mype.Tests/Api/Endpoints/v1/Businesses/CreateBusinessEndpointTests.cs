@@ -29,6 +29,9 @@ namespace Mype.Tests.Api.Endpoints.v1.Businesses
 
         private const string TraceId = "test-trace-id";
 
+        private static readonly DateOnly OpeningBalanceDate = new(2024, 6, 1);
+        private const decimal OpeningBalanceAmount = 1000.00m;
+
         private static readonly Guid CurrentUserId = Guid.NewGuid();
 
         private static readonly Guid BusinessId = Guid.NewGuid();
@@ -228,7 +231,9 @@ namespace Mype.Tests.Api.Endpoints.v1.Businesses
                 DisplayName,
                 LegalName,
                 Ruc,
-                CurrencyCode
+                CurrencyCode,
+                OpeningBalanceAmount,
+                OpeningBalanceDate
             );
         }
 

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.ObjectModel;
 
 namespace Mype.Domain.Permissions.Constants
@@ -159,6 +159,18 @@ namespace Mype.Domain.Permissions.Constants
             "Permite consultar los indicadores financieros del negocio."
         );
 
+        public static readonly SystemPermissionDefinition OpeningBalanceCreate = Create(
+            23,
+            "OPENING_BALANCE_CREATE",
+            "Crear saldo de apertura",
+            "Permite crear el saldo de apertura al crear el negocio."
+        );
+        public static readonly SystemPermissionDefinition OpeningBalanceReplace = Create(
+            24,
+            "OPENING_BALANCE_REPLACE",
+            "Corregir saldo de apertura",
+            "Permite sustituir el saldo de apertura con auditoría."
+        );
         public static readonly ReadOnlyCollection<SystemPermissionDefinition> All =
             Array.AsReadOnly(
                 new[]
@@ -185,6 +197,8 @@ namespace Mype.Domain.Permissions.Constants
                     MovementCancel,
                     HistoryRead,
                     DashboardRead,
+                    OpeningBalanceCreate,
+                    OpeningBalanceReplace,
                 }
             );
 
@@ -214,6 +228,8 @@ namespace Mype.Domain.Permissions.Constants
                     MovementCancel,
                     HistoryRead,
                     DashboardRead,
+                    OpeningBalanceCreate,
+                    OpeningBalanceReplace,
                 }
             );
 
