@@ -29,22 +29,16 @@ namespace Mype.Tests.Application.Businesses.Commands.ReplaceOpeningBalance
 
             fixture.UseCurrent(current);
 
-            fixture.Movements
-                .Setup(repository =>
-                    repository.AddAsync(
-                        It.IsAny<FinancialMovement>(),
-                        CancellationToken.None
-                    )
+            fixture
+                .Movements.Setup(repository =>
+                    repository.AddAsync(It.IsAny<FinancialMovement>(), CancellationToken.None)
                 )
                 .Callback<FinancialMovement, CancellationToken>(
                     (movement, _) => addedMovement = movement
                 )
                 .Returns(Task.CompletedTask);
 
-            var result = await fixture.Handler().Handle(
-                fixture.Command(),
-                CancellationToken.None
-            );
+            var result = await fixture.Handler().Handle(fixture.Command(), CancellationToken.None);
 
             result.IsSuccess.Should().BeTrue();
 
@@ -55,47 +49,28 @@ namespace Mype.Tests.Application.Businesses.Commands.ReplaceOpeningBalance
             result.Value.MovementDate.Should().Be(addedMovement.MovementDate);
             result.Value.Version.Should().Be(addedMovement.Version);
 
-            addedMovement.Type.Should().Be(
-                FinancialMovementType.OpeningBalance
-            );
-            addedMovement.Status.Should().Be(
-                FinancialMovementStatus.Confirmed
-            );
+            addedMovement.Type.Should().Be(FinancialMovementType.OpeningBalance);
+            addedMovement.Status.Should().Be(FinancialMovementStatus.Confirmed);
             addedMovement.IsCurrentOpeningBalance.Should().BeTrue();
             addedMovement.ReplacesMovementId.Should().Be(current.Id);
-            addedMovement.ReplacementReason.Should().Be(
-                "Conciliación inicial"
-            );
+            addedMovement.ReplacementReason.Should().Be("Conciliación inicial");
             addedMovement.TotalAmount.Should().Be(-250m);
-            addedMovement.MovementDate.Should().Be(
-                fixture.OpeningDate
-            );
+            addedMovement.MovementDate.Should().Be(fixture.OpeningDate);
 
             current.IsCurrentOpeningBalance.Should().BeFalse();
 
             fixture.Movements.Verify(
-                repository =>
-                    repository.SetOriginalVersion(
-                        current,
-                        7
-                    ),
+                repository => repository.SetOriginalVersion(current, 7),
                 Times.Once
             );
 
             fixture.Movements.Verify(
-                repository =>
-                    repository.AddAsync(
-                        addedMovement,
-                        CancellationToken.None
-                    ),
+                repository => repository.AddAsync(addedMovement, CancellationToken.None),
                 Times.Once
             );
 
             fixture.UnitOfWork.Verify(
-                unit =>
-                    unit.SaveChangesAsync(
-                        CancellationToken.None
-                    ),
+                unit => unit.SaveChangesAsync(CancellationToken.None),
                 Times.Once
             );
         }
