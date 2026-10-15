@@ -21,6 +21,8 @@ namespace Mype.Tests.Infrastructure.Auth
 
         private static readonly Guid UserId = Guid.NewGuid();
 
+        private static readonly Guid SessionId = Guid.NewGuid();
+
         private static readonly DateTimeOffset IssuedAt = new(2026, 10, 8, 12, 0, 0, TimeSpan.Zero);
 
         [Fact]
@@ -28,7 +30,7 @@ namespace Mype.Tests.Infrastructure.Auth
         {
             var helper = CreateHelper();
 
-            var result = helper.GenerateToken(UserId, Email, DisplayName, IssuedAt);
+            var result = helper.GenerateToken(UserId, Email, DisplayName, SessionId, IssuedAt);
 
             result.Value.Should().NotBeNullOrWhiteSpace();
             result.TokenType.Should().Be(TokenType);
@@ -41,7 +43,7 @@ namespace Mype.Tests.Infrastructure.Auth
         {
             var helper = CreateHelper();
 
-            var result = helper.GenerateToken(UserId, Email, DisplayName, IssuedAt);
+            var result = helper.GenerateToken(UserId, Email, DisplayName, SessionId, IssuedAt);
 
             using var payload = ReadPayload(result.Value);
 
@@ -53,7 +55,15 @@ namespace Mype.Tests.Infrastructure.Auth
 
             payload.RootElement.GetProperty("jti").GetString().Should().NotBeNullOrWhiteSpace();
 
+            payload
+                .RootElement.GetProperty(AuthConstants.SessionIdClaimName)
+                .GetString()
+                .Should()
+                .Be(SessionId.ToString());
+
             payload.RootElement.TryGetProperty("iat", out _).Should().BeTrue();
+
+            payload.RootElement.TryGetProperty("nbf", out _).Should().BeTrue();
 
             payload.RootElement.TryGetProperty("exp", out _).Should().BeTrue();
 
@@ -69,7 +79,7 @@ namespace Mype.Tests.Infrastructure.Auth
 
             var helper = CreateHelper(expirationMinutes: configuredExpiration);
 
-            var result = helper.GenerateToken(UserId, Email, DisplayName, IssuedAt);
+            var result = helper.GenerateToken(UserId, Email, DisplayName, SessionId, IssuedAt);
 
             result.ExpiresAt.Should().Be(IssuedAt.AddMinutes(45));
 
@@ -87,7 +97,7 @@ namespace Mype.Tests.Infrastructure.Auth
         {
             var helper = CreateHelper();
 
-            var result = helper.GenerateToken(UserId, Email, DisplayName, IssuedAt);
+            var result = helper.GenerateToken(UserId, Email, DisplayName, SessionId, IssuedAt);
 
             using var payload = ReadPayload(result.Value);
 
@@ -98,6 +108,12 @@ namespace Mype.Tests.Infrastructure.Auth
             payload.RootElement.TryGetProperty("businessRole", out _).Should().BeFalse();
 
             payload.RootElement.TryGetProperty("passwordHash", out _).Should().BeFalse();
+
+            payload.RootElement.TryGetProperty("refreshToken", out _).Should().BeFalse();
+
+            payload.RootElement.TryGetProperty("refreshTokenVerifier", out _).Should().BeFalse();
+
+            payload.RootElement.TryGetProperty("familyId", out _).Should().BeFalse();
         }
 
         [Theory]
@@ -115,7 +131,8 @@ namespace Mype.Tests.Infrastructure.Auth
 
             var helper = CreateHelper(configurationValues);
 
-            var action = () => helper.GenerateToken(UserId, Email, DisplayName, IssuedAt);
+            var action = () =>
+                helper.GenerateToken(UserId, Email, DisplayName, SessionId, IssuedAt);
 
             action
                 .Should()
@@ -131,7 +148,8 @@ namespace Mype.Tests.Infrastructure.Auth
         {
             var helper = CreateHelper(expirationMinutes: invalidExpiration);
 
-            var action = () => helper.GenerateToken(UserId, Email, DisplayName, IssuedAt);
+            var action = () =>
+                helper.GenerateToken(UserId, Email, DisplayName, SessionId, IssuedAt);
 
             action
                 .Should()
