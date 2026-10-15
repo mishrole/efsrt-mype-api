@@ -16,6 +16,10 @@ namespace Mype.Shared.Constants
         public const string InvalidCredentials = "INVALID_CREDENTIALS";
         public const string AccountUnavailable = "ACCOUNT_UNAVAILABLE";
         public const string Unauthenticated = "UNAUTHENTICATED";
+        public const string SessionUnavailable = "SESSION_UNAVAILABLE";
+        public const string SessionReuseDetected = "SESSION_REUSE_DETECTED";
+        public const string SessionRefreshFailed = "SESSION_REFRESH_FAILED";
+        public const string SessionRevocationFailed = "SESSION_REVOCATION_FAILED";
 
         #endregion
 

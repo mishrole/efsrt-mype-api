@@ -33,7 +33,11 @@ namespace Mype.Api.Extensions
                                 .Select(origin => origin.Trim())
                                 .ToArray();
 
-                            policy.WithOrigins(allowedOrigins).AllowAnyHeader().AllowAnyMethod();
+                            policy
+                                .WithOrigins(allowedOrigins)
+                                .AllowAnyHeader()
+                                .AllowAnyMethod()
+                                .AllowCredentials();
                         }
                         else if (environment.IsDevelopment())
                         {
@@ -43,7 +47,8 @@ namespace Mype.Api.Extensions
                                     && uri.IsLoopback
                                 )
                                 .AllowAnyHeader()
-                                .AllowAnyMethod();
+                                .AllowAnyMethod()
+                                .AllowCredentials();
                         }
                         else
                         {

@@ -1,5 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Mype.Application.Auth.Interfaces;
 using Mype.Application.Common.Interfaces;
+using Mype.Infrastructure.Auth.Repositories;
 
 namespace Mype.Infrastructure.Auth
 {
@@ -9,6 +11,8 @@ namespace Mype.Infrastructure.Auth
         {
             services.AddSingleton<IJwtTokenHelper, JwtTokenHelper>();
             services.AddSingleton<IPasswordHasherHelper, PasswordHasherHelper>();
+            services.AddSingleton<IRefreshTokenHelper, RefreshTokenHelper>();
+            services.AddScoped<IAuthSessionRepository, AuthSessionRepository>();
 
             return services;
         }

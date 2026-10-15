@@ -2,6 +2,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Mype.Application.Common.Interfaces;
+using Mype.Domain.AuthSessions;
 using Mype.Domain.Businesses;
 using Mype.Domain.BusinessMemberships;
 using Mype.Domain.BusinessRolePermissions;
@@ -64,6 +65,7 @@ namespace Mype.Infrastructure.Persistence
         public DbSet<FinancialMovement> FinancialMovements => Set<FinancialMovement>();
         public DbSet<FinancialMovementItem> FinancialMovementItems => Set<FinancialMovementItem>();
         public DbSet<MovementEvidence> MovementEvidences => Set<MovementEvidence>();
+        public DbSet<AuthSession> AuthSessions => Set<AuthSession>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

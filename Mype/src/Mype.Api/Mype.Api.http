@@ -1,7 +1,5 @@
-
-
-
-@Mype.Api_HostAddress = http://localhost:5010
+@Mype.Api_HostAddress = https://localhost:7020
+@FrontendOrigin = http://localhost:5173
 @AccessToken = ACCESS_TOKEN
 @BusinessId = BUSINESS_ID
 @CategoryId = CATEGORY_ID
@@ -14,6 +12,8 @@
 @ProductVersion = 1
 @EvidenceId = EVIDENCE_ID
 @EvidenceVersion = 1
+@UserEmail = user@example.com
+@UserPassword = password1
 
 # Comprueba que la API y la conexión con la base de datos estén disponibles.
 GET {{Mype.Api_HostAddress}}/health
@@ -503,3 +503,61 @@ Accept: application/json
   "reason": "Ajuste del saldo inicial después de la conciliación.",
   "movementVersion": {{MovementVersion}}
 }
+
+### Iniciar sesión, crear una sesión autenticada y emitir la cookie HttpOnly del refresh token.
+# @name login
+POST {{Mype.Api_HostAddress}}/api/v1/auth/login
+Content-Type: application/json
+Accept: application/json
+Origin: {{FrontendOrigin}}
+
+{
+  "email": "{{UserEmail}}",
+  "password": "{{UserPassword}}"
+}
+
+> {%
+    client.global.set("AccessToken", response.body.accessToken);
+%}
+
+### Renovar la sesión mediante la cookie HttpOnly y rotar el refresh token.
+# @name refreshSession
+POST {{Mype.Api_HostAddress}}/api/v1/auth/refresh
+Content-Type: application/json
+Accept: application/json
+Origin: {{FrontendOrigin}}
+
+{}
+
+> {%
+    client.global.set("AccessToken", response.body.accessToken);
+%}
+
+### Consultar los negocios con el access token renovado.
+GET {{Mype.Api_HostAddress}}/api/v1/businesses
+Authorization: Bearer {{AccessToken}}
+Accept: application/json
+
+### Cerrar únicamente la sesión actual y eliminar la cookie de renovación.
+# @name logout
+POST {{Mype.Api_HostAddress}}/api/v1/auth/logout
+Content-Type: application/json
+Accept: application/json
+Origin: {{FrontendOrigin}}
+
+{}
+
+### Comprobar que el JWT de la sesión revocada ya no permite acceder.
+# Debe responder 401 UNAUTHENTICATED.
+GET {{Mype.Api_HostAddress}}/api/v1/businesses
+Authorization: Bearer {{AccessToken}}
+Accept: application/json
+
+### Intentar renovar una sesión cerrada.
+# Debe responder 401 SESSION_UNAVAILABLE porque logout eliminó la cookie y revocó la sesión.
+POST {{Mype.Api_HostAddress}}/api/v1/auth/refresh
+Content-Type: application/json
+Accept: application/json
+Origin: {{FrontendOrigin}}
+
+{}

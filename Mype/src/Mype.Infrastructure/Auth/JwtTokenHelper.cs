@@ -20,6 +20,7 @@ namespace Mype.Infrastructure.Auth
             Guid userId,
             string email,
             string displayName,
+            Guid sessionId,
             DateTimeOffset issuedAt
         )
         {
@@ -43,6 +44,7 @@ namespace Mype.Infrastructure.Auth
                 [JwtRegisteredClaimNames.Email] = email,
                 [JwtRegisteredClaimNames.Name] = displayName,
                 [JwtRegisteredClaimNames.Jti] = Guid.NewGuid().ToString(),
+                [AuthConstants.SessionIdClaimName] = sessionId.ToString(),
             };
 
             var tokenDescriptor = new SecurityTokenDescriptor

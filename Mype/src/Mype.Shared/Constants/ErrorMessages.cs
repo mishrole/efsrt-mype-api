@@ -33,6 +33,10 @@ namespace Mype.Shared.Constants
         public const string InvalidCredentials =
             "El correo electrónico o la contraseña no son válidos.";
         public const string AccountUnavailable = "La cuenta no se encuentra disponible.";
+        public const string SessionUnavailable = "La sesión no se encuentra disponible.";
+        public const string SessionReuseDetected = "La sesión fue invalidada por seguridad.";
+        public const string SessionRefreshFailed = "No fue posible renovar la sesión.";
+        public const string SessionRevocationFailed = "No fue posible cerrar la sesión.";
 
         #endregion
 
