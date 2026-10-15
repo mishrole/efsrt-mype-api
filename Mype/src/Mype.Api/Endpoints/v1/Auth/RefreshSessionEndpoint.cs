@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Mype.Api.Common;
 using Mype.Api.Extensions;
 using Mype.Application.Auth.Commands.RefreshSession;
+using Mype.Application.Common;
 
 namespace Mype.Api.Endpoints.v1.Auth
 {
@@ -17,14 +18,23 @@ namespace Mype.Api.Endpoints.v1.Auth
             CancellationToken cancellationToken
         )
         {
-            var command = new RefreshSessionCommand
-            {
-                RefreshToken = AuthCookieManager.ReadRefreshToken(context.Request),
-            };
-            var result = await sender.Send(command, cancellationToken);
+            var refreshToken = AuthCookieManager.ReadRefreshToken(context.Request);
 
-            context.Response.Headers.CacheControl = "no-store";
-            context.Response.Headers.Pragma = "no-cache";
+            if (string.IsNullOrWhiteSpace(refreshToken))
+            {
+                var unavailableResult = Result<RefreshSessionResult>.Failure(
+                    RefreshSessionErrors.SessionUnavailable
+                );
+
+                AuthCookieManager.DeleteRefreshToken(context.Response);
+
+                return unavailableResult.ToHttpResult(context, TypedResults.Ok);
+            }
+
+            var result = await sender.Send(
+                new RefreshSessionCommand { RefreshToken = refreshToken },
+                cancellationToken
+            );
 
             if (result.IsSuccess && result.Value != null)
             {
@@ -38,6 +48,9 @@ namespace Mype.Api.Endpoints.v1.Auth
             {
                 AuthCookieManager.DeleteRefreshToken(context.Response);
             }
+
+            context.Response.Headers.CacheControl = "no-store";
+            context.Response.Headers.Pragma = "no-cache";
 
             return result.ToHttpResult(context, TypedResults.Ok);
         }

@@ -37,6 +37,10 @@ namespace Mype.Shared.Constants
         public const string SessionReuseDetected = "La sesión fue invalidada por seguridad.";
         public const string SessionRefreshFailed = "No fue posible renovar la sesión.";
         public const string SessionRevocationFailed = "No fue posible cerrar la sesión.";
+        public const string JwtTokenValidationFailed =
+            "No fue posible validar el token de autenticación.";
+        public const string JwtSessionRevokedOrExpired =
+            "La sesión del token JWT fue revocada o expirada.";
 
         #endregion
 

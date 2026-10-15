@@ -1,4 +1,5 @@
 using System;
+using System.Security.Claims;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -9,6 +10,8 @@ using Microsoft.IdentityModel.Tokens;
 using Mype.Api;
 using Mype.Api.Context;
 using Mype.Api.Extensions;
+using Mype.Application.Auth.Interfaces;
+using Mype.Application.Common.Interfaces;
 using Mype.Application.Extensions;
 using Mype.Infrastructure.Extensions;
 using Mype.Infrastructure.Persistence;
@@ -85,6 +88,47 @@ try
                     )
                 ),
                 ClockSkew = TimeSpan.Zero,
+            };
+
+            options.Events = new JwtBearerEvents
+            {
+                OnTokenValidated = async context =>
+                {
+                    var userIdValue = context
+                        .Principal?.FindFirst(ClaimTypes.NameIdentifier)
+                        ?.Value;
+
+                    var sessionIdValue = context
+                        .Principal?.FindFirst(AuthConstants.SessionIdClaimName)
+                        ?.Value;
+
+                    if (
+                        !Guid.TryParse(userIdValue, out var userId)
+                        || !Guid.TryParse(sessionIdValue, out var sessionId)
+                    )
+                    {
+                        context.Fail(ErrorMessages.JwtTokenValidationFailed);
+
+                        return;
+                    }
+
+                    var sessionRepository =
+                        context.HttpContext.RequestServices.GetRequiredService<IAuthSessionRepository>();
+
+                    var clock = context.HttpContext.RequestServices.GetRequiredService<IClock>();
+
+                    var isActive = await sessionRepository.IsActiveAsync(
+                        sessionId,
+                        userId,
+                        clock.UtcNow,
+                        context.HttpContext.RequestAborted
+                    );
+
+                    if (!isActive)
+                    {
+                        context.Fail(ErrorMessages.JwtSessionRevokedOrExpired);
+                    }
+                },
             };
         });
 
