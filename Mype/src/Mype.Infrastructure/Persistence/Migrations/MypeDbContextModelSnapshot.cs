@@ -22,6 +22,86 @@ namespace Mype.Infrastructure.Persistence.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("Mype.Domain.AuthSessions.AuthSession", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTimeOffset>("AbsoluteExpiresAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("absolute_expires_at");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<Guid>("FamilyId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("family_id");
+
+                    b.Property<DateTimeOffset>("IdleExpiresAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("idle_expires_at");
+
+                    b.Property<string>("RefreshTokenVerifier")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character(64)")
+                        .HasColumnName("refresh_token_verifier")
+                        .IsFixedLength();
+
+                    b.Property<Guid?>("ReplacedBySessionId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("replaced_by_session_id");
+
+                    b.Property<int?>("RevocationReason")
+                        .HasColumnType("integer")
+                        .HasColumnName("revocation_reason");
+
+                    b.Property<DateTimeOffset?>("RevokedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("revoked_at");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("user_id");
+
+                    b.Property<uint>("Version")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
+                    b.HasKey("Id")
+                        .HasName("pk_auth_sessions");
+
+                    b.HasIndex("AbsoluteExpiresAt")
+                        .HasDatabaseName("ix_auth_sessions_absolute_expires_at");
+
+                    b.HasIndex("FamilyId")
+                        .HasDatabaseName("ix_auth_sessions_family_id");
+
+                    b.HasIndex("IdleExpiresAt")
+                        .HasDatabaseName("ix_auth_sessions_idle_expires_at");
+
+                    b.HasIndex("RefreshTokenVerifier")
+                        .IsUnique()
+                        .HasDatabaseName("ux_auth_sessions_refresh_token_verifier");
+
+                    b.HasIndex("ReplacedBySessionId")
+                        .HasDatabaseName("ix_auth_sessions_replaced_by_session_id");
+
+                    b.HasIndex("UserId", "RevokedAt")
+                        .HasDatabaseName("ix_auth_sessions_user_id_revoked_at");
+
+                    b.ToTable("auth_sessions", (string)null);
+                });
+
             modelBuilder.Entity("Mype.Domain.BusinessMemberships.BusinessMembership", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1422,6 +1502,22 @@ namespace Mype.Infrastructure.Persistence.Migrations
                         .HasDatabaseName("ux_users_normalized_email");
 
                     b.ToTable("users", (string)null);
+                });
+
+            modelBuilder.Entity("Mype.Domain.AuthSessions.AuthSession", b =>
+                {
+                    b.HasOne("Mype.Domain.AuthSessions.AuthSession", null)
+                        .WithMany()
+                        .HasForeignKey("ReplacedBySessionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_auth_sessions_auth_sessions_replaced_by_session_id");
+
+                    b.HasOne("Mype.Domain.Users.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_auth_sessions_users_user_id");
                 });
 
             modelBuilder.Entity("Mype.Domain.BusinessMemberships.BusinessMembership", b =>

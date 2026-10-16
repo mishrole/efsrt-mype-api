@@ -4,9 +4,12 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Moq;
 using Mype.Application.Auth.Commands.Login;
+using Mype.Application.Auth.Interfaces;
+using Mype.Application.Auth.Models;
 using Mype.Application.Common.Interfaces;
 using Mype.Application.Common.Models;
 using Mype.Application.Users.Interfaces;
+using Mype.Domain.AuthSessions;
 using Mype.Domain.Users;
 using Mype.Shared.Constants;
 
@@ -22,6 +25,8 @@ namespace Mype.Tests.Application.Auth.Commands.Login
         private const string PasswordHash = "password-hash";
         private const string DisplayName = "Test User";
         private const string AccessToken = "access-token";
+        private const string RefreshToken = "refresh-token";
+        private const string RefreshTokenVerifier = "refresh-token-verifier";
         private const string TokenType = AuthConstants.TokenType;
 
         private static readonly DateTimeOffset CreatedAt = new(
@@ -38,13 +43,33 @@ namespace Mype.Tests.Application.Auth.Commands.Login
 
         private static readonly DateTimeOffset ExpiresAt = IssuedAt.AddMinutes(60);
 
+        private static readonly DateTimeOffset RefreshTokenIdleExpiresAt = IssuedAt.AddDays(
+            AuthConstants.RefreshTokenIdleExpirationDays
+        );
+
+        private static readonly DateTimeOffset RefreshTokenAbsoluteExpiresAt = IssuedAt.AddDays(
+            AuthConstants.RefreshTokenAbsoluteExpirationDays
+        );
+
         private readonly Mock<IUserRepository> _userRepositoryMock = new();
+
         private readonly Mock<IPasswordHasherHelper> _passwordHasherMock = new();
+
         private readonly Mock<IEmailNormalizer> _emailNormalizerMock = new();
+
         private readonly Mock<IJwtTokenHelper> _jwtTokenHelperMock = new();
+
+        private readonly Mock<IRefreshTokenHelper> _refreshTokenHelperMock = new();
+
+        private readonly Mock<IAuthSessionRepository> _sessionRepositoryMock = new();
+
+        private readonly Mock<IUnitOfWork> _unitOfWorkMock = new();
+
         private readonly Mock<IClock> _clockMock = new();
 
         private readonly LoginCommandHandler _handler;
+
+        private AuthSession _createdSession;
 
         public LoginCommandHandlerTests()
         {
@@ -54,12 +79,35 @@ namespace Mype.Tests.Application.Auth.Commands.Login
 
             _clockMock.SetupGet(clock => clock.UtcNow).Returns(IssuedAt);
 
+            _refreshTokenHelperMock
+                .Setup(helper => helper.Generate(IssuedAt))
+                .Returns(
+                    new RefreshTokenResult(
+                        RefreshToken,
+                        RefreshTokenVerifier,
+                        RefreshTokenIdleExpiresAt,
+                        RefreshTokenAbsoluteExpiresAt
+                    )
+                );
+
+            _sessionRepositoryMock
+                .Setup(repository =>
+                    repository.AddAsync(It.IsAny<AuthSession>(), It.IsAny<CancellationToken>())
+                )
+                .Callback<AuthSession, CancellationToken>((session, _) => _createdSession = session)
+                .Returns(Task.CompletedTask);
+
+            _unitOfWorkMock
+                .Setup(unitOfWork => unitOfWork.SaveChangesAsync(It.IsAny<CancellationToken>()))
+                .ReturnsAsync(1);
+
             _jwtTokenHelperMock
                 .Setup(helper =>
                     helper.GenerateToken(
                         It.IsAny<Guid>(),
                         It.IsAny<string>(),
                         It.IsAny<string>(),
+                        It.IsAny<Guid>(),
                         It.IsAny<DateTimeOffset>()
                     )
                 )
@@ -78,6 +126,9 @@ namespace Mype.Tests.Application.Auth.Commands.Login
                 _passwordHasherMock.Object,
                 _emailNormalizerMock.Object,
                 _jwtTokenHelperMock.Object,
+                _refreshTokenHelperMock.Object,
+                _sessionRepositoryMock.Object,
+                _unitOfWorkMock.Object,
                 _clockMock.Object
             );
         }
@@ -100,19 +151,51 @@ namespace Mype.Tests.Application.Auth.Commands.Login
             result.Value.AccessToken.Should().Be(AccessToken);
             result.Value.TokenType.Should().Be(TokenType);
             result.Value.ExpiresAt.Should().Be(ExpiresAt);
+            result.Value.RefreshToken.Should().Be(RefreshToken);
+            result.Value.RefreshTokenExpiresAt.Should().Be(RefreshTokenIdleExpiresAt);
 
             result.Value.User.Id.Should().Be(user.Id);
             result.Value.User.Email.Should().Be(OriginalEmail);
             result.Value.User.DisplayName.Should().Be(DisplayName);
             result.Value.User.Status.Should().Be(UserStatus.Active);
 
+            _createdSession.Should().NotBeNull();
+            _createdSession.UserId.Should().Be(user.Id);
+            _createdSession.RefreshTokenVerifier.Should().Be(RefreshTokenVerifier);
+            _createdSession.IdleExpiresAt.Should().Be(RefreshTokenIdleExpiresAt);
+            _createdSession.AbsoluteExpiresAt.Should().Be(RefreshTokenAbsoluteExpiresAt);
+
             _passwordHasherMock.Verify(
                 hasher => hasher.VerifyPassword(PasswordHash, Password),
                 Times.Once
             );
 
+            _sessionRepositoryMock.Verify(
+                repository =>
+                    repository.AddAsync(
+                        It.Is<AuthSession>(session =>
+                            session.UserId == user.Id
+                            && session.RefreshTokenVerifier == RefreshTokenVerifier
+                        ),
+                        It.IsAny<CancellationToken>()
+                    ),
+                Times.Once
+            );
+
+            _unitOfWorkMock.Verify(
+                unitOfWork => unitOfWork.SaveChangesAsync(It.IsAny<CancellationToken>()),
+                Times.Once
+            );
+
             _jwtTokenHelperMock.Verify(
-                helper => helper.GenerateToken(user.Id, OriginalEmail, DisplayName, IssuedAt),
+                helper =>
+                    helper.GenerateToken(
+                        user.Id,
+                        OriginalEmail,
+                        DisplayName,
+                        _createdSession.Id,
+                        IssuedAt
+                    ),
                 Times.Once
             );
         }
@@ -141,6 +224,56 @@ namespace Mype.Tests.Application.Auth.Commands.Login
         }
 
         [Fact]
+        public async Task Handle_Should_Create_Session_Before_Generating_Access_Token()
+        {
+            var user = CreateUser();
+            var command = CreateCommand();
+            var sequence = new MockSequence();
+
+            SetupUserLookup(user);
+            SetupPasswordVerification(Password, true);
+
+            _sessionRepositoryMock
+                .InSequence(sequence)
+                .Setup(repository =>
+                    repository.AddAsync(It.IsAny<AuthSession>(), It.IsAny<CancellationToken>())
+                )
+                .Callback<AuthSession, CancellationToken>((session, _) => _createdSession = session)
+                .Returns(Task.CompletedTask);
+
+            _unitOfWorkMock
+                .InSequence(sequence)
+                .Setup(unitOfWork => unitOfWork.SaveChangesAsync(It.IsAny<CancellationToken>()))
+                .ReturnsAsync(1);
+
+            _jwtTokenHelperMock
+                .InSequence(sequence)
+                .Setup(helper =>
+                    helper.GenerateToken(
+                        user.Id,
+                        OriginalEmail,
+                        DisplayName,
+                        It.IsAny<Guid>(),
+                        IssuedAt
+                    )
+                )
+                .Returns(
+                    new JwtTokenResult
+                    {
+                        Value = AccessToken,
+                        TokenType = TokenType,
+                        IssuedAt = IssuedAt,
+                        ExpiresAt = ExpiresAt,
+                    }
+                );
+
+            var result = await _handler.Handle(command, CancellationToken.None);
+
+            result.IsSuccess.Should().BeTrue();
+            _createdSession.Should().NotBeNull();
+        }
+
+        [Fact]
         public async Task Handle_Should_Return_InvalidCredentials_When_User_Does_Not_Exist()
         {
             var command = CreateCommand();
@@ -152,22 +285,13 @@ namespace Mype.Tests.Application.Auth.Commands.Login
             result.IsSuccess.Should().BeFalse();
             result.Value.Should().BeNull();
             result.Error.Should().BeSameAs(LoginErrors.InvalidCredentials);
-
             result.Error.Code.Should().Be(ErrorCodes.InvalidCredentials);
+
+            VerifySessionWasNotCreated();
+            VerifyTokenWasNotGenerated();
 
             _passwordHasherMock.Verify(
                 hasher => hasher.VerifyPassword(It.IsAny<string>(), It.IsAny<string>()),
-                Times.Never
-            );
-
-            _jwtTokenHelperMock.Verify(
-                helper =>
-                    helper.GenerateToken(
-                        It.IsAny<Guid>(),
-                        It.IsAny<string>(),
-                        It.IsAny<string>(),
-                        It.IsAny<DateTimeOffset>()
-                    ),
                 Times.Never
             );
         }
@@ -176,7 +300,6 @@ namespace Mype.Tests.Application.Auth.Commands.Login
         public async Task Handle_Should_Return_InvalidCredentials_When_Password_Is_Incorrect()
         {
             var user = CreateUser();
-
             var command = CreateCommand(InvalidPassword);
 
             SetupUserLookup(user);
@@ -187,19 +310,10 @@ namespace Mype.Tests.Application.Auth.Commands.Login
             result.IsSuccess.Should().BeFalse();
             result.Value.Should().BeNull();
             result.Error.Should().BeSameAs(LoginErrors.InvalidCredentials);
-
             result.Error.Code.Should().Be(ErrorCodes.InvalidCredentials);
 
-            _jwtTokenHelperMock.Verify(
-                helper =>
-                    helper.GenerateToken(
-                        It.IsAny<Guid>(),
-                        It.IsAny<string>(),
-                        It.IsAny<string>(),
-                        It.IsAny<DateTimeOffset>()
-                    ),
-                Times.Never
-            );
+            VerifySessionWasNotCreated();
+            VerifyTokenWasNotGenerated();
         }
 
         [Fact]
@@ -219,19 +333,10 @@ namespace Mype.Tests.Application.Auth.Commands.Login
             result.IsSuccess.Should().BeFalse();
             result.Value.Should().BeNull();
             result.Error.Should().BeSameAs(LoginErrors.AccountUnavailable);
-
             result.Error.Code.Should().Be(ErrorCodes.AccountUnavailable);
 
-            _jwtTokenHelperMock.Verify(
-                helper =>
-                    helper.GenerateToken(
-                        It.IsAny<Guid>(),
-                        It.IsAny<string>(),
-                        It.IsAny<string>(),
-                        It.IsAny<DateTimeOffset>()
-                    ),
-                Times.Never
-            );
+            VerifySessionWasNotCreated();
+            VerifyTokenWasNotGenerated();
         }
 
         [Fact]
@@ -249,9 +354,52 @@ namespace Mype.Tests.Application.Auth.Commands.Login
 
             result.IsSuccess.Should().BeTrue();
 
+            _createdSession.Should().NotBeNull();
+
             _jwtTokenHelperMock.Verify(
-                helper => helper.GenerateToken(user.Id, OriginalEmail, DisplayName, IssuedAt),
+                helper =>
+                    helper.GenerateToken(
+                        user.Id,
+                        OriginalEmail,
+                        DisplayName,
+                        _createdSession.Id,
+                        IssuedAt
+                    ),
                 Times.Once
+            );
+        }
+
+        private void VerifySessionWasNotCreated()
+        {
+            _refreshTokenHelperMock.Verify(
+                helper => helper.Generate(It.IsAny<DateTimeOffset>()),
+                Times.Never
+            );
+
+            _sessionRepositoryMock.Verify(
+                repository =>
+                    repository.AddAsync(It.IsAny<AuthSession>(), It.IsAny<CancellationToken>()),
+                Times.Never
+            );
+
+            _unitOfWorkMock.Verify(
+                unitOfWork => unitOfWork.SaveChangesAsync(It.IsAny<CancellationToken>()),
+                Times.Never
+            );
+        }
+
+        private void VerifyTokenWasNotGenerated()
+        {
+            _jwtTokenHelperMock.Verify(
+                helper =>
+                    helper.GenerateToken(
+                        It.IsAny<Guid>(),
+                        It.IsAny<string>(),
+                        It.IsAny<string>(),
+                        It.IsAny<Guid>(),
+                        It.IsAny<DateTimeOffset>()
+                    ),
+                Times.Never
             );
         }
 

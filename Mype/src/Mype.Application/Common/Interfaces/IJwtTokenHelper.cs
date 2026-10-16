@@ -9,6 +9,7 @@ namespace Mype.Application.Common.Interfaces
             Guid userId,
             string email,
             string displayName,
+            Guid sessionId,
             DateTimeOffset issuedAt
         );
     }

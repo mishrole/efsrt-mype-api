@@ -1,9 +1,11 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Mype.Application.Auth.Interfaces;
 using Mype.Application.Common;
 using Mype.Application.Common.Interfaces;
 using Mype.Application.Users.Interfaces;
+using Mype.Domain.AuthSessions;
 
 namespace Mype.Application.Auth.Commands.Login
 {
@@ -13,6 +15,9 @@ namespace Mype.Application.Auth.Commands.Login
         private readonly IPasswordHasherHelper _passwordHasher;
         private readonly IEmailNormalizer _emailNormalizer;
         private readonly IJwtTokenHelper _jwtTokenHelper;
+        private readonly IRefreshTokenHelper _refreshTokenHelper;
+        private readonly IAuthSessionRepository _sessionRepository;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly IClock _clock;
 
         public LoginCommandHandler(
@@ -20,6 +25,9 @@ namespace Mype.Application.Auth.Commands.Login
             IPasswordHasherHelper passwordHasher,
             IEmailNormalizer emailNormalizer,
             IJwtTokenHelper jwtTokenHelper,
+            IRefreshTokenHelper refreshTokenHelper,
+            IAuthSessionRepository sessionRepository,
+            IUnitOfWork unitOfWork,
             IClock clock
         )
         {
@@ -27,6 +35,9 @@ namespace Mype.Application.Auth.Commands.Login
             _passwordHasher = passwordHasher;
             _emailNormalizer = emailNormalizer;
             _jwtTokenHelper = jwtTokenHelper;
+            _refreshTokenHelper = refreshTokenHelper;
+            _sessionRepository = sessionRepository;
+            _unitOfWork = unitOfWork;
             _clock = clock;
         }
 
@@ -64,19 +75,36 @@ namespace Mype.Application.Auth.Commands.Login
 
             var issuedAt = _clock.UtcNow;
 
-            var token = _jwtTokenHelper.GenerateToken(
+            var refreshToken = _refreshTokenHelper.Generate(issuedAt);
+
+            var session = AuthSession.Create(
+                user.Id,
+                refreshToken.Verifier,
+                issuedAt,
+                refreshToken.IdleExpiresAt,
+                refreshToken.AbsoluteExpiresAt
+            );
+
+            await _sessionRepository.AddAsync(session, cancellationToken);
+
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+            var accessToken = _jwtTokenHelper.GenerateToken(
                 user.Id,
                 user.Email,
                 user.DisplayName,
+                session.Id,
                 issuedAt
             );
 
             return Result<LoginResult>.Success(
                 new LoginResult
                 {
-                    AccessToken = token.Value,
-                    TokenType = token.TokenType,
-                    ExpiresAt = token.ExpiresAt,
+                    AccessToken = accessToken.Value,
+                    TokenType = accessToken.TokenType,
+                    ExpiresAt = accessToken.ExpiresAt,
+                    RefreshToken = refreshToken.Value,
+                    RefreshTokenExpiresAt = session.IdleExpiresAt,
                     User = new AuthenticatedUserResult
                     {
                         Id = user.Id,

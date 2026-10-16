@@ -22,6 +22,7 @@ jobs:
       SLEEP_DURATION_PROVIDER: ${{ secrets.SLEEP_DURATION_PROVIDER }}
       CORS_POLICY_NAME: ${{ secrets.CORS_POLICY_NAME }}
       JWT_EXPIRATION_MINUTES: ${{ secrets.JWT_EXPIRATION_MINUTES }}
+      REFRESH_TOKEN_PEPPER: ${{ secrets.REFRESH_TOKEN_PEPPER }}
 
     steps:
       - name: Set up JDK 21

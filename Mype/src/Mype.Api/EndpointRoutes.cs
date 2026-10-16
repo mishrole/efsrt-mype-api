@@ -9,6 +9,7 @@ using Mype.Api.Endpoints.v1.FinancialDashboard;
 using Mype.Api.Endpoints.v1.FinancialMovements;
 using Mype.Api.Endpoints.v1.Products;
 using Mype.Application.Auth.Commands.Login;
+using Mype.Application.Auth.Commands.RefreshSession;
 using Mype.Application.Auth.Commands.RegisterUser;
 using Mype.Application.Businesses.Commands.CreateBusiness;
 using Mype.Application.Businesses.Commands.ReplaceOpeningBalance;
@@ -69,6 +70,23 @@ namespace Mype.Api
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status401Unauthorized)
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status403Forbidden)
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
+
+            authGroup
+                .MapPost("/refresh", RefreshSessionEndpoint.DoAsync)
+                .AllowAnonymous()
+                .WithName("RefreshSession")
+                .WithSummary("Renovar sesión")
+                .Produces<RefreshSessionResult>(StatusCodes.Status200OK)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status400BadRequest)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status401Unauthorized)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
+
+            authGroup
+                .MapPost("/logout", LogoutEndpoint.DoAsync)
+                .AllowAnonymous()
+                .WithName("Logout")
+                .WithSummary("Cerrar sesión")
+                .Produces(StatusCodes.Status204NoContent);
 
             #endregion
 

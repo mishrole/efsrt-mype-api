@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text.Json.Serialization;
 
 namespace Mype.Application.Auth.Commands.Login
 {
@@ -11,5 +12,11 @@ namespace Mype.Application.Auth.Commands.Login
         public DateTimeOffset ExpiresAt { get; set; }
 
         public AuthenticatedUserResult User { get; set; } = new();
+
+        [JsonIgnore]
+        public string RefreshToken { get; set; } = string.Empty;
+
+        [JsonIgnore]
+        public DateTimeOffset RefreshTokenExpiresAt { get; set; }
     }
 }

@@ -19,5 +19,6 @@ namespace Mype.Shared.Constants
         public const string EvidenceMaxSizeBytesStringKey = "EVIDENCE_MAX_SIZE_BYTES";
         public const string EvidenceReadUriMinutesStringKey = "EVIDENCE_READ_URI_MINUTES";
         public const string EvidencePurgeRetentionDaysStringKey = "EVIDENCE_PURGE_RETENTION_DAYS";
+        public const string RefreshTokenPepperStringKey = "REFRESH_TOKEN_PEPPER";
     }
 }

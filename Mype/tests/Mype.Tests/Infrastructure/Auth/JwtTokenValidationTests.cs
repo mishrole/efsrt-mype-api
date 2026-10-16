@@ -22,6 +22,7 @@ namespace Mype.Tests.Infrastructure.Auth
         private const string Email = "user@example.com";
         private const string DisplayName = "Test User";
         private const string ExpirationMinutes = "60";
+        private static readonly Guid SessionId = Guid.NewGuid();
 
         private static readonly Guid UserId = Guid.NewGuid();
 
@@ -110,7 +111,7 @@ namespace Mype.Tests.Infrastructure.Auth
         {
             var helper = CreateHelper(secretKey, issuer, audience, expirationMinutes);
 
-            return helper.GenerateToken(UserId, Email, DisplayName, issuedAt).Value;
+            return helper.GenerateToken(UserId, Email, DisplayName, SessionId, issuedAt).Value;
         }
 
         private static JwtTokenHelper CreateHelper(

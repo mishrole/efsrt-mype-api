@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Mype.Api.Common;
 using Mype.Api.Extensions;
 using Mype.Application.Auth.Commands.Login;
 
@@ -22,6 +23,15 @@ namespace Mype.Api.Endpoints.v1.Auth
             var command = new LoginCommand { Email = request.Email, Password = request.Password };
 
             var result = await sender.Send(command, cancellationToken);
+
+            if (result.IsSuccess && result.Value != null)
+            {
+                AuthCookieManager.WriteRefreshToken(
+                    context.Response,
+                    result.Value.RefreshToken,
+                    result.Value.RefreshTokenExpiresAt
+                );
+            }
 
             context.Response.Headers.CacheControl = "no-store";
             context.Response.Headers.Pragma = "no-cache";
