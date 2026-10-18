@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -41,20 +42,36 @@ namespace Mype.Api.Middlewares
             {
                 await _next(context);
             }
+            catch (OperationCanceledException) when (context.RequestAborted.IsCancellationRequested)
+            {
+                _logger.LogDebug(
+                    ErrorMessages.ExceptionHandlingMiddlewareRequestAbortedError,
+                    context.TraceIdentifier
+                );
+            }
             catch (BadHttpRequestException exception)
             {
                 _logger.LogWarning(exception, ErrorMessages.BadHttpRequestReceived);
                 await HandleExceptionAsync(context, exception);
             }
-            catch (Exception ex)
+            catch (Exception exception)
             {
-                _logger.LogError(ex, ErrorMessages.ExceptionHandlingMiddlewareError, ex.Message);
-                await HandleExceptionAsync(context, ex);
+                _logger.LogError(
+                    exception,
+                    ErrorMessages.ExceptionHandlingMiddlewareError,
+                    exception.Message
+                );
+                await HandleExceptionAsync(context, exception);
             }
         }
 
         private Task HandleExceptionAsync(HttpContext context, Exception exception)
         {
+            if (context.Response.HasStarted || context.RequestAborted.IsCancellationRequested)
+            {
+                return Task.CompletedTask;
+            }
+
             var detail = _env.IsDevelopment() ? exception.StackTrace : null;
 
             var response = HttpErrorMapper.FromException(
@@ -66,10 +83,9 @@ namespace Mype.Api.Middlewares
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = response.StatusCode;
 
-            return context.Response.WriteAsync(
-                JsonSerializer.Serialize(response, _jsonOptions),
-                context.RequestAborted
-            );
+            var serializedResponse = JsonSerializer.Serialize(response, _jsonOptions);
+
+            return context.Response.WriteAsync(serializedResponse, CancellationToken.None);
         }
     }
 }

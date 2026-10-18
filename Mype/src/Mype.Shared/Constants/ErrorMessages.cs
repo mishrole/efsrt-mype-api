@@ -13,6 +13,9 @@ namespace Mype.Shared.Constants
         public const string ExceptionHandlingMiddlewareError =
             "Ocurrió una excepción no controlada: {ExceptionMessage}";
 
+        public const string ExceptionHandlingMiddlewareRequestAbortedError =
+            "La solicitud fue cancelada por el cliente: {TraceIdentifier}";
+
         #region Common
 
         public const string UnexpectedError = "Ocurrió un error inesperado.";
