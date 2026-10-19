@@ -30,6 +30,8 @@ namespace Mype.Tests.Application.Products.Commands.ReactivateProduct
 
         private static readonly Guid CategoryId = Guid.NewGuid();
 
+        private static readonly Guid ProductCategoryId = Guid.NewGuid();
+
         private static readonly Guid ProductId = Guid.NewGuid();
 
         private static readonly DateTimeOffset UtcNow = new(2026, 10, 10, 12, 0, 0, TimeSpan.Zero);
@@ -348,6 +350,7 @@ namespace Mype.Tests.Application.Products.Commands.ReactivateProduct
             var product = Product.Create(
                 BusinessId,
                 CategoryId,
+                ProductCategoryId,
                 "Gaseosa",
                 "GASEOSA",
                 3.50m,

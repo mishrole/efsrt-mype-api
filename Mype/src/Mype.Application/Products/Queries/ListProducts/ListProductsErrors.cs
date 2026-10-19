@@ -29,5 +29,11 @@ namespace Mype.Application.Products.Queries.ListProducts
             ErrorMessages.CategoryNotFound,
             ApplicationErrorType.NotFound
         );
+
+        public static readonly ApplicationError ProductCategoryNotFound = new(
+            ErrorCodes.ProductCategoryNotFound,
+            ErrorMessages.ProductCategoryNotFound,
+            ApplicationErrorType.NotFound
+        );
     }
 }

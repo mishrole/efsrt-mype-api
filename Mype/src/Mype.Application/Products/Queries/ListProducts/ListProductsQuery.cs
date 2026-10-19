@@ -16,6 +16,8 @@ namespace Mype.Application.Products.Queries.ListProducts
 
         public Guid? CategoryId { get; set; }
 
+        public Guid? ProductCategoryId { get; set; }
+
         public bool? IsActive { get; set; }
 
         public bool AvailableForSale { get; set; }

@@ -33,6 +33,15 @@ namespace Mype.Infrastructure.Persistence.Exceptions
                     exception
                 )
             },
+            {
+                DatabaseConstraints.ProductCategories.BusinessNormalizedName,
+                exception => new ApplicationErrorException(
+                    ErrorCodes.ProductCategoryAlreadyExists,
+                    ErrorMessages.ProductCategoryAlreadyExists,
+                    ApplicationErrorType.Conflict,
+                    exception
+                )
+            },
         };
 
         public Exception Translate(Exception exception)
@@ -70,11 +79,11 @@ namespace Mype.Infrastructure.Persistence.Exceptions
                 && postgresException.ConstraintName != null
                 && UniqueConstraintMappings.TryGetValue(
                     postgresException.ConstraintName,
-                    out var exceptionFactory
+                    out var mappedExceptionFactory
                 )
             )
             {
-                return exceptionFactory(originalException);
+                return mappedExceptionFactory(originalException);
             }
 
             return originalException;

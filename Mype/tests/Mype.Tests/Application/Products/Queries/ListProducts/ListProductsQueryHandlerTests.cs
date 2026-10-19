@@ -7,12 +7,14 @@ using Mype.Application.BusinessMemberships.Interfaces;
 using Mype.Application.BusinessMemberships.Models;
 using Mype.Application.Categories.Interfaces;
 using Mype.Application.Permissions.Interfaces;
+using Mype.Application.ProductCategories.Interfaces;
 using Mype.Application.Products.Interfaces;
 using Mype.Application.Products.Models;
 using Mype.Application.Products.Queries.ListProducts;
 using Mype.Domain.Businesses;
 using Mype.Domain.BusinessMemberships;
 using Mype.Domain.Permissions.Constants;
+using Mype.Domain.ProductCategories;
 
 namespace Mype.Tests.Application.Products.Queries.ListProducts
 {
@@ -28,6 +30,10 @@ namespace Mype.Tests.Application.Products.Queries.ListProducts
 
         private const string ProductName = "Gaseosa 500 ml";
 
+        private const string ProductCategoryName = "Bebidas";
+
+        private const string ProductCategoryColor = "#FF0000";
+
         private const string Search = "  gaseosa  500 ml ";
 
         private const string NormalizedSearch = "GASEOSA 500 ML";
@@ -42,6 +48,8 @@ namespace Mype.Tests.Application.Products.Queries.ListProducts
 
         private static readonly Guid CategoryId = Guid.NewGuid();
 
+        private static readonly Guid ProductCategoryId = Guid.NewGuid();
+
         private static readonly Guid ProductId = Guid.NewGuid();
 
         private readonly Mock<IBusinessMembershipRepository> _membershipRepositoryMock = new();
@@ -49,6 +57,8 @@ namespace Mype.Tests.Application.Products.Queries.ListProducts
         private readonly Mock<IPermissionRepository> _permissionRepositoryMock = new();
 
         private readonly Mock<ICategoryRepository> _categoryRepositoryMock = new();
+
+        private readonly Mock<IProductCategoryRepository> _productCategoryRepositoryMock = new();
 
         private readonly Mock<IProductRepository> _productRepositoryMock = new();
 
@@ -60,6 +70,7 @@ namespace Mype.Tests.Application.Products.Queries.ListProducts
                 _membershipRepositoryMock.Object,
                 _permissionRepositoryMock.Object,
                 _categoryRepositoryMock.Object,
+                _productCategoryRepositoryMock.Object,
                 _productRepositoryMock.Object
             );
         }
@@ -75,6 +86,7 @@ namespace Mype.Tests.Application.Products.Queries.ListProducts
                         BusinessId,
                         NormalizedSearch,
                         CategoryId,
+                        ProductCategoryId,
                         true,
                         true,
                         It.IsAny<CancellationToken>()
@@ -86,6 +98,7 @@ namespace Mype.Tests.Application.Products.Queries.ListProducts
                 CreateQuery(
                     search: Search,
                     categoryId: CategoryId,
+                    productCategoryId: ProductCategoryId,
                     isActive: true,
                     availableForSale: true
                 ),
@@ -102,6 +115,9 @@ namespace Mype.Tests.Application.Products.Queries.ListProducts
             product.BusinessId.Should().Be(BusinessId);
             product.CategoryId.Should().Be(CategoryId);
             product.CategoryName.Should().Be(CategoryName);
+            product.ProductCategoryId.Should().Be(ProductCategoryId);
+            product.ProductCategoryName.Should().Be(ProductCategoryName);
+            product.ProductCategoryColor.Should().Be(ProductCategoryColor);
             product.Name.Should().Be(ProductName);
             product.SalePrice.Should().Be(3.50m);
             product.UnitCost.Should().Be(2.20m);
@@ -120,6 +136,7 @@ namespace Mype.Tests.Application.Products.Queries.ListProducts
                         null,
                         null,
                         null,
+                        null,
                         false,
                         It.IsAny<CancellationToken>()
                     )
@@ -135,6 +152,7 @@ namespace Mype.Tests.Application.Products.Queries.ListProducts
                 repository =>
                     repository.ListByBusinessAsync(
                         BusinessId,
+                        null,
                         null,
                         null,
                         null,
@@ -221,7 +239,10 @@ namespace Mype.Tests.Application.Products.Queries.ListProducts
             VerifyProductsWereNotQueried();
         }
 
-        private void SetupValidAccess(bool categoryExists = true)
+        private void SetupValidAccess(
+            bool categoryExists = true,
+            ProductCategory productCategory = null
+        )
         {
             SetupContext(CreateContext());
 
@@ -236,6 +257,27 @@ namespace Mype.Tests.Application.Products.Queries.ListProducts
                     )
                 )
                 .ReturnsAsync(categoryExists);
+
+            _productCategoryRepositoryMock
+                .Setup(repository =>
+                    repository.GetByIdAndBusinessAsync(
+                        ProductCategoryId,
+                        BusinessId,
+                        It.IsAny<CancellationToken>()
+                    )
+                )
+                .ReturnsAsync(
+                    productCategory
+                        ?? ProductCategory.Create(
+                            BusinessId,
+                            ProductCategoryName,
+                            ProductCategoryName.ToUpperInvariant(),
+                            ProductCategoryColor,
+                            false,
+                            CurrentUserId,
+                            DateTimeOffset.UtcNow
+                        )
+                );
         }
 
         private void SetupContext(BusinessContextProjection context)
@@ -293,6 +335,7 @@ namespace Mype.Tests.Application.Products.Queries.ListProducts
                         It.IsAny<Guid>(),
                         It.IsAny<string>(),
                         It.IsAny<Guid?>(),
+                        It.IsAny<Guid?>(),
                         It.IsAny<bool?>(),
                         It.IsAny<bool>(),
                         It.IsAny<CancellationToken>()
@@ -323,6 +366,7 @@ namespace Mype.Tests.Application.Products.Queries.ListProducts
         private static ListProductsQuery CreateQuery(
             string search = null,
             Guid? categoryId = null,
+            Guid? productCategoryId = null,
             bool? isActive = null,
             bool availableForSale = false
         )
@@ -333,6 +377,7 @@ namespace Mype.Tests.Application.Products.Queries.ListProducts
                 CurrentUserId = CurrentUserId,
                 Search = search,
                 CategoryId = categoryId,
+                ProductCategoryId = productCategoryId,
                 IsActive = isActive,
                 AvailableForSale = availableForSale,
             };
@@ -347,6 +392,9 @@ namespace Mype.Tests.Application.Products.Queries.ListProducts
                     BusinessId,
                     CategoryId,
                     CategoryName,
+                    ProductCategoryId,
+                    ProductCategoryName,
+                    ProductCategoryColor,
                     ProductName,
                     3.50m,
                     2.20m,

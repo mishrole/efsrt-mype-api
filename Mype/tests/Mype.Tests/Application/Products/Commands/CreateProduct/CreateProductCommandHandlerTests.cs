@@ -8,12 +8,14 @@ using Mype.Application.BusinessMemberships.Models;
 using Mype.Application.Categories.Interfaces;
 using Mype.Application.Common.Interfaces;
 using Mype.Application.Permissions.Interfaces;
+using Mype.Application.ProductCategories.Interfaces;
 using Mype.Application.Products.Commands.CreateProduct;
 using Mype.Application.Products.Interfaces;
 using Mype.Domain.Businesses;
 using Mype.Domain.BusinessMemberships;
 using Mype.Domain.Categories;
 using Mype.Domain.Permissions.Constants;
+using Mype.Domain.ProductCategories;
 using Mype.Domain.Products;
 
 namespace Mype.Tests.Application.Products.Commands.CreateProduct
@@ -23,10 +25,12 @@ namespace Mype.Tests.Application.Products.Commands.CreateProduct
         private static readonly Guid BusinessId = Guid.NewGuid();
         private static readonly Guid UserId = Guid.NewGuid();
         private static readonly Guid CategoryId = Guid.NewGuid();
+        private static readonly Guid ProductCategoryId = Guid.NewGuid();
         private static readonly Guid RoleId = Guid.NewGuid();
         private readonly Mock<IBusinessMembershipRepository> _memberships = new();
         private readonly Mock<IPermissionRepository> _permissions = new();
         private readonly Mock<ICategoryRepository> _categories = new();
+        private readonly Mock<IProductCategoryRepository> _productCategories = new();
         private readonly Mock<IProductRepository> _products = new();
         private readonly Mock<IUnitOfWork> _unitOfWork = new();
         private readonly Mock<IClock> _clock = new();
@@ -38,6 +42,7 @@ namespace Mype.Tests.Application.Products.Commands.CreateProduct
                 _memberships.Object,
                 _permissions.Object,
                 _categories.Object,
+                _productCategories.Object,
                 _products.Object,
                 _unitOfWork.Object,
                 _clock.Object
@@ -146,6 +151,21 @@ namespace Mype.Tests.Application.Products.Commands.CreateProduct
             );
         }
 
+        private ProductCategory CreateActiveProductCategory()
+        {
+            var now = new DateTimeOffset(2026, 10, 8, 12, 0, 0, TimeSpan.Zero);
+
+            return ProductCategory.Create(
+                BusinessId,
+                "Bebidas",
+                "BEBIDAS",
+                ProductCategoryPalette.Neutral,
+                false,
+                UserId,
+                now
+            );
+        }
+
         private void SetupValid(DateTimeOffset now)
         {
             SetupContext();
@@ -174,6 +194,17 @@ namespace Mype.Tests.Application.Products.Commands.CreateProduct
                     )
                 )
                 .ReturnsAsync(false);
+
+            _productCategories
+                .Setup(repository =>
+                    repository.GetByIdAndBusinessAsync(
+                        ProductCategoryId,
+                        BusinessId,
+                        It.IsAny<CancellationToken>()
+                    )
+                )
+                .ReturnsAsync(CreateActiveProductCategory());
+
             _unitOfWork
                 .Setup(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()))
                 .ReturnsAsync(1);
@@ -213,6 +244,7 @@ namespace Mype.Tests.Application.Products.Commands.CreateProduct
                 BusinessId = BusinessId,
                 CurrentUserId = UserId,
                 CategoryId = CategoryId,
+                ProductCategoryId = ProductCategoryId,
                 Name = name,
                 SalePrice = 3.50m,
                 UnitCost = 2.20m,

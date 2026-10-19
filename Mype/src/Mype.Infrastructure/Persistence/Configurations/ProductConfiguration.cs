@@ -23,6 +23,8 @@ namespace Mype.Infrastructure.Persistence.Configurations
 
             builder.Property(product => product.CategoryId).IsRequired();
 
+            builder.Property(product => product.ProductCategoryId).IsRequired();
+
             builder
                 .Property(product => product.Name)
                 .HasMaxLength(ProductConstraints.NameMaxLength)
@@ -102,6 +104,13 @@ namespace Mype.Infrastructure.Persistence.Configurations
                 .HasPrincipalKey(category => new { category.Id, category.BusinessId })
                 .OnDelete(DeleteBehavior.Restrict)
                 .HasConstraintName(DatabaseConstraints.Products.CategoryBusiness);
+
+            builder
+                .HasOne<Mype.Domain.ProductCategories.ProductCategory>()
+                .WithMany()
+                .HasForeignKey(product => new { product.ProductCategoryId, product.BusinessId })
+                .HasPrincipalKey(category => new { category.Id, category.BusinessId })
+                .OnDelete(DeleteBehavior.Restrict);
 
             builder
                 .HasOne<User>()

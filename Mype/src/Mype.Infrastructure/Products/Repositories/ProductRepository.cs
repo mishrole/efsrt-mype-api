@@ -81,6 +81,7 @@ namespace Mype.Infrastructure.Products.Repositories
             Guid businessId,
             string normalizedSearch,
             Guid? categoryId,
+            Guid? productCategoryId,
             bool? isActive,
             bool availableForSale,
             CancellationToken cancellationToken
@@ -94,8 +95,19 @@ namespace Mype.Infrastructure.Products.Repositories
                         CategoryId = category.Id,
                         category.BusinessId,
                     }
+                join productCategory in _dbContext.ProductCategories.AsNoTracking()
+                    on new { product.ProductCategoryId, product.BusinessId } equals new
+                    {
+                        ProductCategoryId = productCategory.Id,
+                        productCategory.BusinessId,
+                    }
                 where product.BusinessId == businessId
-                select new { Product = product, Category = category };
+                select new
+                {
+                    Product = product,
+                    Category = category,
+                    ProductCategory = productCategory,
+                };
 
             if (!string.IsNullOrWhiteSpace(normalizedSearch))
             {
@@ -109,6 +121,13 @@ namespace Mype.Infrastructure.Products.Repositories
                 query = query.Where(item => item.Product.CategoryId == categoryId.Value);
             }
 
+            if (productCategoryId.HasValue)
+            {
+                query = query.Where(item =>
+                    item.Product.ProductCategoryId == productCategoryId.Value
+                );
+            }
+
             if (isActive.HasValue)
             {
                 query = query.Where(item => item.Product.IsActive == isActive.Value);
@@ -120,6 +139,7 @@ namespace Mype.Infrastructure.Products.Repositories
                     item.Product.IsActive
                     && item.Category.IsActive
                     && item.Category.Type == CategoryType.Sale
+                    && item.ProductCategory.IsActive
                 );
             }
 
@@ -130,6 +150,9 @@ namespace Mype.Infrastructure.Products.Repositories
                     item.Product.BusinessId,
                     item.Product.CategoryId,
                     item.Category.Name,
+                    item.Product.ProductCategoryId,
+                    item.ProductCategory.Name,
+                    item.ProductCategory.Color,
                     item.Product.Name,
                     item.Product.SalePrice,
                     item.Product.UnitCost,
@@ -152,6 +175,12 @@ namespace Mype.Infrastructure.Products.Repositories
                         CategoryId = category.Id,
                         category.BusinessId,
                     }
+                join productCategory in _dbContext.ProductCategories.AsNoTracking()
+                    on new { product.ProductCategoryId, product.BusinessId } equals new
+                    {
+                        ProductCategoryId = productCategory.Id,
+                        productCategory.BusinessId,
+                    }
                 where product.Id == productId && product.BusinessId == businessId
                 select new ProductDetailProjection(
                     product.Id,
@@ -159,6 +188,9 @@ namespace Mype.Infrastructure.Products.Repositories
                     product.CategoryId,
                     category.Name,
                     category.Type,
+                    product.ProductCategoryId,
+                    productCategory.Name,
+                    productCategory.Color,
                     product.Name,
                     product.SalePrice,
                     product.UnitCost,

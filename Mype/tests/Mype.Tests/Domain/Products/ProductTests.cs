@@ -30,9 +30,10 @@ namespace Mype.Tests.Domain.Products
         {
             var p = Create();
             var category = Guid.NewGuid();
+            var productCategoryId = Guid.NewGuid();
             var user = Guid.NewGuid();
             var at = CreatedAt.AddHours(1);
-            p.Update(category, "Agua", "AGUA", 2m, 1m, user, at);
+            p.Update(category, productCategoryId, "Agua", "AGUA", 2m, 1m, user, at);
             p.CategoryId.Should().Be(category);
             p.Name.Should().Be("Agua");
             p.NormalizedName.Should().Be("AGUA");
@@ -59,6 +60,7 @@ namespace Mype.Tests.Domain.Products
 
         private static Product Create() =>
             Product.Create(
+                Guid.NewGuid(),
                 Guid.NewGuid(),
                 Guid.NewGuid(),
                 "Gaseosa",

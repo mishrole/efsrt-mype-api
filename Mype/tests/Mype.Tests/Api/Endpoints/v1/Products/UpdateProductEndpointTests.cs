@@ -22,6 +22,7 @@ namespace Mype.Tests.Api.Endpoints.v1.Products
             var productId = Guid.NewGuid();
             var userId = Guid.NewGuid();
             var categoryId = Guid.NewGuid();
+            var productCategoryId = Guid.NewGuid();
             var sender = new Mock<ISender>();
             var user = new Mock<IUserContextProvider>();
             user.Setup(x => x.GetCurrentUserId()).Returns(userId);
@@ -51,6 +52,7 @@ namespace Mype.Tests.Api.Endpoints.v1.Products
                 new UpdateProductEndpoint.UpdateProductRequest(
                     "Gaseosa",
                     categoryId,
+                    productCategoryId,
                     3.5m,
                     2.2m,
                     7

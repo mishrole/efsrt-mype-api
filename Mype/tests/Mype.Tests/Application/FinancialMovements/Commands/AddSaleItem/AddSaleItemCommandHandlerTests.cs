@@ -29,6 +29,7 @@ namespace Mype.Tests.Application.FinancialMovements.Commands.AddSaleItem
             RoleId = Guid.NewGuid(),
             MovementId = Guid.NewGuid(),
             CategoryId = Guid.NewGuid(),
+            ProductCategoryId = Guid.NewGuid(),
             ProductId = Guid.NewGuid();
         private static readonly DateTimeOffset Now = new(2026, 10, 10, 12, 0, 0, TimeSpan.Zero);
         private readonly Mock<IBusinessMembershipRepository> _memberships = new();
@@ -224,6 +225,7 @@ namespace Mype.Tests.Application.FinancialMovements.Commands.AddSaleItem
             var p = Product.Create(
                 BusinessId,
                 CategoryId,
+                ProductCategoryId,
                 "Gaseosa",
                 "GASEOSA",
                 3.5m,

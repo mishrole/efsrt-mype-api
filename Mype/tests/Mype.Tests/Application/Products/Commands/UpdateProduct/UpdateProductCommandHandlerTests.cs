@@ -9,12 +9,14 @@ using Mype.Application.Categories.Interfaces;
 using Mype.Application.Common.Exceptions;
 using Mype.Application.Common.Interfaces;
 using Mype.Application.Permissions.Interfaces;
+using Mype.Application.ProductCategories.Interfaces;
 using Mype.Application.Products.Commands.UpdateProduct;
 using Mype.Application.Products.Interfaces;
 using Mype.Domain.Businesses;
 using Mype.Domain.BusinessMemberships;
 using Mype.Domain.Categories;
 using Mype.Domain.Permissions.Constants;
+using Mype.Domain.ProductCategories;
 using Mype.Domain.Products;
 using Mype.Shared.Constants;
 
@@ -30,6 +32,8 @@ namespace Mype.Tests.Application.Products.Commands.UpdateProduct
 
         private static readonly Guid CategoryId = Guid.NewGuid();
 
+        private static readonly Guid ProductCategoryId = Guid.NewGuid();
+
         private static readonly Guid ProductId = Guid.NewGuid();
 
         private static readonly DateTimeOffset UtcNow = new(2026, 10, 10, 12, 0, 0, TimeSpan.Zero);
@@ -37,6 +41,7 @@ namespace Mype.Tests.Application.Products.Commands.UpdateProduct
         private readonly Mock<IBusinessMembershipRepository> _memberships = new();
         private readonly Mock<IPermissionRepository> _permissions = new();
         private readonly Mock<ICategoryRepository> _categories = new();
+        private readonly Mock<IProductCategoryRepository> _productCategories = new();
         private readonly Mock<IProductRepository> _products = new();
         private readonly Mock<IUnitOfWork> _unitOfWork = new();
         private readonly Mock<IClock> _clock = new();
@@ -48,6 +53,7 @@ namespace Mype.Tests.Application.Products.Commands.UpdateProduct
                 _memberships.Object,
                 _permissions.Object,
                 _categories.Object,
+                _productCategories.Object,
                 _products.Object,
                 _unitOfWork.Object,
                 _clock.Object
@@ -58,6 +64,9 @@ namespace Mype.Tests.Application.Products.Commands.UpdateProduct
         public async Task Handle_Should_Update_Product_When_Request_Is_Valid()
         {
             var product = CreateProductEntity();
+
+            SetupProductAndCategory();
+
             SetupValidAccess();
             _products
                 .Setup(x =>
@@ -68,11 +77,6 @@ namespace Mype.Tests.Application.Products.Commands.UpdateProduct
                     )
                 )
                 .ReturnsAsync(product);
-            _categories
-                .Setup(x =>
-                    x.GetByIdAndBusinessAsync(CategoryId, BusinessId, It.IsAny<CancellationToken>())
-                )
-                .ReturnsAsync(CreateCategory());
             _products
                 .Setup(x =>
                     x.ExistsOtherByBusinessAndNormalizedNameAsync(
@@ -350,6 +354,29 @@ namespace Mype.Tests.Application.Products.Commands.UpdateProduct
                     x.GetByIdAndBusinessAsync(CategoryId, BusinessId, It.IsAny<CancellationToken>())
                 )
                 .ReturnsAsync(CreateCategory());
+
+            _productCategories
+                .Setup(repository =>
+                    repository.GetByIdAndBusinessAsync(
+                        ProductCategoryId,
+                        BusinessId,
+                        It.IsAny<CancellationToken>()
+                    )
+                )
+                .ReturnsAsync(CreateActiveProductCategory());
+        }
+
+        private ProductCategory CreateActiveProductCategory()
+        {
+            return ProductCategory.Create(
+                BusinessId,
+                "Bebidas",
+                "BEBIDAS",
+                ProductCategoryPalette.Neutral,
+                false,
+                UserId,
+                UtcNow
+            );
         }
 
         private void SetupSuccessfulUpdate()
@@ -375,6 +402,7 @@ namespace Mype.Tests.Application.Products.Commands.UpdateProduct
                 ProductId = ProductId,
                 CurrentUserId = UserId,
                 CategoryId = CategoryId,
+                ProductCategoryId = ProductCategoryId,
                 Name = name,
                 SalePrice = 4m,
                 UnitCost = 2.5m,
@@ -427,6 +455,7 @@ namespace Mype.Tests.Application.Products.Commands.UpdateProduct
             var product = Product.Create(
                 BusinessId,
                 CategoryId,
+                ProductCategoryId,
                 "Gaseosa",
                 "GASEOSA",
                 3.50m,

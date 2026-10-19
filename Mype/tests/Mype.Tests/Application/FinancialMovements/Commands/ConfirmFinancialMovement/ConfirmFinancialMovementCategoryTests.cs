@@ -183,6 +183,7 @@ namespace Mype.Tests.Application.FinancialMovements.Commands.ConfirmFinancialMov
                 var product = Product.Create(
                     BusinessId,
                     categoryId,
+                    Guid.NewGuid(),
                     "Gaseosa",
                     "GASEOSA",
                     4m,

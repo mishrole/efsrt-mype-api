@@ -18,9 +18,11 @@ namespace Mype.Tests.Domain.FinancialMovements
             var confirmerId = Guid.NewGuid();
             var cancellerId = Guid.NewGuid();
             var categoryId = Guid.NewGuid();
+            var productCategoryId = Guid.NewGuid();
             var product = Product.Create(
                 businessId,
                 categoryId,
+                productCategoryId,
                 "Producto",
                 "PRODUCTO",
                 8m,

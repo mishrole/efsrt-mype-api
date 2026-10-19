@@ -22,7 +22,8 @@ namespace Mype.Tests.Application.Products.Queries.GetProductDetail
             ProductId = Guid.NewGuid(),
             UserId = Guid.NewGuid(),
             RoleId = Guid.NewGuid(),
-            CategoryId = Guid.NewGuid();
+            CategoryId = Guid.NewGuid(),
+            ProductCategoryId = Guid.NewGuid();
         private readonly Mock<IBusinessMembershipRepository> _memberships = new();
         private readonly Mock<IPermissionRepository> _permissions = new();
         private readonly Mock<IProductRepository> _products = new();
@@ -46,6 +47,9 @@ namespace Mype.Tests.Application.Products.Queries.GetProductDetail
                         CategoryId,
                         "Productos",
                         CategoryType.Sale,
+                        ProductCategoryId,
+                        "Bebidas",
+                        "#FFFFFF",
                         "Gaseosa",
                         3.5m,
                         2.2m,

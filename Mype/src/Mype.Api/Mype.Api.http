@@ -3,6 +3,8 @@
 @AccessToken = ACCESS_TOKEN
 @BusinessId = BUSINESS_ID
 @CategoryId = CATEGORY_ID
+@ProductCategoryId = PRODUCT_CATEGORY_ID
+@ProductCategoryVersion = 1
 @ExpenseCategoryId = EXPENSE_CATEGORY_ID
 @ProductId = PRODUCT_ID
 @MovementId = MOVEMENT_ID
@@ -106,7 +108,113 @@ Accept: application/json
 
 ###
 
-# Crea un producto asociado con una categoría de venta.
+# Crea rápidamente una categoría desde el selector de Producto.
+# Al omitir color, el backend asigna el neutral #64748B.
+POST {{Mype.Api_HostAddress}}/api/v1/businesses/{{BusinessId}}/product-categories
+Authorization: Bearer {{AccessToken}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "Bebidas"
+}
+
+###
+
+# Crea una categoría desde el módulo de categorías de producto con color elegido.
+POST {{Mype.Api_HostAddress}}/api/v1/businesses/{{BusinessId}}/product-categories
+Authorization: Bearer {{AccessToken}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "Bebidas",
+  "color": "#3F6FC4"
+}
+
+###
+
+# Lista todas las categorías de producto del negocio.
+GET {{Mype.Api_HostAddress}}/api/v1/businesses/{{BusinessId}}/product-categories
+Authorization: Bearer {{AccessToken}}
+Accept: application/json
+
+###
+
+# Lista únicamente las categorías de producto activas.
+GET {{Mype.Api_HostAddress}}/api/v1/businesses/{{BusinessId}}/product-categories?isActive=true
+Authorization: Bearer {{AccessToken}}
+Accept: application/json
+
+###
+
+# Lista únicamente las categorías de producto inactivas.
+GET {{Mype.Api_HostAddress}}/api/v1/businesses/{{BusinessId}}/product-categories?isActive=false
+Authorization: Bearer {{AccessToken}}
+Accept: application/json
+
+###
+
+# Busca categorías de producto por nombre normalizado.
+GET {{Mype.Api_HostAddress}}/api/v1/businesses/{{BusinessId}}/product-categories?search=bebidas
+Authorization: Bearer {{AccessToken}}
+Accept: application/json
+
+###
+
+# Combina búsqueda por nombre y estado lógico.
+GET {{Mype.Api_HostAddress}}/api/v1/businesses/{{BusinessId}}/product-categories?search=bebidas&isActive=true
+Authorization: Bearer {{AccessToken}}
+Accept: application/json
+
+###
+
+# Obtiene el detalle de una categoría de producto.
+GET {{Mype.Api_HostAddress}}/api/v1/businesses/{{BusinessId}}/product-categories/{{ProductCategoryId}}
+Authorization: Bearer {{AccessToken}}
+Accept: application/json
+
+###
+
+# Actualiza el nombre y color usando concurrencia optimista.
+PUT {{Mype.Api_HostAddress}}/api/v1/businesses/{{BusinessId}}/product-categories/{{ProductCategoryId}}
+Authorization: Bearer {{AccessToken}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "Bebidas frías",
+  "color": "#3F6FC4",
+  "version": {{ProductCategoryVersion}}
+}
+
+###
+
+# Desactiva lógicamente una categoría de producto.
+PATCH {{Mype.Api_HostAddress}}/api/v1/businesses/{{BusinessId}}/product-categories/{{ProductCategoryId}}/deactivate
+Authorization: Bearer {{AccessToken}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "version": {{ProductCategoryVersion}}
+}
+
+###
+
+# Reactiva una categoría de producto después de la confirmación del usuario.
+PATCH {{Mype.Api_HostAddress}}/api/v1/businesses/{{BusinessId}}/product-categories/{{ProductCategoryId}}/reactivate
+Authorization: Bearer {{AccessToken}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "version": {{ProductCategoryVersion}}
+}
+
+###
+
+# Crea un producto asociado con una clasificación financiera y una categoría de producto.
 POST {{Mype.Api_HostAddress}}/api/v1/businesses/{{BusinessId}}/products
 Authorization: Bearer {{AccessToken}}
 Content-Type: application/json
@@ -115,6 +223,7 @@ Accept: application/json
 {
   "name": "Gaseosa 500 ml",
   "categoryId": "{{CategoryId}}",
+  "productCategoryId": "{{ProductCategoryId}}",
   "salePrice": 3.50,
   "unitCost": 2.20
 }
@@ -137,6 +246,20 @@ Accept: application/json
 
 # Filtra los productos por categoría.
 GET {{Mype.Api_HostAddress}}/api/v1/businesses/{{BusinessId}}/products?categoryId={{CategoryId}}
+Authorization: Bearer {{AccessToken}}
+Accept: application/json
+
+###
+
+# Filtra productos por categoría de producto.
+GET {{Mype.Api_HostAddress}}/api/v1/businesses/{{BusinessId}}/products?productCategoryId={{ProductCategoryId}}
+Authorization: Bearer {{AccessToken}}
+Accept: application/json
+
+###
+
+# Combina categoría financiera, categoría de producto y estado.
+GET {{Mype.Api_HostAddress}}/api/v1/businesses/{{BusinessId}}/products?categoryId={{CategoryId}}&productCategoryId={{ProductCategoryId}}&isActive=true
 Authorization: Bearer {{AccessToken}}
 Accept: application/json
 
@@ -172,6 +295,7 @@ Accept: application/json
 {
   "name": "Gaseosa 500 ml",
   "categoryId": "{{CategoryId}}",
+  "productCategoryId": "{{ProductCategoryId}}",
   "salePrice": 3.80,
   "unitCost": 2.35,
   "version": {{ProductVersion}}

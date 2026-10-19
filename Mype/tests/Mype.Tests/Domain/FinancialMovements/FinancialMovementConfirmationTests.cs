@@ -207,6 +207,7 @@ namespace Mype.Tests.Domain.FinancialMovements
             Product.Create(
                 businessId,
                 Guid.NewGuid(),
+                Guid.NewGuid(),
                 "Gaseosa",
                 "GASEOSA",
                 4m,

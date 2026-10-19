@@ -11,6 +11,7 @@ namespace Mype.Application.Products.Commands.UpdateProduct
         public Guid ProductId { get; set; }
         public Guid CurrentUserId { get; set; }
         public Guid CategoryId { get; set; }
+        public Guid ProductCategoryId { get; set; }
         public string Name { get; set; } = string.Empty;
         public decimal SalePrice { get; set; }
         public decimal UnitCost { get; set; }

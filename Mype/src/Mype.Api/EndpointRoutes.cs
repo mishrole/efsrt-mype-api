@@ -7,6 +7,7 @@ using Mype.Api.Endpoints.v1.Businesses;
 using Mype.Api.Endpoints.v1.Categories;
 using Mype.Api.Endpoints.v1.FinancialDashboard;
 using Mype.Api.Endpoints.v1.FinancialMovements;
+using Mype.Api.Endpoints.v1.ProductCategories;
 using Mype.Api.Endpoints.v1.Products;
 using Mype.Application.Auth.Commands.Login;
 using Mype.Application.Auth.Commands.RefreshSession;
@@ -28,6 +29,7 @@ using Mype.Application.FinancialMovements.Queries.GetFinancialMovementHistoryDet
 using Mype.Application.FinancialMovements.Queries.ListFinancialMovementDrafts;
 using Mype.Application.FinancialMovements.Queries.ListFinancialMovementHistory;
 using Mype.Application.MovementEvidences.Models;
+using Mype.Application.ProductCategories;
 using Mype.Application.Products.Commands.Common;
 using Mype.Application.Products.Commands.CreateProduct;
 using Mype.Application.Products.Queries.GetProductDetail;
@@ -150,6 +152,10 @@ namespace Mype.Api
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status409Conflict)
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
 
+            #endregion
+
+            #region Categories
+
             var categoryGroup = businessGroup
                 .MapGroup("/{businessId:guid}/categories")
                 .WithTags("Categories");
@@ -164,6 +170,92 @@ namespace Mype.Api
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status403Forbidden)
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status409Conflict)
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
+
+            #endregion
+
+            #region Product Categories
+
+            var productCategoryGroup = businessGroup
+                .MapGroup("/{businessId:guid}/product-categories")
+                .WithTags("ProductCategories");
+
+            productCategoryGroup
+                .MapPost(string.Empty, CreateProductCategoryEndpoint.DoAsync)
+                .WithName("CreateProductCategory")
+                .WithSummary("Crear una categoría de producto")
+                .Produces<ProductCategoryResult>(StatusCodes.Status201Created)
+                .ProducesValidationProblem(StatusCodes.Status400BadRequest)
+                .ProducesProblem(StatusCodes.Status401Unauthorized)
+                .ProducesProblem(StatusCodes.Status403Forbidden)
+                .ProducesProblem(StatusCodes.Status409Conflict)
+                .ProducesProblem(StatusCodes.Status500InternalServerError);
+
+            productCategoryGroup
+                .MapGet(string.Empty, ListProductCategoriesEndpoint.DoAsync)
+                .WithName("ListProductCategories")
+                .WithSummary("Listar categorías de producto")
+                .Produces<IReadOnlyCollection<ProductCategoryResult>>(StatusCodes.Status200OK)
+                .ProducesValidationProblem(StatusCodes.Status400BadRequest)
+                .ProducesProblem(StatusCodes.Status401Unauthorized)
+                .ProducesProblem(StatusCodes.Status403Forbidden)
+                .ProducesProblem(StatusCodes.Status409Conflict);
+
+            productCategoryGroup
+                .MapGet("/{productCategoryId:guid}", GetProductCategoryDetailEndpoint.DoAsync)
+                .WithName("GetProductCategoryDetail")
+                .WithSummary("Consultar una categoría de producto")
+                .Produces<ProductCategoryResult>(StatusCodes.Status200OK)
+                .ProducesValidationProblem(StatusCodes.Status400BadRequest)
+                .ProducesProblem(StatusCodes.Status401Unauthorized)
+                .ProducesProblem(StatusCodes.Status403Forbidden)
+                .ProducesProblem(StatusCodes.Status404NotFound)
+                .ProducesProblem(StatusCodes.Status409Conflict);
+
+            productCategoryGroup
+                .MapPut("/{productCategoryId:guid}", UpdateProductCategoryEndpoint.DoAsync)
+                .WithName("UpdateProductCategory")
+                .WithSummary("Actualizar una categoría de producto")
+                .Produces<ProductCategoryResult>(StatusCodes.Status200OK)
+                .ProducesValidationProblem(StatusCodes.Status400BadRequest)
+                .ProducesProblem(StatusCodes.Status401Unauthorized)
+                .ProducesProblem(StatusCodes.Status403Forbidden)
+                .ProducesProblem(StatusCodes.Status404NotFound)
+                .ProducesProblem(StatusCodes.Status409Conflict)
+                .ProducesProblem(StatusCodes.Status500InternalServerError);
+
+            productCategoryGroup
+                .MapPatch(
+                    "/{productCategoryId:guid}/deactivate",
+                    DeactivateProductCategoryEndpoint.DoAsync
+                )
+                .WithName("DeactivateProductCategory")
+                .WithSummary("Desactivar una categoría de producto")
+                .Produces<ProductCategoryResult>(StatusCodes.Status200OK)
+                .ProducesValidationProblem(StatusCodes.Status400BadRequest)
+                .ProducesProblem(StatusCodes.Status401Unauthorized)
+                .ProducesProblem(StatusCodes.Status403Forbidden)
+                .ProducesProblem(StatusCodes.Status404NotFound)
+                .ProducesProblem(StatusCodes.Status409Conflict)
+                .ProducesProblem(StatusCodes.Status500InternalServerError);
+
+            productCategoryGroup
+                .MapPatch(
+                    "/{productCategoryId:guid}/reactivate",
+                    ReactivateProductCategoryEndpoint.DoAsync
+                )
+                .WithName("ReactivateProductCategory")
+                .WithSummary("Reactivar una categoría de producto")
+                .Produces<ProductCategoryResult>(StatusCodes.Status200OK)
+                .ProducesValidationProblem(StatusCodes.Status400BadRequest)
+                .ProducesProblem(StatusCodes.Status401Unauthorized)
+                .ProducesProblem(StatusCodes.Status403Forbidden)
+                .ProducesProblem(StatusCodes.Status404NotFound)
+                .ProducesProblem(StatusCodes.Status409Conflict)
+                .ProducesProblem(StatusCodes.Status500InternalServerError);
+
+            #endregion
+
+            #region Products
 
             var productGroup = businessGroup
                 .MapGroup("/{businessId:guid}/products")
@@ -243,6 +335,10 @@ namespace Mype.Api
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status409Conflict)
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status422UnprocessableEntity)
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
+
+            #endregion
+
+            #region Financial Movements
 
             var financialMovementGroup = businessGroup
                 .MapGroup("/{businessId:guid}/financial-movements")
@@ -352,6 +448,10 @@ namespace Mype.Api
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status409Conflict)
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
 
+            #endregion
+
+            #region Financial Movement Items
+
             var financialMovementItemGroup = financialMovementGroup
                 .MapGroup("/{movementId:guid}")
                 .WithTags("FinancialMovementItems");
@@ -422,6 +522,10 @@ namespace Mype.Api
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status404NotFound)
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status409Conflict)
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
+
+            #endregion
+
+            #region Evidences
 
             var evidenceGroup = financialMovementGroup
                 .MapGroup("/{movementId:guid}/evidences")

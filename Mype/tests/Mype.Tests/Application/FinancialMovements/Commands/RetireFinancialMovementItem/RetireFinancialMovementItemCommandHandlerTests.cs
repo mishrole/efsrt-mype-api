@@ -36,7 +36,7 @@ namespace Mype.Tests.Application.FinancialMovements.Commands.RetireFinancialMove
                 now
             );
             var item = m.AddSaleItem(
-                Product.Create(b, Guid.NewGuid(), "A", "A", 1m, 1m, u, now),
+                Product.Create(b, Guid.NewGuid(), Guid.NewGuid(), "A", "A", 1m, 1m, u, now),
                 2m,
                 3m,
                 u,

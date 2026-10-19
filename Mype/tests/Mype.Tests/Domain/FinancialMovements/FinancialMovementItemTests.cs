@@ -10,6 +10,7 @@ namespace Mype.Tests.Domain.FinancialMovements
     {
         private static readonly Guid BusinessId = Guid.NewGuid();
         private static readonly Guid CategoryId = Guid.NewGuid();
+        private static readonly Guid ProductCategoryId = Guid.NewGuid();
         private static readonly Guid UserId = Guid.NewGuid();
         private static readonly DateTimeOffset UtcNow = new(2026, 10, 10, 12, 0, 0, TimeSpan.Zero);
 
@@ -20,6 +21,7 @@ namespace Mype.Tests.Domain.FinancialMovements
             var product = Product.Create(
                 BusinessId,
                 CategoryId,
+                ProductCategoryId,
                 "Gaseosa",
                 "GASEOSA",
                 3.50m,
@@ -81,6 +83,7 @@ namespace Mype.Tests.Domain.FinancialMovements
             var product = Product.Create(
                 Guid.NewGuid(),
                 CategoryId,
+                ProductCategoryId,
                 "Otro",
                 "OTRO",
                 1m,
@@ -122,9 +125,11 @@ namespace Mype.Tests.Domain.FinancialMovements
             var movement = SaleMovement();
             var item = movement.AddSaleItem(CreateProduct(), 1m, 2m, UserId, UtcNow);
             var categoryId = Guid.NewGuid();
+            var productCategoryId = Guid.NewGuid();
             var replacement = Product.Create(
                 BusinessId,
                 categoryId,
+                productCategoryId,
                 "Agua",
                 "AGUA",
                 4m,
@@ -195,6 +200,7 @@ namespace Mype.Tests.Domain.FinancialMovements
             Product.Create(
                 BusinessId,
                 CategoryId,
+                ProductCategoryId,
                 "Gaseosa",
                 "GASEOSA",
                 3.50m,
