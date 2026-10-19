@@ -57,6 +57,13 @@ namespace Mype.Shared.Constants
 
         #endregion
 
+        #region ProductCategories
+
+        public const string ProductCategoryNotFound = "PRODUCT_CATEGORY_NOT_FOUND";
+        public const string ProductCategoryAlreadyExists = "PRODUCT_CATEGORY_ALREADY_EXISTS";
+
+        #endregion
+
         #region FinancialDashboard
 
         public const string DashboardAccessForbidden = "DASHBOARD_ACCESS_FORBIDDEN";

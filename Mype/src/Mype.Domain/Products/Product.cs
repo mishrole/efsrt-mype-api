@@ -11,6 +11,7 @@ namespace Mype.Domain.Products
             Guid id,
             Guid businessId,
             Guid categoryId,
+            Guid productCategoryId,
             string name,
             string normalizedName,
             decimal salePrice,
@@ -22,6 +23,7 @@ namespace Mype.Domain.Products
         {
             BusinessId = businessId;
             CategoryId = categoryId;
+            ProductCategoryId = productCategoryId;
             Name = name;
             NormalizedName = normalizedName;
             SalePrice = salePrice;
@@ -36,6 +38,8 @@ namespace Mype.Domain.Products
         public Guid BusinessId { get; private set; }
 
         public Guid CategoryId { get; private set; }
+
+        public Guid ProductCategoryId { get; private set; }
 
         public string Name { get; private set; } = string.Empty;
 
@@ -62,6 +66,7 @@ namespace Mype.Domain.Products
 
         public void Update(
             Guid categoryId,
+            Guid productCategoryId,
             string name,
             string normalizedName,
             decimal salePrice,
@@ -71,6 +76,7 @@ namespace Mype.Domain.Products
         )
         {
             CategoryId = categoryId;
+            ProductCategoryId = productCategoryId;
             Name = name;
             NormalizedName = normalizedName;
             SalePrice = salePrice;
@@ -98,6 +104,7 @@ namespace Mype.Domain.Products
         public static Product Create(
             Guid businessId,
             Guid categoryId,
+            Guid productCategoryId,
             string name,
             string normalizedName,
             decimal salePrice,
@@ -110,6 +117,7 @@ namespace Mype.Domain.Products
                 Guid.NewGuid(),
                 businessId,
                 categoryId,
+                productCategoryId,
                 name,
                 normalizedName,
                 salePrice,

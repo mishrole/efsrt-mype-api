@@ -5,6 +5,7 @@ using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Mype.Domain.Categories;
+using Mype.Domain.ProductCategories;
 using Mype.Domain.Products;
 using Mype.Infrastructure.Persistence;
 using Mype.Infrastructure.Products.Repositories;
@@ -95,7 +96,7 @@ namespace Mype.Tests.Infrastructure.Products.Repositories
         }
 
         [Fact]
-        public async Task ListByBusinessAsync_Should_Filter_Search_Category_And_Status()
+        public async Task ListByBusinessAsync_Should_Filter_Search_Categories_And_Status()
         {
             await using var factory = CreateFactory();
             await using var scope = factory.Services.CreateAsyncScope();
@@ -116,6 +117,7 @@ namespace Mype.Tests.Infrastructure.Products.Repositories
                 data.Seed.Business.Id,
                 "GASEOSA",
                 data.SaleCategory.Id,
+                data.ProductCategory.Id,
                 true,
                 false,
                 CancellationToken.None
@@ -127,7 +129,7 @@ namespace Mype.Tests.Infrastructure.Products.Repositories
         }
 
         [Fact]
-        public async Task ListByBusinessAsync_AvailableForSale_Should_Require_Active_Product_And_Category()
+        public async Task ListByBusinessAsync_AvailableForSale_Should_Require_Active_Product_And_Categories()
         {
             await using var factory = CreateFactory();
             await using var scope = factory.Services.CreateAsyncScope();
@@ -137,6 +139,7 @@ namespace Mype.Tests.Infrastructure.Products.Repositories
             var available = CreateProduct(data, "Disponible");
             var inactiveProduct = CreateProduct(data, "Producto inactivo");
             inactiveProduct.Deactivate(data.Seed.User.Id, RepositoryTestData.UtcNow.AddMinutes(1));
+
             var inactiveCategory = Category.CreateDefault(
                 data.Seed.Business.Id,
                 CategoryType.Sale,
@@ -147,9 +150,11 @@ namespace Mype.Tests.Infrastructure.Products.Repositories
             );
             inactiveCategory.Deactivate(data.Seed.User.Id, RepositoryTestData.UtcNow.AddMinutes(1));
             context.Categories.Add(inactiveCategory);
+
             var unavailableByCategory = Product.Create(
                 data.Seed.Business.Id,
                 inactiveCategory.Id,
+                data.ProductCategory.Id,
                 "Categoría no disponible",
                 $"PRODUCT {Guid.NewGuid():N}".ToUpperInvariant(),
                 4m,
@@ -157,13 +162,43 @@ namespace Mype.Tests.Infrastructure.Products.Repositories
                 data.Seed.User.Id,
                 RepositoryTestData.UtcNow
             );
+
+            var inactiveProductCategory = ProductCategory.Create(
+                data.Seed.Business.Id,
+                "Categoría de producto inactiva",
+                $"PRODUCT CATEGORY {Guid.NewGuid():N}".ToUpperInvariant(),
+                ProductCategoryPalette.Neutral,
+                false,
+                data.Seed.User.Id,
+                RepositoryTestData.UtcNow
+            );
+            inactiveProductCategory.Deactivate(
+                data.Seed.User.Id,
+                RepositoryTestData.UtcNow.AddMinutes(1)
+            );
+            context.ProductCategories.Add(inactiveProductCategory);
+
+            var unavailableByProductCategory = Product.Create(
+                data.Seed.Business.Id,
+                data.SaleCategory.Id,
+                inactiveProductCategory.Id,
+                "Categoría de producto no disponible",
+                $"PRODUCT {Guid.NewGuid():N}".ToUpperInvariant(),
+                4m,
+                2m,
+                data.Seed.User.Id,
+                RepositoryTestData.UtcNow
+            );
+
             await repository.AddAsync(available, CancellationToken.None);
             await repository.AddAsync(inactiveProduct, CancellationToken.None);
             await repository.AddAsync(unavailableByCategory, CancellationToken.None);
+            await repository.AddAsync(unavailableByProductCategory, CancellationToken.None);
             await context.SaveChangesAsync(CancellationToken.None);
 
             var result = await repository.ListByBusinessAsync(
                 data.Seed.Business.Id,
+                null,
                 null,
                 null,
                 null,
@@ -175,7 +210,7 @@ namespace Mype.Tests.Infrastructure.Products.Repositories
         }
 
         [Fact]
-        public async Task GetByIdAndBusinessAsync_Should_Project_Category_And_NotTrack_Product()
+        public async Task GetByIdAndBusinessAsync_Should_Project_Categories_And_NotTrack_Product()
         {
             await using var factory = CreateFactory();
             await using var scope = factory.Services.CreateAsyncScope();
@@ -197,7 +232,11 @@ namespace Mype.Tests.Infrastructure.Products.Repositories
             result.CategoryId.Should().Be(data.SaleCategory.Id);
             result.CategoryName.Should().Be(data.SaleCategory.Name);
             result.CategoryType.Should().Be(CategoryType.Sale);
+            result.ProductCategoryId.Should().Be(data.ProductCategory.Id);
+            result.ProductCategoryName.Should().Be(data.ProductCategory.Name);
+            result.ProductCategoryColor.Should().Be(data.ProductCategory.Color);
             context.ChangeTracker.Entries<Product>().Should().BeEmpty();
+            context.ChangeTracker.Entries<ProductCategory>().Should().BeEmpty();
         }
 
         private MypeWebApplicationFactory CreateFactory() => new(_database.ConnectionString);
@@ -205,7 +244,7 @@ namespace Mype.Tests.Infrastructure.Products.Repositories
         private static async Task<ProductSeed> SeedProductDependenciesAsync(MypeDbContext context)
         {
             var seed = await RepositoryTestData.SeedBusinessAsync(context);
-            var category = Category.CreateDefault(
+            var saleCategory = Category.CreateDefault(
                 seed.Business.Id,
                 CategoryType.Sale,
                 "Productos",
@@ -213,15 +252,26 @@ namespace Mype.Tests.Infrastructure.Products.Repositories
                 seed.User.Id,
                 RepositoryTestData.UtcNow
             );
-            context.Categories.Add(category);
+            var productCategory = ProductCategory.Create(
+                seed.Business.Id,
+                "Otros",
+                $"OTROS {seed.Suffix}".ToUpperInvariant(),
+                ProductCategoryPalette.Neutral,
+                true,
+                seed.User.Id,
+                RepositoryTestData.UtcNow
+            );
+            context.Categories.Add(saleCategory);
+            context.ProductCategories.Add(productCategory);
             await context.SaveChangesAsync(CancellationToken.None);
-            return new(seed, category);
+            return new(seed, saleCategory, productCategory);
         }
 
         private static Product CreateProduct(ProductSeed data, string name) =>
             Product.Create(
                 data.Seed.Business.Id,
                 data.SaleCategory.Id,
+                data.ProductCategory.Id,
                 name,
                 $"{name} {Guid.NewGuid():N}".ToUpperInvariant(),
                 5m,
@@ -230,6 +280,10 @@ namespace Mype.Tests.Infrastructure.Products.Repositories
                 RepositoryTestData.UtcNow
             );
 
-        private sealed record ProductSeed(BusinessSeed Seed, Category SaleCategory);
+        private sealed record ProductSeed(
+            BusinessSeed Seed,
+            Category SaleCategory,
+            ProductCategory ProductCategory
+        );
     }
 }

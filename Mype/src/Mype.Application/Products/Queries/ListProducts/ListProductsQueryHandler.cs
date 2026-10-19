@@ -7,6 +7,7 @@ using Mype.Application.BusinessMemberships.Interfaces;
 using Mype.Application.Categories.Interfaces;
 using Mype.Application.Common;
 using Mype.Application.Permissions.Interfaces;
+using Mype.Application.ProductCategories.Interfaces;
 using Mype.Application.Products.Interfaces;
 using Mype.Application.Products.Normalizers;
 using Mype.Domain.Businesses;
@@ -24,21 +25,22 @@ namespace Mype.Application.Products.Queries.ListProducts
 
         private readonly ICategoryRepository _categoryRepository;
 
+        private readonly IProductCategoryRepository _productCategoryRepository;
+
         private readonly IProductRepository _productRepository;
 
         public ListProductsQueryHandler(
             IBusinessMembershipRepository membershipRepository,
             IPermissionRepository permissionRepository,
             ICategoryRepository categoryRepository,
+            IProductCategoryRepository productCategoryRepository,
             IProductRepository productRepository
         )
         {
             _membershipRepository = membershipRepository;
-
             _permissionRepository = permissionRepository;
-
             _categoryRepository = categoryRepository;
-
+            _productCategoryRepository = productCategoryRepository;
             _productRepository = productRepository;
         }
 
@@ -91,6 +93,20 @@ namespace Mype.Application.Products.Queries.ListProducts
                 }
             }
 
+            if (request.ProductCategoryId.HasValue)
+            {
+                var productCategory = await _productCategoryRepository.GetByIdAndBusinessAsync(
+                    request.ProductCategoryId.Value,
+                    request.BusinessId,
+                    cancellationToken
+                );
+
+                if (productCategory is null)
+                {
+                    return Failure(ListProductsErrors.ProductCategoryNotFound);
+                }
+            }
+
             var normalizedSearch = string.IsNullOrWhiteSpace(request.Search)
                 ? null
                 : ProductNameNormalizer.NormalizeForComparison(request.Search);
@@ -99,6 +115,7 @@ namespace Mype.Application.Products.Queries.ListProducts
                 request.BusinessId,
                 normalizedSearch,
                 request.CategoryId,
+                request.ProductCategoryId,
                 request.IsActive,
                 request.AvailableForSale,
                 cancellationToken
@@ -110,6 +127,9 @@ namespace Mype.Application.Products.Queries.ListProducts
                     product.BusinessId,
                     product.CategoryId,
                     product.CategoryName,
+                    product.ProductCategoryId,
+                    product.ProductCategoryName,
+                    product.ProductCategoryColor,
                     product.Name,
                     product.SalePrice,
                     product.UnitCost,

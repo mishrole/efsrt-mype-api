@@ -15,6 +15,7 @@ namespace Mype.Api.Endpoints.v1.Products
         public sealed record CreateProductRequest(
             string Name,
             Guid CategoryId,
+            Guid ProductCategoryId,
             decimal SalePrice,
             decimal UnitCost
         );
@@ -33,6 +34,7 @@ namespace Mype.Api.Endpoints.v1.Products
                 BusinessId = businessId,
                 CurrentUserId = userContextProvider.GetCurrentUserId(),
                 CategoryId = request.CategoryId,
+                ProductCategoryId = request.ProductCategoryId,
                 Name = request.Name,
                 SalePrice = request.SalePrice,
                 UnitCost = request.UnitCost,

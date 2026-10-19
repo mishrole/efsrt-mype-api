@@ -12,6 +12,7 @@ using Mype.Domain.Currencies;
 using Mype.Domain.FinancialMovements;
 using Mype.Domain.MovementEvidences;
 using Mype.Domain.Permissions;
+using Mype.Domain.ProductCategories;
 using Mype.Domain.Products;
 using Mype.Domain.Users;
 using Mype.Infrastructure.Persistence.Exceptions;
@@ -62,6 +63,7 @@ namespace Mype.Infrastructure.Persistence
         public DbSet<BusinessRolePermission> BusinessRolePermissions =>
             Set<BusinessRolePermission>();
         public DbSet<Product> Products => Set<Product>();
+        public DbSet<ProductCategory> ProductCategories => Set<ProductCategory>();
         public DbSet<FinancialMovement> FinancialMovements => Set<FinancialMovement>();
         public DbSet<FinancialMovementItem> FinancialMovementItems => Set<FinancialMovementItem>();
         public DbSet<MovementEvidence> MovementEvidences => Set<MovementEvidence>();

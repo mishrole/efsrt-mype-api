@@ -15,6 +15,7 @@ namespace Mype.Api.Endpoints.v1.Products
         public sealed record UpdateProductRequest(
             string Name,
             Guid CategoryId,
+            Guid ProductCategoryId,
             decimal SalePrice,
             decimal UnitCost,
             uint Version
@@ -37,6 +38,7 @@ namespace Mype.Api.Endpoints.v1.Products
                 CurrentUserId = userContextProvider.GetCurrentUserId(),
                 Name = request.Name,
                 CategoryId = request.CategoryId,
+                ProductCategoryId = request.ProductCategoryId,
                 SalePrice = request.SalePrice,
                 UnitCost = request.UnitCost,
                 Version = request.Version,

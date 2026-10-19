@@ -10,6 +10,7 @@ using Mype.Domain.Categories;
 using Mype.Domain.FinancialMovements;
 using Mype.Domain.FinancialMovements.Constraints;
 using Mype.Domain.MovementEvidences;
+using Mype.Domain.ProductCategories;
 using Mype.Domain.Products;
 using Mype.Infrastructure.FinancialMovements.Repositories;
 using Mype.Infrastructure.Persistence;
@@ -202,9 +203,19 @@ namespace Mype.Tests.Infrastructure.FinancialMovements.Repositories
                 seed.User.Id,
                 RepositoryTestData.UtcNow
             );
+            var productCategory = ProductCategory.Create(
+                seed.Business.Id,
+                "Otros",
+                $"OTROS {seed.Suffix}".ToUpperInvariant(),
+                ProductCategoryPalette.Neutral,
+                true,
+                seed.User.Id,
+                RepositoryTestData.UtcNow
+            );
             var product = Product.Create(
                 seed.Business.Id,
                 category.Id,
+                productCategory.Id,
                 "Producto",
                 $"PRODUCTO {seed.Suffix}".ToUpperInvariant(),
                 5m,
@@ -232,6 +243,7 @@ namespace Mype.Tests.Infrastructure.FinancialMovements.Repositories
             movement.RetireItem(retired.Id, seed.User.Id, RepositoryTestData.UtcNow.AddMinutes(1));
             movement.Confirm(seed.User.Id, RepositoryTestData.UtcNow.AddMinutes(2));
             context.Categories.Add(category);
+            context.ProductCategories.Add(productCategory);
             context.Products.Add(product);
             context.FinancialMovements.Add(movement);
             await context.SaveChangesAsync();

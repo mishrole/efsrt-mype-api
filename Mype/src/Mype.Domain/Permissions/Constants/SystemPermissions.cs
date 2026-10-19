@@ -171,6 +171,42 @@ namespace Mype.Domain.Permissions.Constants
             "Corregir saldo de apertura",
             "Permite sustituir el saldo de apertura con auditoría."
         );
+
+        public static readonly SystemPermissionDefinition ProductCategoryRead = Create(
+            25,
+            "PRODUCT_CATEGORY_READ",
+            "Consultar categorías de producto",
+            "Permite consultar las categorías de producto del negocio."
+        );
+
+        public static readonly SystemPermissionDefinition ProductCategoryCreate = Create(
+            26,
+            "PRODUCT_CATEGORY_CREATE",
+            "Crear categorías de producto",
+            "Permite crear categorías de producto para el negocio."
+        );
+
+        public static readonly SystemPermissionDefinition ProductCategoryUpdate = Create(
+            27,
+            "PRODUCT_CATEGORY_UPDATE",
+            "Actualizar categorías de producto",
+            "Permite actualizar las categorías de producto del negocio."
+        );
+
+        public static readonly SystemPermissionDefinition ProductCategoryDeactivate = Create(
+            28,
+            "PRODUCT_CATEGORY_DEACTIVATE",
+            "Desactivar categorías de producto",
+            "Permite desactivar las categorías de producto del negocio."
+        );
+
+        public static readonly SystemPermissionDefinition ProductCategoryReactivate = Create(
+            29,
+            "PRODUCT_CATEGORY_REACTIVATE",
+            "Reactivar categorías de producto",
+            "Permite reactivar las categorías de producto del negocio."
+        );
+
         public static readonly ReadOnlyCollection<SystemPermissionDefinition> All =
             Array.AsReadOnly(
                 new[]
@@ -199,6 +235,11 @@ namespace Mype.Domain.Permissions.Constants
                     DashboardRead,
                     OpeningBalanceCreate,
                     OpeningBalanceReplace,
+                    ProductCategoryRead,
+                    ProductCategoryCreate,
+                    ProductCategoryUpdate,
+                    ProductCategoryDeactivate,
+                    ProductCategoryReactivate,
                 }
             );
 
@@ -230,6 +271,11 @@ namespace Mype.Domain.Permissions.Constants
                     DashboardRead,
                     OpeningBalanceCreate,
                     OpeningBalanceReplace,
+                    ProductCategoryRead,
+                    ProductCategoryCreate,
+                    ProductCategoryUpdate,
+                    ProductCategoryDeactivate,
+                    ProductCategoryReactivate,
                 }
             );
 

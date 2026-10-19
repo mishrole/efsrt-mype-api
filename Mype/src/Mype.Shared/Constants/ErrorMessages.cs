@@ -68,6 +68,13 @@ namespace Mype.Shared.Constants
 
         #endregion
 
+        #region ProductCategories
+
+        public const string ProductCategoryNotFound = "La categoría de producto no fue encontrada.";
+        public const string ProductCategoryAlreadyExists = "La categoría de producto ya existe.";
+
+        #endregion
+
         #region Products
 
         public const string ProductAccessForbidden =

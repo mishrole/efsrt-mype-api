@@ -2,36 +2,48 @@
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Mype.Application.Common.Exceptions;
+using Mype.Infrastructure.Persistence.Constraints;
 using Mype.Infrastructure.Persistence.Exceptions;
 using Mype.Shared.Constants;
 using Npgsql;
 
 namespace Mype.Tests.Infrastructure.Persistence.Exceptions
 {
-    public class PostgreSqlExceptionTranslatorTests
+    public sealed class PostgreSqlExceptionTranslatorTests
     {
         private readonly PostgreSqlExceptionTranslator _translator = new();
 
         [Theory]
-        [InlineData("ux_users_normalized_email", "EMAIL_ALREADY_REGISTERED")]
-        [InlineData("ux_products_business_name", "PRODUCT_ALREADY_EXISTS")]
+        [InlineData(DatabaseConstraints.Users.NormalizedEmail, ErrorCodes.EmailAlreadyRegistered)]
+        [InlineData(DatabaseConstraints.Products.BusinessName, ErrorCodes.ProductAlreadyExists)]
+        [InlineData(
+            DatabaseConstraints.ProductCategories.BusinessNormalizedName,
+            ErrorCodes.ProductCategoryAlreadyExists
+        )]
         public void Translate_Should_Map_Known_Unique_Constraints(
-            string constraint,
-            string expected
+            string constraintName,
+            string expectedErrorCode
         )
         {
-            var result = _translator.Translate(
-                CreateDbUpdateException(PostgresErrorCodes.UniqueViolation, constraint)
+            var translatedException = _translator.Translate(
+                CreateDbUpdateException(PostgresErrorCodes.UniqueViolation, constraintName)
             );
-            result.Should().BeOfType<ApplicationErrorException>().Which.Code.Should().Be(expected);
+
+            translatedException
+                .Should()
+                .BeOfType<ApplicationErrorException>()
+                .Which.Code.Should()
+                .Be(expectedErrorCode);
         }
 
         [Fact]
         public void Translate_Should_Map_Concurrency_Conflict()
         {
-            var exception = new DbUpdateConcurrencyException("conflict");
-            var result = _translator.Translate(exception);
-            result
+            var persistenceException = new DbUpdateConcurrencyException("conflict");
+
+            var translatedException = _translator.Translate(persistenceException);
+
+            translatedException
                 .Should()
                 .BeOfType<ApplicationErrorException>()
                 .Which.Code.Should()
@@ -41,8 +53,9 @@ namespace Mype.Tests.Infrastructure.Persistence.Exceptions
         [Fact]
         public void Translate_Should_Return_Original_For_Unknown_Exception()
         {
-            var ex = new InvalidOperationException();
-            _translator.Translate(ex).Should().BeSameAs(ex);
+            var originalException = new InvalidOperationException();
+
+            _translator.Translate(originalException).Should().BeSameAs(originalException);
         }
 
         private static DbUpdateException CreateDbUpdateException(
@@ -50,7 +63,7 @@ namespace Mype.Tests.Infrastructure.Persistence.Exceptions
             string constraintName
         )
         {
-            var pg = new PostgresException(
+            var postgresException = new PostgresException(
                 "failed",
                 "ERROR",
                 "ERROR",
@@ -62,7 +75,7 @@ namespace Mype.Tests.Infrastructure.Persistence.Exceptions
                 null,
                 null,
                 "public",
-                "products",
+                "product_categories",
                 null,
                 null,
                 constraintName,
@@ -70,7 +83,7 @@ namespace Mype.Tests.Infrastructure.Persistence.Exceptions
                 null,
                 null
             );
-            return new DbUpdateException(ErrorMessages.SaveChangesError, pg);
+            return new DbUpdateException(ErrorMessages.SaveChangesError, postgresException);
         }
     }
 }

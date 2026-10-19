@@ -1,5 +1,4 @@
 using System;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -27,6 +26,7 @@ namespace Mype.Tests.Application.FinancialMovements.Commands.AddSaleItem
         private static readonly Guid UserId = Guid.NewGuid();
         private static readonly Guid RoleId = Guid.NewGuid();
         private static readonly Guid CategoryId = Guid.NewGuid();
+        private static readonly Guid ProductCategoryId = Guid.NewGuid();
         private static readonly DateTimeOffset Now = new(2026, 10, 10, 12, 0, 0, TimeSpan.Zero);
 
         private readonly Mock<IBusinessMembershipRepository> _memberships = new();
@@ -111,6 +111,7 @@ namespace Mype.Tests.Application.FinancialMovements.Commands.AddSaleItem
             var product = Product.Create(
                 BusinessId,
                 CategoryId,
+                ProductCategoryId,
                 "Producto",
                 "PRODUCTO",
                 1m,
@@ -261,7 +262,17 @@ namespace Mype.Tests.Application.FinancialMovements.Commands.AddSaleItem
         }
 
         private static Product ActiveProduct() =>
-            Product.Create(BusinessId, CategoryId, "Producto", "PRODUCTO", 5m, 2m, UserId, Now);
+            Product.Create(
+                BusinessId,
+                CategoryId,
+                ProductCategoryId,
+                "Producto",
+                "PRODUCTO",
+                5m,
+                2m,
+                UserId,
+                Now
+            );
 
         private void SetupSuccessfulDependencies()
         {

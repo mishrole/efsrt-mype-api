@@ -119,6 +119,7 @@ namespace Mype.Tests.Application.FinancialMovements.Commands.RetireFinancialMove
             var product = Product.Create(
                 BusinessId,
                 Guid.NewGuid(),
+                Guid.NewGuid(),
                 "Producto",
                 "PRODUCTO",
                 5m,

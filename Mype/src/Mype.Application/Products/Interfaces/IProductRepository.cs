@@ -36,6 +36,7 @@ namespace Mype.Application.Products.Interfaces
             Guid businessId,
             string normalizedSearch,
             Guid? categoryId,
+            Guid? productCategoryId,
             bool? isActive,
             bool availableForSale,
             CancellationToken cancellationToken

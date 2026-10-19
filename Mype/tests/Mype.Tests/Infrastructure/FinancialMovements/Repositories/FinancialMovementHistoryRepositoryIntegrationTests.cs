@@ -3,12 +3,11 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Mype.Application.FinancialMovements.Models;
 using Mype.Domain.Categories;
 using Mype.Domain.FinancialMovements;
 using Mype.Domain.MovementEvidences;
+using Mype.Domain.ProductCategories;
 using Mype.Domain.Products;
 using Mype.Infrastructure.FinancialMovements.Repositories;
 using Mype.Infrastructure.Persistence;
@@ -224,9 +223,19 @@ namespace Mype.Tests.Infrastructure.FinancialMovements.Repositories
                 secondBusiness.User.Id,
                 RepositoryTestData.UtcNow
             );
+            var productCategory = ProductCategory.Create(
+                firstBusiness.Business.Id,
+                "Otros",
+                $"OTROS {firstBusiness.Suffix}".ToUpperInvariant(),
+                ProductCategoryPalette.Neutral,
+                true,
+                firstBusiness.User.Id,
+                RepositoryTestData.UtcNow
+            );
             var product = Product.Create(
                 firstBusiness.Business.Id,
                 saleCategory.Id,
+                productCategory.Id,
                 "Producto histórico",
                 $"PRODUCTO {firstBusiness.Suffix}".ToUpperInvariant(),
                 5m,
@@ -243,6 +252,7 @@ namespace Mype.Tests.Infrastructure.FinancialMovements.Repositories
             var retiredProduct = Product.Create(
                 firstBusiness.Business.Id,
                 retiredOnlyCategory.Id,
+                productCategory.Id,
                 "Producto retirado",
                 $"PRODUCTO RETIRADO {firstBusiness.Suffix}".ToUpperInvariant(),
                 5m,
@@ -250,6 +260,7 @@ namespace Mype.Tests.Infrastructure.FinancialMovements.Repositories
                 firstBusiness.User.Id,
                 RepositoryTestData.UtcNow
             );
+            context.ProductCategories.Add(productCategory);
             context.Products.AddRange(product, retiredProduct);
 
             var latest = FinancialMovement.CreateDraft(

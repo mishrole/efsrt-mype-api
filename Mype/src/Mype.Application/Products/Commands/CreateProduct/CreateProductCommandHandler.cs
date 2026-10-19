@@ -9,6 +9,7 @@ using Mype.Application.Common;
 using Mype.Application.Common.Exceptions;
 using Mype.Application.Common.Interfaces;
 using Mype.Application.Permissions.Interfaces;
+using Mype.Application.ProductCategories.Interfaces;
 using Mype.Application.Products.Interfaces;
 using Mype.Application.Products.Normalizers;
 using Mype.Domain.Businesses;
@@ -29,6 +30,8 @@ namespace Mype.Application.Products.Commands.CreateProduct
 
         private readonly ICategoryRepository _categoryRepository;
 
+        private readonly IProductCategoryRepository _productCategoryRepository;
+
         private readonly IProductRepository _productRepository;
 
         private readonly IUnitOfWork _unitOfWork;
@@ -39,6 +42,7 @@ namespace Mype.Application.Products.Commands.CreateProduct
             IBusinessMembershipRepository membershipRepository,
             IPermissionRepository permissionRepository,
             ICategoryRepository categoryRepository,
+            IProductCategoryRepository productCategoryRepository,
             IProductRepository productRepository,
             IUnitOfWork unitOfWork,
             IClock clock
@@ -49,6 +53,8 @@ namespace Mype.Application.Products.Commands.CreateProduct
             _permissionRepository = permissionRepository;
 
             _categoryRepository = categoryRepository;
+
+            _productCategoryRepository = productCategoryRepository;
 
             _productRepository = productRepository;
 
@@ -112,6 +118,15 @@ namespace Mype.Application.Products.Commands.CreateProduct
                 return Failure(CreateProductErrors.CategoryUnavailable);
             }
 
+            var productCategory = await _productCategoryRepository.GetByIdAndBusinessAsync(
+                request.ProductCategoryId,
+                request.BusinessId,
+                cancellationToken
+            );
+
+            if (productCategory == null || !productCategory.IsActive)
+                return Failure(CreateProductErrors.CategoryUnavailable);
+
             var name = ProductNameNormalizer.NormalizeName(request.Name);
 
             var normalizedName = ProductNameNormalizer.NormalizeForComparison(request.Name);
@@ -132,6 +147,7 @@ namespace Mype.Application.Products.Commands.CreateProduct
             var product = Product.Create(
                 request.BusinessId,
                 request.CategoryId,
+                request.ProductCategoryId,
                 name,
                 normalizedName,
                 request.SalePrice,
@@ -167,6 +183,9 @@ namespace Mype.Application.Products.Commands.CreateProduct
                     BusinessId = product.BusinessId,
                     CategoryId = product.CategoryId,
                     CategoryName = category.Name,
+                    ProductCategoryId = productCategory.Id,
+                    ProductCategoryName = productCategory.Name,
+                    ProductCategoryColor = productCategory.Color,
                     Name = product.Name,
                     SalePrice = product.SalePrice,
                     UnitCost = product.UnitCost,

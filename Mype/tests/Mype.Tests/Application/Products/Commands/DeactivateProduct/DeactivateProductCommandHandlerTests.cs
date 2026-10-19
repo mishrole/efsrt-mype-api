@@ -29,6 +29,7 @@ namespace Mype.Tests.Application.Products.Commands.DeactivateProduct
         private static readonly Guid RoleId = Guid.NewGuid();
 
         private static readonly Guid CategoryId = Guid.NewGuid();
+        private static readonly Guid ProductCategoryId = Guid.NewGuid();
 
         private static readonly Guid ProductId = Guid.NewGuid();
 
@@ -325,6 +326,7 @@ namespace Mype.Tests.Application.Products.Commands.DeactivateProduct
             var product = Product.Create(
                 BusinessId,
                 CategoryId,
+                ProductCategoryId,
                 "Gaseosa",
                 "GASEOSA",
                 3.50m,

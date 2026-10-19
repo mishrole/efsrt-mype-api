@@ -40,6 +40,7 @@ namespace Mype.Tests.Application.FinancialMovements.Commands.UpdateSaleItem
             var product = Product.Create(
                 b,
                 Guid.NewGuid(),
+                Guid.NewGuid(),
                 "A",
                 "A",
                 1m,

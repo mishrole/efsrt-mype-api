@@ -28,6 +28,7 @@ namespace Mype.Tests.Application.FinancialMovements.Commands.UpdateSaleItem
         private static readonly Guid UserId = Guid.NewGuid();
         private static readonly Guid RoleId = Guid.NewGuid();
         private static readonly Guid CategoryId = Guid.NewGuid();
+        private static readonly Guid ProductCategoryId = Guid.NewGuid();
         private static readonly DateTimeOffset Now = DateTimeOffset.UtcNow;
         private readonly Mock<IBusinessMembershipRepository> _memberships = new();
         private readonly Mock<IPermissionRepository> _permissions = new();
@@ -127,6 +128,7 @@ namespace Mype.Tests.Application.FinancialMovements.Commands.UpdateSaleItem
             var product = Product.Create(
                 BusinessId,
                 CategoryId,
+                ProductCategoryId,
                 "Producto",
                 "PRODUCTO",
                 5m,

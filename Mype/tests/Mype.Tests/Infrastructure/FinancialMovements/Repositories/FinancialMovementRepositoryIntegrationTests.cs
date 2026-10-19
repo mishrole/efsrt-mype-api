@@ -9,6 +9,7 @@ using Mype.Application.Common.Exceptions;
 using Mype.Domain.Businesses;
 using Mype.Domain.Categories;
 using Mype.Domain.FinancialMovements;
+using Mype.Domain.ProductCategories;
 using Mype.Domain.Products;
 using Mype.Domain.Users;
 using Mype.Infrastructure.FinancialMovements.Repositories;
@@ -242,9 +243,19 @@ namespace Mype.Tests.Infrastructure.FinancialMovements.Repositories
                 user.Id,
                 UtcNow
             );
+            var productCategory = ProductCategory.Create(
+                business.Id,
+                $"Product Category {suffix}",
+                $"PRODUCT CATEGORY {suffix}".ToUpperInvariant(),
+                ProductCategoryPalette.Neutral,
+                true,
+                user.Id,
+                UtcNow
+            );
             var product = Product.Create(
                 business.Id,
                 category.Id,
+                productCategory.Id,
                 $"Product {suffix}",
                 $"PRODUCT {suffix}".ToUpperInvariant(),
                 5m,
@@ -256,6 +267,7 @@ namespace Mype.Tests.Infrastructure.FinancialMovements.Repositories
             context.Users.Add(user);
             context.Businesses.Add(business);
             context.Categories.Add(category);
+            context.ProductCategories.Add(productCategory);
             context.Products.Add(product);
             await context.SaveChangesAsync(CancellationToken.None);
 

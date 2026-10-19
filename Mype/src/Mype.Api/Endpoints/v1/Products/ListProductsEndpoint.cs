@@ -16,6 +16,7 @@ namespace Mype.Api.Endpoints.v1.Products
             Guid businessId,
             [FromQuery] string search,
             [FromQuery] Guid? categoryId,
+            [FromQuery] Guid? productCategoryId,
             [FromQuery] bool? isActive,
             [FromQuery] bool? availableForSale,
             [FromServices] ISender sender,
@@ -30,6 +31,7 @@ namespace Mype.Api.Endpoints.v1.Products
                 CurrentUserId = userContextProvider.GetCurrentUserId(),
                 Search = search,
                 CategoryId = categoryId,
+                ProductCategoryId = productCategoryId,
                 IsActive = isActive,
                 AvailableForSale = availableForSale ?? false,
             };

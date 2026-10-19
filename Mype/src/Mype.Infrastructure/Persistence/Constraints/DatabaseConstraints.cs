@@ -55,6 +55,12 @@ namespace Mype.Infrastructure.Persistence.Constraints
             public const string UpdatedByUser = "fk_products_users_updated_by_user_id";
         }
 
+        public static class ProductCategories
+        {
+            public const string BusinessNormalizedName =
+                "ux_product_categories_business_normalized_name";
+        }
+
         public static class FinancialMovements
         {
             public const string IdBusiness = "ux_financial_movements_id_business";

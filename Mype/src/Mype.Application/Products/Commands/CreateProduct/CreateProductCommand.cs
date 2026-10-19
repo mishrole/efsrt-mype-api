@@ -12,6 +12,8 @@ namespace Mype.Application.Products.Commands.CreateProduct
 
         public Guid CategoryId { get; set; }
 
+        public Guid ProductCategoryId { get; set; }
+
         public string Name { get; set; } = string.Empty;
 
         public decimal SalePrice { get; set; }

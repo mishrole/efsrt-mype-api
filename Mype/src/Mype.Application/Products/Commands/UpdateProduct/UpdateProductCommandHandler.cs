@@ -9,6 +9,7 @@ using Mype.Application.Common;
 using Mype.Application.Common.Exceptions;
 using Mype.Application.Common.Interfaces;
 using Mype.Application.Permissions.Interfaces;
+using Mype.Application.ProductCategories.Interfaces;
 using Mype.Application.Products.Commands.Common;
 using Mype.Application.Products.Interfaces;
 using Mype.Application.Products.Normalizers;
@@ -26,6 +27,8 @@ namespace Mype.Application.Products.Commands.UpdateProduct
         private readonly IBusinessMembershipRepository _membershipRepository;
         private readonly IPermissionRepository _permissionRepository;
         private readonly ICategoryRepository _categoryRepository;
+
+        private readonly IProductCategoryRepository _productCategoryRepository;
         private readonly IProductRepository _productRepository;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IClock _clock;
@@ -34,6 +37,7 @@ namespace Mype.Application.Products.Commands.UpdateProduct
             IBusinessMembershipRepository membershipRepository,
             IPermissionRepository permissionRepository,
             ICategoryRepository categoryRepository,
+            IProductCategoryRepository productCategoryRepository,
             IProductRepository productRepository,
             IUnitOfWork unitOfWork,
             IClock clock
@@ -42,6 +46,7 @@ namespace Mype.Application.Products.Commands.UpdateProduct
             _membershipRepository = membershipRepository;
             _permissionRepository = permissionRepository;
             _categoryRepository = categoryRepository;
+            _productCategoryRepository = productCategoryRepository;
             _productRepository = productRepository;
             _unitOfWork = unitOfWork;
             _clock = clock;
@@ -93,6 +98,15 @@ namespace Mype.Application.Products.Commands.UpdateProduct
             if (!category.IsActive)
                 return Failure(UpdateProductErrors.CategoryUnavailable);
 
+            var productCategory = await _productCategoryRepository.GetByIdAndBusinessAsync(
+                request.ProductCategoryId,
+                request.BusinessId,
+                cancellationToken
+            );
+
+            if (productCategory == null || !productCategory.IsActive)
+                return Failure(UpdateProductErrors.CategoryUnavailable);
+
             var name = ProductNameNormalizer.NormalizeName(request.Name);
             var normalizedName = ProductNameNormalizer.NormalizeForComparison(request.Name);
             if (
@@ -108,6 +122,7 @@ namespace Mype.Application.Products.Commands.UpdateProduct
             _productRepository.SetOriginalVersion(product, request.Version);
             product.Update(
                 request.CategoryId,
+                request.ProductCategoryId,
                 name,
                 normalizedName,
                 request.SalePrice,

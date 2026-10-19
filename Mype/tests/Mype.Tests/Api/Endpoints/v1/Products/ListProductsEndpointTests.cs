@@ -21,6 +21,7 @@ namespace Mype.Tests.Api.Endpoints.v1.Products
             var businessId = Guid.NewGuid();
             var userId = Guid.NewGuid();
             var categoryId = Guid.NewGuid();
+            var productCategoryId = Guid.NewGuid();
 
             var senderMock = new Mock<ISender>();
             var userContextProviderMock = new Mock<IUserContextProvider>();
@@ -41,6 +42,7 @@ namespace Mype.Tests.Api.Endpoints.v1.Products
                 businessId,
                 "gaseosa",
                 categoryId,
+                productCategoryId,
                 true,
                 true,
                 senderMock.Object,
@@ -96,6 +98,7 @@ namespace Mype.Tests.Api.Endpoints.v1.Products
 
             var result = await ListProductsEndpoint.DoAsync(
                 businessId,
+                null,
                 null,
                 null,
                 null,

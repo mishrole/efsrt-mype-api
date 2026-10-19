@@ -20,6 +20,7 @@ namespace Mype.Tests.Api.Endpoints.v1.Products
             var businessId = Guid.NewGuid();
             var userId = Guid.NewGuid();
             var categoryId = Guid.NewGuid();
+            var productCategoryId = Guid.NewGuid();
             var productId = Guid.NewGuid();
 
             var senderMock = new Mock<ISender>();
@@ -45,7 +46,13 @@ namespace Mype.Tests.Api.Endpoints.v1.Products
 
             var result = await CreateProductEndpoint.DoAsync(
                 businessId,
-                new CreateProductEndpoint.CreateProductRequest("Gaseosa", categoryId, 3.50m, 2.20m),
+                new CreateProductEndpoint.CreateProductRequest(
+                    "Gaseosa",
+                    categoryId,
+                    productCategoryId,
+                    3.50m,
+                    2.20m
+                ),
                 senderMock.Object,
                 userContextProviderMock.Object,
                 new DefaultHttpContext(),
