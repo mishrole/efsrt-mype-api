@@ -34,6 +34,7 @@ namespace Mype.Domain.FinancialMovements
         public Guid MovementId { get; private set; }
         public Guid CategoryId { get; private set; }
         public Guid? ProductId { get; private set; }
+        public Guid? ProductCategoryId { get; private set; }
         public string Description { get; private set; } = string.Empty;
         public decimal Quantity { get; private set; }
         public decimal UnitAmount { get; private set; }
@@ -187,6 +188,7 @@ namespace Mype.Domain.FinancialMovements
         private void ApplyProduct(Product product)
         {
             ProductId = product.Id;
+            ProductCategoryId = product.ProductCategoryId;
             CategoryId = product.CategoryId;
             Description = product.Name;
             UnitCostSnapshot = product.UnitCost;
@@ -198,6 +200,7 @@ namespace Mype.Domain.FinancialMovements
             CategoryId = categoryId;
             Description = normalizedDescription;
             ProductId = null;
+            ProductCategoryId = null;
             UnitCostSnapshot = null;
         }
 

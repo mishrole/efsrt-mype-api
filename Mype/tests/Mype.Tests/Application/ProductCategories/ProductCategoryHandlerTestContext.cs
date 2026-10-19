@@ -36,27 +36,67 @@ namespace Mype.Tests.Application.ProductCategories
         )
         {
             MembershipRepositoryMock
-                .Setup(repository => repository.GetContextByBusinessAndUserAsync(BusinessId, CurrentUserId, It.IsAny<CancellationToken>()))
-                .ReturnsAsync(new BusinessContextProjection(BusinessId, "Bodega", "PEN", businessStatus, Guid.NewGuid(), membershipStatus, RoleId, "OWNER", roleIsActive));
+                .Setup(repository =>
+                    repository.GetContextByBusinessAndUserAsync(
+                        BusinessId,
+                        CurrentUserId,
+                        It.IsAny<CancellationToken>()
+                    )
+                )
+                .ReturnsAsync(
+                    new BusinessContextProjection(
+                        BusinessId,
+                        "Bodega",
+                        "PEN",
+                        businessStatus,
+                        Guid.NewGuid(),
+                        membershipStatus,
+                        RoleId,
+                        "OWNER",
+                        roleIsActive
+                    )
+                );
 
             PermissionRepositoryMock
-                .Setup(repository => repository.ListActiveCodesByRoleIdAsync(RoleId, It.IsAny<CancellationToken>()))
+                .Setup(repository =>
+                    repository.ListActiveCodesByRoleIdAsync(RoleId, It.IsAny<CancellationToken>())
+                )
                 .ReturnsAsync(includePermission ? new[] { permissionCode } : Array.Empty<string>());
 
             ClockMock.SetupGet(clock => clock.UtcNow).Returns(UtcNow);
-            UnitOfWorkMock.Setup(unitOfWork => unitOfWork.SaveChangesAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
+            UnitOfWorkMock
+                .Setup(unitOfWork => unitOfWork.SaveChangesAsync(It.IsAny<CancellationToken>()))
+                .ReturnsAsync(1);
         }
 
         internal void SetupMissingBusinessContext()
         {
             MembershipRepositoryMock
-                .Setup(repository => repository.GetContextByBusinessAndUserAsync(BusinessId, CurrentUserId, It.IsAny<CancellationToken>()))
+                .Setup(repository =>
+                    repository.GetContextByBusinessAndUserAsync(
+                        BusinessId,
+                        CurrentUserId,
+                        It.IsAny<CancellationToken>()
+                    )
+                )
                 .ReturnsAsync((BusinessContextProjection)null);
         }
 
-        internal static ProductCategory CreateProductCategory(string name = "Bebidas", string normalizedName = "BEBIDAS", bool isActive = true)
+        internal static ProductCategory CreateProductCategory(
+            string name = "Bebidas",
+            string normalizedName = "BEBIDAS",
+            bool isActive = true
+        )
         {
-            var productCategory = ProductCategory.Create(BusinessId, name, normalizedName, "#3F6FC4", false, CurrentUserId, UtcNow);
+            var productCategory = ProductCategory.Create(
+                BusinessId,
+                name,
+                normalizedName,
+                "#3F6FC4",
+                false,
+                CurrentUserId,
+                UtcNow
+            );
             if (!isActive)
             {
                 productCategory.Deactivate(CurrentUserId, UtcNow.AddMinutes(1));

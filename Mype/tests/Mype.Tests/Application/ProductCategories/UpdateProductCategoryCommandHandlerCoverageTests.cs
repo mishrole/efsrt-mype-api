@@ -19,15 +19,35 @@ namespace Mype.Tests.Application.ProductCategories
             var testContext = new ProductCategoryHandlerTestContext();
             testContext.SetupAccess(ProductCategoryPermissions.Update);
             var productCategory = ProductCategoryHandlerTestContext.CreateProductCategory();
-            testContext.ProductCategoryRepositoryMock.Setup(repository => repository.GetTrackedByIdAndBusinessAsync(ProductCategoryHandlerTestContext.ProductCategoryId, ProductCategoryHandlerTestContext.BusinessId, It.IsAny<CancellationToken>())).ReturnsAsync(productCategory);
-            testContext.ProductCategoryRepositoryMock.Setup(repository => repository.GetByNormalizedNameAsync(ProductCategoryHandlerTestContext.BusinessId, "BEBIDAS FRIAS", It.IsAny<CancellationToken>())).ReturnsAsync(productCategory);
+            testContext
+                .ProductCategoryRepositoryMock.Setup(repository =>
+                    repository.GetTrackedByIdAndBusinessAsync(
+                        ProductCategoryHandlerTestContext.ProductCategoryId,
+                        ProductCategoryHandlerTestContext.BusinessId,
+                        It.IsAny<CancellationToken>()
+                    )
+                )
+                .ReturnsAsync(productCategory);
+            testContext
+                .ProductCategoryRepositoryMock.Setup(repository =>
+                    repository.GetByNormalizedNameAsync(
+                        ProductCategoryHandlerTestContext.BusinessId,
+                        "BEBIDAS FRIAS",
+                        It.IsAny<CancellationToken>()
+                    )
+                )
+                .ReturnsAsync(productCategory);
 
-            var result = await CreateHandler(testContext).Handle(CreateCommand(), CancellationToken.None);
+            var result = await CreateHandler(testContext)
+                .Handle(CreateCommand(), CancellationToken.None);
 
             result.IsSuccess.Should().BeTrue();
             productCategory.Name.Should().Be("Bebidas frías");
             productCategory.Color.Should().Be("#ABCDEF");
-            testContext.ProductCategoryRepositoryMock.Verify(repository => repository.SetOriginalVersion(productCategory, 7), Times.Once);
+            testContext.ProductCategoryRepositoryMock.Verify(
+                repository => repository.SetOriginalVersion(productCategory, 7),
+                Times.Once
+            );
         }
 
         [Fact]
@@ -35,9 +55,18 @@ namespace Mype.Tests.Application.ProductCategories
         {
             var testContext = new ProductCategoryHandlerTestContext();
             testContext.SetupAccess(ProductCategoryPermissions.Update);
-            testContext.ProductCategoryRepositoryMock.Setup(repository => repository.GetTrackedByIdAndBusinessAsync(It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<CancellationToken>())).ReturnsAsync((ProductCategory)null);
+            testContext
+                .ProductCategoryRepositoryMock.Setup(repository =>
+                    repository.GetTrackedByIdAndBusinessAsync(
+                        It.IsAny<Guid>(),
+                        It.IsAny<Guid>(),
+                        It.IsAny<CancellationToken>()
+                    )
+                )
+                .ReturnsAsync((ProductCategory)null);
 
-            var result = await CreateHandler(testContext).Handle(CreateCommand(), CancellationToken.None);
+            var result = await CreateHandler(testContext)
+                .Handle(CreateCommand(), CancellationToken.None);
 
             result.Error.Should().BeSameAs(ProductCategoryErrors.NotFound);
         }
@@ -50,13 +79,40 @@ namespace Mype.Tests.Application.ProductCategories
             var testContext = new ProductCategoryHandlerTestContext();
             testContext.SetupAccess(ProductCategoryPermissions.Update);
             var productCategory = ProductCategoryHandlerTestContext.CreateProductCategory();
-            var duplicateProductCategory = ProductCategoryHandlerTestContext.CreateProductCategory("Duplicada", "BEBIDAS FRIAS", duplicateIsActive);
-            testContext.ProductCategoryRepositoryMock.Setup(repository => repository.GetTrackedByIdAndBusinessAsync(It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<CancellationToken>())).ReturnsAsync(productCategory);
-            testContext.ProductCategoryRepositoryMock.Setup(repository => repository.GetByNormalizedNameAsync(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<CancellationToken>())).ReturnsAsync(duplicateProductCategory);
+            var duplicateProductCategory = ProductCategoryHandlerTestContext.CreateProductCategory(
+                "Duplicada",
+                "BEBIDAS FRIAS",
+                duplicateIsActive
+            );
+            testContext
+                .ProductCategoryRepositoryMock.Setup(repository =>
+                    repository.GetTrackedByIdAndBusinessAsync(
+                        It.IsAny<Guid>(),
+                        It.IsAny<Guid>(),
+                        It.IsAny<CancellationToken>()
+                    )
+                )
+                .ReturnsAsync(productCategory);
+            testContext
+                .ProductCategoryRepositoryMock.Setup(repository =>
+                    repository.GetByNormalizedNameAsync(
+                        It.IsAny<Guid>(),
+                        It.IsAny<string>(),
+                        It.IsAny<CancellationToken>()
+                    )
+                )
+                .ReturnsAsync(duplicateProductCategory);
 
-            var result = await CreateHandler(testContext).Handle(CreateCommand(), CancellationToken.None);
+            var result = await CreateHandler(testContext)
+                .Handle(CreateCommand(), CancellationToken.None);
 
-            result.Error.Should().BeSameAs(duplicateIsActive ? ProductCategoryErrors.AlreadyExists : ProductCategoryErrors.ReactivationRequired);
+            result
+                .Error.Should()
+                .BeSameAs(
+                    duplicateIsActive
+                        ? ProductCategoryErrors.AlreadyExists
+                        : ProductCategoryErrors.ReactivationRequired
+                );
         }
 
         [Theory]
@@ -68,13 +124,48 @@ namespace Mype.Tests.Application.ProductCategories
             var testContext = new ProductCategoryHandlerTestContext();
             testContext.SetupAccess(ProductCategoryPermissions.Update);
             var productCategory = ProductCategoryHandlerTestContext.CreateProductCategory();
-            testContext.ProductCategoryRepositoryMock.Setup(repository => repository.GetTrackedByIdAndBusinessAsync(It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<CancellationToken>())).ReturnsAsync(productCategory);
-            testContext.ProductCategoryRepositoryMock.Setup(repository => repository.GetByNormalizedNameAsync(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<CancellationToken>())).ReturnsAsync((ProductCategory)null);
-            testContext.UnitOfWorkMock.Setup(unitOfWork => unitOfWork.SaveChangesAsync(It.IsAny<CancellationToken>())).ThrowsAsync(new ApplicationErrorException(persistenceErrorCode, "error", ApplicationErrorType.Conflict));
+            testContext
+                .ProductCategoryRepositoryMock.Setup(repository =>
+                    repository.GetTrackedByIdAndBusinessAsync(
+                        It.IsAny<Guid>(),
+                        It.IsAny<Guid>(),
+                        It.IsAny<CancellationToken>()
+                    )
+                )
+                .ReturnsAsync(productCategory);
+            testContext
+                .ProductCategoryRepositoryMock.Setup(repository =>
+                    repository.GetByNormalizedNameAsync(
+                        It.IsAny<Guid>(),
+                        It.IsAny<string>(),
+                        It.IsAny<CancellationToken>()
+                    )
+                )
+                .ReturnsAsync((ProductCategory)null);
+            testContext
+                .UnitOfWorkMock.Setup(unitOfWork =>
+                    unitOfWork.SaveChangesAsync(It.IsAny<CancellationToken>())
+                )
+                .ThrowsAsync(
+                    new ApplicationErrorException(
+                        persistenceErrorCode,
+                        "error",
+                        ApplicationErrorType.Conflict
+                    )
+                );
 
-            var result = await CreateHandler(testContext).Handle(CreateCommand(), CancellationToken.None);
+            var result = await CreateHandler(testContext)
+                .Handle(CreateCommand(), CancellationToken.None);
 
-            result.Error.Should().BeSameAs(persistenceErrorCode == ErrorCodes.ProductCategoryAlreadyExists ? ProductCategoryErrors.AlreadyExists : persistenceErrorCode == ErrorCodes.ConcurrencyConflict ? ProductCategoryErrors.ConcurrencyConflict : ProductCategoryErrors.PersistenceFailed);
+            result
+                .Error.Should()
+                .BeSameAs(
+                    persistenceErrorCode == ErrorCodes.ProductCategoryAlreadyExists
+                        ? ProductCategoryErrors.AlreadyExists
+                    : persistenceErrorCode == ErrorCodes.ConcurrencyConflict
+                        ? ProductCategoryErrors.ConcurrencyConflict
+                    : ProductCategoryErrors.PersistenceFailed
+                );
         }
 
         [Fact]
@@ -83,21 +174,62 @@ namespace Mype.Tests.Application.ProductCategories
             var testContext = new ProductCategoryHandlerTestContext();
             testContext.SetupAccess(ProductCategoryPermissions.Update);
             var productCategory = ProductCategoryHandlerTestContext.CreateProductCategory();
-            testContext.ProductCategoryRepositoryMock.Setup(repository => repository.GetTrackedByIdAndBusinessAsync(It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<CancellationToken>())).ReturnsAsync(productCategory);
-            testContext.ProductCategoryRepositoryMock.Setup(repository => repository.GetByNormalizedNameAsync(It.IsAny<Guid>(), It.IsAny<string>(), It.IsAny<CancellationToken>())).ReturnsAsync((ProductCategory)null);
-            testContext.UnitOfWorkMock.Setup(unitOfWork => unitOfWork.SaveChangesAsync(It.IsAny<CancellationToken>())).ThrowsAsync(new OperationCanceledException());
+            testContext
+                .ProductCategoryRepositoryMock.Setup(repository =>
+                    repository.GetTrackedByIdAndBusinessAsync(
+                        It.IsAny<Guid>(),
+                        It.IsAny<Guid>(),
+                        It.IsAny<CancellationToken>()
+                    )
+                )
+                .ReturnsAsync(productCategory);
+            testContext
+                .ProductCategoryRepositoryMock.Setup(repository =>
+                    repository.GetByNormalizedNameAsync(
+                        It.IsAny<Guid>(),
+                        It.IsAny<string>(),
+                        It.IsAny<CancellationToken>()
+                    )
+                )
+                .ReturnsAsync((ProductCategory)null);
+            testContext
+                .UnitOfWorkMock.Setup(unitOfWork =>
+                    unitOfWork.SaveChangesAsync(It.IsAny<CancellationToken>())
+                )
+                .ThrowsAsync(new OperationCanceledException());
 
-            await FluentActions.Invoking(() => CreateHandler(testContext).Handle(CreateCommand(), CancellationToken.None)).Should().ThrowAsync<OperationCanceledException>();
+            await FluentActions
+                .Invoking(() =>
+                    CreateHandler(testContext).Handle(CreateCommand(), CancellationToken.None)
+                )
+                .Should()
+                .ThrowAsync<OperationCanceledException>();
         }
 
-        private static UpdateProductCategoryCommandHandler CreateHandler(ProductCategoryHandlerTestContext testContext)
+        private static UpdateProductCategoryCommandHandler CreateHandler(
+            ProductCategoryHandlerTestContext testContext
+        )
         {
-            return new UpdateProductCategoryCommandHandler(testContext.MembershipRepositoryMock.Object, testContext.PermissionRepositoryMock.Object, testContext.ProductCategoryRepositoryMock.Object, testContext.UnitOfWorkMock.Object, testContext.ClockMock.Object);
+            return new UpdateProductCategoryCommandHandler(
+                testContext.MembershipRepositoryMock.Object,
+                testContext.PermissionRepositoryMock.Object,
+                testContext.ProductCategoryRepositoryMock.Object,
+                testContext.UnitOfWorkMock.Object,
+                testContext.ClockMock.Object
+            );
         }
 
         private static UpdateProductCategoryCommand CreateCommand()
         {
-            return new UpdateProductCategoryCommand { BusinessId = ProductCategoryHandlerTestContext.BusinessId, ProductCategoryId = ProductCategoryHandlerTestContext.ProductCategoryId, CurrentUserId = ProductCategoryHandlerTestContext.CurrentUserId, Name = "  Bebidas   frías ", Color = "#abcdef", Version = 7 };
+            return new UpdateProductCategoryCommand
+            {
+                BusinessId = ProductCategoryHandlerTestContext.BusinessId,
+                ProductCategoryId = ProductCategoryHandlerTestContext.ProductCategoryId,
+                CurrentUserId = ProductCategoryHandlerTestContext.CurrentUserId,
+                Name = "  Bebidas   frías ",
+                Color = "#abcdef",
+                Version = 7,
+            };
         }
     }
 }
