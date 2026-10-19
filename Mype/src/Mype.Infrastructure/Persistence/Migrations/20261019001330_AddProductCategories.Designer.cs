@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Mype.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(MypeDbContext))]
-    [Migration("20261018202808_AddProductCategories")]
+    [Migration("20261019001330_AddProductCategories")]
     partial class AddProductCategories
     {
         /// <inheritdoc />
@@ -351,6 +351,36 @@ namespace Mype.Infrastructure.Persistence.Migrations
                         {
                             BusinessRoleId = new Guid("20000000-0000-0000-0000-000000000001"),
                             PermissionId = new Guid("30000000-0000-0000-0000-000000000024"),
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0))
+                        },
+                        new
+                        {
+                            BusinessRoleId = new Guid("20000000-0000-0000-0000-000000000001"),
+                            PermissionId = new Guid("30000000-0000-0000-0000-000000000025"),
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0))
+                        },
+                        new
+                        {
+                            BusinessRoleId = new Guid("20000000-0000-0000-0000-000000000001"),
+                            PermissionId = new Guid("30000000-0000-0000-0000-000000000026"),
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0))
+                        },
+                        new
+                        {
+                            BusinessRoleId = new Guid("20000000-0000-0000-0000-000000000001"),
+                            PermissionId = new Guid("30000000-0000-0000-0000-000000000027"),
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0))
+                        },
+                        new
+                        {
+                            BusinessRoleId = new Guid("20000000-0000-0000-0000-000000000001"),
+                            PermissionId = new Guid("30000000-0000-0000-0000-000000000028"),
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0))
+                        },
+                        new
+                        {
+                            BusinessRoleId = new Guid("20000000-0000-0000-0000-000000000001"),
+                            PermissionId = new Guid("30000000-0000-0000-0000-000000000029"),
                             CreatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0))
                         });
                 });
@@ -1347,6 +1377,61 @@ namespace Mype.Infrastructure.Persistence.Migrations
                             IsSystem = true,
                             Name = "Corregir saldo de apertura",
                             UpdatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0))
+                        },
+                        new
+                        {
+                            Id = new Guid("30000000-0000-0000-0000-000000000025"),
+                            Code = "PRODUCT_CATEGORY_READ",
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Description = "Permite consultar las categorías de producto del negocio.",
+                            IsActive = true,
+                            IsSystem = true,
+                            Name = "Consultar categorías de producto",
+                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0))
+                        },
+                        new
+                        {
+                            Id = new Guid("30000000-0000-0000-0000-000000000026"),
+                            Code = "PRODUCT_CATEGORY_CREATE",
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Description = "Permite crear categorías de producto para el negocio.",
+                            IsActive = true,
+                            IsSystem = true,
+                            Name = "Crear categorías de producto",
+                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0))
+                        },
+                        new
+                        {
+                            Id = new Guid("30000000-0000-0000-0000-000000000027"),
+                            Code = "PRODUCT_CATEGORY_UPDATE",
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Description = "Permite actualizar las categorías de producto del negocio.",
+                            IsActive = true,
+                            IsSystem = true,
+                            Name = "Actualizar categorías de producto",
+                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0))
+                        },
+                        new
+                        {
+                            Id = new Guid("30000000-0000-0000-0000-000000000028"),
+                            Code = "PRODUCT_CATEGORY_DEACTIVATE",
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Description = "Permite desactivar las categorías de producto del negocio.",
+                            IsActive = true,
+                            IsSystem = true,
+                            Name = "Desactivar categorías de producto",
+                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0))
+                        },
+                        new
+                        {
+                            Id = new Guid("30000000-0000-0000-0000-000000000029"),
+                            Code = "PRODUCT_CATEGORY_REACTIVATE",
+                            CreatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
+                            Description = "Permite reactivar las categorías de producto del negocio.",
+                            IsActive = true,
+                            IsSystem = true,
+                            Name = "Reactivar categorías de producto",
+                            UpdatedAt = new DateTimeOffset(new DateTime(2026, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0))
                         });
                 });
 
@@ -1429,7 +1514,7 @@ namespace Mype.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("BusinessId", "NormalizedName")
                         .IsUnique()
-                        .HasDatabaseName("ix_product_categories_business_id_normalized_name");
+                        .HasDatabaseName("ux_product_categories_business_normalized_name");
 
                     b.ToTable("product_categories", (string)null);
                 });
