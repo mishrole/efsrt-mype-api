@@ -81,11 +81,15 @@ namespace Mype.Infrastructure.Persistence.Constraints
             public const string MovementActive = "ix_financial_movement_items_movement_active";
             public const string BusinessCategory = "ix_financial_movement_items_business_category";
             public const string BusinessProduct = "ix_financial_movement_items_business_product";
+            public const string BusinessProductCategory =
+                "ix_financial_movement_items_business_product_category";
             public const string MovementBusiness =
                 "fk_financial_movement_items_movements_movement_id_business_id";
             public const string CategoryBusiness =
                 "fk_financial_movement_items_categories_category_id_business_id";
             public const string Product = "fk_financial_movement_items_products_product_id";
+            public const string ProductCategoryBusiness =
+                "fk_financial_movement_items_product_categories_product_category_id_business_id";
             public const string CreatedByUser =
                 "fk_financial_movement_items_users_created_by_user_id";
             public const string UpdatedByUser =
@@ -97,6 +101,8 @@ namespace Mype.Infrastructure.Persistence.Constraints
                 "ck_financial_movement_items_subtotal_non_negative";
             public const string UnitCostNonNegative =
                 "ck_financial_movement_items_unit_cost_non_negative";
+            public const string ProductCategorySnapshotConsistency =
+                "ck_financial_movement_items_product_category_snapshot_consistency";
         }
 
         public static class MovementEvidences

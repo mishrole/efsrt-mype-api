@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Mype.Domain.Categories;
 using Mype.Domain.FinancialMovements;
 using Mype.Domain.FinancialMovements.Constraints;
+using Mype.Domain.ProductCategories;
 using Mype.Domain.Products;
 using Mype.Domain.Users;
 using Mype.Infrastructure.Persistence.Constraints;
@@ -12,70 +13,168 @@ namespace Mype.Infrastructure.Persistence.Configurations
     public sealed class FinancialMovementItemConfiguration
         : IEntityTypeConfiguration<FinancialMovementItem>
     {
-        public void Configure(EntityTypeBuilder<FinancialMovementItem> b)
+        public void Configure(EntityTypeBuilder<FinancialMovementItem> itemBuilder)
         {
-            b.ToTable(
+            itemBuilder.ToTable(
                 "financial_movement_items",
-                t =>
+                tableBuilder =>
                 {
-                    t.HasCheckConstraint(
+                    tableBuilder.HasCheckConstraint(
                         DatabaseConstraints.FinancialMovementItems.QuantityPositive,
                         "quantity > 0"
                     );
-                    t.HasCheckConstraint(
+                    tableBuilder.HasCheckConstraint(
                         DatabaseConstraints.FinancialMovementItems.UnitAmountNonNegative,
                         "unit_amount >= 0"
                     );
-                    t.HasCheckConstraint(
+                    tableBuilder.HasCheckConstraint(
                         DatabaseConstraints.FinancialMovementItems.SubtotalNonNegative,
                         "subtotal_amount >= 0"
                     );
-                    t.HasCheckConstraint(
+                    tableBuilder.HasCheckConstraint(
                         DatabaseConstraints.FinancialMovementItems.UnitCostNonNegative,
                         "unit_cost_snapshot IS NULL OR unit_cost_snapshot >= 0"
                     );
+                    tableBuilder.HasCheckConstraint(
+                        DatabaseConstraints
+                            .FinancialMovementItems
+                            .ProductCategorySnapshotConsistency,
+                        """
+                        (
+                            product_id IS NOT NULL
+                            AND product_category_id IS NOT NULL
+                            AND unit_cost_snapshot IS NOT NULL
+                        )
+                        OR
+                        (
+                            product_id IS NULL
+                            AND product_category_id IS NULL
+                            AND unit_cost_snapshot IS NULL
+                        )
+                        """
+                    );
                 }
             );
-            b.HasKey(x => x.Id);
-            b.Property(x => x.Id).ValueGeneratedNever();
-            b.Property(x => x.Description)
+
+            itemBuilder.HasKey(financialMovementItem => financialMovementItem.Id);
+            itemBuilder
+                .Property(financialMovementItem => financialMovementItem.Id)
+                .ValueGeneratedNever();
+            itemBuilder
+                .Property(financialMovementItem => financialMovementItem.Description)
                 .HasMaxLength(FinancialMovementItemConstraints.DescriptionMaxLength)
                 .IsRequired();
-            b.Property(x => x.Quantity).HasPrecision(18, 4).IsRequired();
-            b.Property(x => x.UnitAmount).HasPrecision(18, 2).IsRequired();
-            b.Property(x => x.UnitCostSnapshot).HasPrecision(18, 2);
-            b.Property(x => x.SubtotalAmount).HasPrecision(18, 2).IsRequired();
-            b.Property(x => x.IsActive).IsRequired();
-            b.Property(x => x.CreatedAt).HasColumnType("timestamp with time zone").IsRequired();
-            b.Property(x => x.UpdatedAt).HasColumnType("timestamp with time zone").IsRequired();
-            b.Property(x => x.RetiredAt).HasColumnType("timestamp with time zone");
-            b.Property(x => x.Version).IsRowVersion();
-            b.HasIndex(x => new { x.MovementId, x.IsActive })
+            itemBuilder
+                .Property(financialMovementItem => financialMovementItem.Quantity)
+                .HasPrecision(18, 4)
+                .IsRequired();
+            itemBuilder
+                .Property(financialMovementItem => financialMovementItem.UnitAmount)
+                .HasPrecision(18, 2)
+                .IsRequired();
+            itemBuilder
+                .Property(financialMovementItem => financialMovementItem.UnitCostSnapshot)
+                .HasPrecision(18, 2);
+            itemBuilder.Property(financialMovementItem => financialMovementItem.ProductCategoryId);
+            itemBuilder
+                .Property(financialMovementItem => financialMovementItem.SubtotalAmount)
+                .HasPrecision(18, 2)
+                .IsRequired();
+            itemBuilder
+                .Property(financialMovementItem => financialMovementItem.IsActive)
+                .IsRequired();
+            itemBuilder
+                .Property(financialMovementItem => financialMovementItem.CreatedAt)
+                .HasColumnType("timestamp with time zone")
+                .IsRequired();
+            itemBuilder
+                .Property(financialMovementItem => financialMovementItem.UpdatedAt)
+                .HasColumnType("timestamp with time zone")
+                .IsRequired();
+            itemBuilder
+                .Property(financialMovementItem => financialMovementItem.RetiredAt)
+                .HasColumnType("timestamp with time zone");
+            itemBuilder
+                .Property(financialMovementItem => financialMovementItem.Version)
+                .IsRowVersion();
+
+            itemBuilder
+                .HasIndex(financialMovementItem => new
+                {
+                    financialMovementItem.MovementId,
+                    financialMovementItem.IsActive,
+                })
                 .HasDatabaseName(DatabaseConstraints.FinancialMovementItems.MovementActive);
-            b.HasIndex(x => new { x.BusinessId, x.CategoryId })
+            itemBuilder
+                .HasIndex(financialMovementItem => new
+                {
+                    financialMovementItem.BusinessId,
+                    financialMovementItem.CategoryId,
+                })
                 .HasDatabaseName(DatabaseConstraints.FinancialMovementItems.BusinessCategory);
-            b.HasIndex(x => new { x.BusinessId, x.ProductId })
+            itemBuilder
+                .HasIndex(financialMovementItem => new
+                {
+                    financialMovementItem.BusinessId,
+                    financialMovementItem.ProductId,
+                })
                 .HasFilter("product_id IS NOT NULL")
                 .HasDatabaseName(DatabaseConstraints.FinancialMovementItems.BusinessProduct);
-            b.HasOne<Category>()
+            itemBuilder
+                .HasIndex(financialMovementItem => new
+                {
+                    financialMovementItem.BusinessId,
+                    financialMovementItem.ProductCategoryId,
+                })
+                .HasFilter("product_category_id IS NOT NULL")
+                .HasDatabaseName(
+                    DatabaseConstraints.FinancialMovementItems.BusinessProductCategory
+                );
+
+            itemBuilder
+                .HasOne<Category>()
                 .WithMany()
-                .HasForeignKey(x => new { x.CategoryId, x.BusinessId })
-                .HasPrincipalKey(x => new { x.Id, x.BusinessId })
+                .HasForeignKey(financialMovementItem => new
+                {
+                    financialMovementItem.CategoryId,
+                    financialMovementItem.BusinessId,
+                })
+                .HasPrincipalKey(category => new { category.Id, category.BusinessId })
                 .OnDelete(DeleteBehavior.Restrict)
                 .HasConstraintName(DatabaseConstraints.FinancialMovementItems.CategoryBusiness);
-            b.HasOne<Product>()
+            itemBuilder
+                .HasOne<Product>()
                 .WithMany()
-                .HasForeignKey(x => x.ProductId)
+                .HasForeignKey(financialMovementItem => financialMovementItem.ProductId)
                 .OnDelete(DeleteBehavior.Restrict)
                 .HasConstraintName(DatabaseConstraints.FinancialMovementItems.Product);
-            b.HasOne<User>()
+            itemBuilder
+                .HasOne<ProductCategory>()
                 .WithMany()
-                .HasForeignKey(x => x.CreatedByUserId)
+                .HasForeignKey(financialMovementItem => new
+                {
+                    financialMovementItem.ProductCategoryId,
+                    financialMovementItem.BusinessId,
+                })
+                .HasPrincipalKey(productCategory => new
+                {
+                    productCategory.Id,
+                    productCategory.BusinessId,
+                })
+                .OnDelete(DeleteBehavior.Restrict)
+                .HasConstraintName(
+                    DatabaseConstraints.FinancialMovementItems.ProductCategoryBusiness
+                );
+            itemBuilder
+                .HasOne<User>()
+                .WithMany()
+                .HasForeignKey(financialMovementItem => financialMovementItem.CreatedByUserId)
                 .OnDelete(DeleteBehavior.Restrict)
                 .HasConstraintName(DatabaseConstraints.FinancialMovementItems.CreatedByUser);
-            b.HasOne<User>()
+            itemBuilder
+                .HasOne<User>()
                 .WithMany()
-                .HasForeignKey(x => x.UpdatedByUserId)
+                .HasForeignKey(financialMovementItem => financialMovementItem.UpdatedByUserId)
                 .OnDelete(DeleteBehavior.Restrict)
                 .HasConstraintName(DatabaseConstraints.FinancialMovementItems.UpdatedByUser);
         }

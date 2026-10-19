@@ -834,6 +834,10 @@ namespace Mype.Infrastructure.Persistence.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("movement_id");
 
+                    b.Property<Guid?>("ProductCategoryId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("product_category_id");
+
                     b.Property<Guid?>("ProductId")
                         .HasColumnType("uuid")
                         .HasColumnName("product_id");
@@ -891,6 +895,10 @@ namespace Mype.Infrastructure.Persistence.Migrations
                     b.HasIndex("BusinessId", "CategoryId")
                         .HasDatabaseName("ix_financial_movement_items_business_category");
 
+                    b.HasIndex("BusinessId", "ProductCategoryId")
+                        .HasDatabaseName("ix_financial_movement_items_business_product_category")
+                        .HasFilter("product_category_id IS NOT NULL");
+
                     b.HasIndex("BusinessId", "ProductId")
                         .HasDatabaseName("ix_financial_movement_items_business_product")
                         .HasFilter("product_id IS NOT NULL");
@@ -904,8 +912,13 @@ namespace Mype.Infrastructure.Persistence.Migrations
                     b.HasIndex("MovementId", "IsActive")
                         .HasDatabaseName("ix_financial_movement_items_movement_active");
 
+                    b.HasIndex("ProductCategoryId", "BusinessId")
+                        .HasDatabaseName("ix_financial_movement_items_product_category_id_business_id");
+
                     b.ToTable("financial_movement_items", null, t =>
                         {
+                            t.HasCheckConstraint("ck_financial_movement_items_product_category_snapshot_consistency", "(\n    product_id IS NOT NULL\n    AND product_category_id IS NOT NULL\n    AND unit_cost_snapshot IS NOT NULL\n)\nOR\n(\n    product_id IS NULL\n    AND product_category_id IS NULL\n    AND unit_cost_snapshot IS NULL\n)");
+
                             t.HasCheckConstraint("ck_financial_movement_items_quantity_positive", "quantity > 0");
 
                             t.HasCheckConstraint("ck_financial_movement_items_subtotal_non_negative", "subtotal_amount >= 0");
@@ -1872,6 +1885,13 @@ namespace Mype.Infrastructure.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("fk_financial_movement_items_movements_movement_id_business_id");
+
+                    b.HasOne("Mype.Domain.ProductCategories.ProductCategory", null)
+                        .WithMany()
+                        .HasForeignKey("ProductCategoryId", "BusinessId")
+                        .HasPrincipalKey("Id", "BusinessId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .HasConstraintName("fk_financial_movement_items_product_categories_product_category_id_business_id");
                 });
 
             modelBuilder.Entity("Mype.Domain.MovementEvidences.MovementEvidence", b =>

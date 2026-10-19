@@ -1,4 +1,3 @@
-
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -105,7 +104,6 @@ namespace Mype.Tests.Infrastructure.ProductCategories.Repositories
             foreignResult.Should().BeNull();
         }
 
-
         [Fact]
         public async Task ListAsync_Should_Cover_All_Optional_Filter_Branches()
         {
@@ -114,22 +112,71 @@ namespace Mype.Tests.Infrastructure.ProductCategories.Repositories
             var dbContext = scope.ServiceProvider.GetRequiredService<MypeDbContext>();
             var businessSeed = await RepositoryTestData.SeedBusinessAsync(dbContext);
             var repository = new ProductCategoryRepository(dbContext);
-            var activeProductCategory = ProductCategory.Create(businessSeed.Business.Id, "Bebidas", $"BEBIDAS {businessSeed.Suffix}".ToUpperInvariant(), "#3F6FC4", false, businessSeed.User.Id, RepositoryTestData.UtcNow);
-            var inactiveProductCategory = ProductCategory.Create(businessSeed.Business.Id, "Snacks", $"SNACKS {businessSeed.Suffix}".ToUpperInvariant(), "#F59E0B", false, businessSeed.User.Id, RepositoryTestData.UtcNow);
-            inactiveProductCategory.Deactivate(businessSeed.User.Id, RepositoryTestData.UtcNow.AddMinutes(1));
+            var activeProductCategory = ProductCategory.Create(
+                businessSeed.Business.Id,
+                "Bebidas",
+                $"BEBIDAS {businessSeed.Suffix}".ToUpperInvariant(),
+                "#3F6FC4",
+                false,
+                businessSeed.User.Id,
+                RepositoryTestData.UtcNow
+            );
+            var inactiveProductCategory = ProductCategory.Create(
+                businessSeed.Business.Id,
+                "Snacks",
+                $"SNACKS {businessSeed.Suffix}".ToUpperInvariant(),
+                "#F59E0B",
+                false,
+                businessSeed.User.Id,
+                RepositoryTestData.UtcNow
+            );
+            inactiveProductCategory.Deactivate(
+                businessSeed.User.Id,
+                RepositoryTestData.UtcNow.AddMinutes(1)
+            );
             await repository.AddAsync(activeProductCategory, CancellationToken.None);
             await repository.AddAsync(inactiveProductCategory, CancellationToken.None);
             await dbContext.SaveChangesAsync(CancellationToken.None);
             dbContext.ChangeTracker.Clear();
 
-            var allProductCategories = await repository.ListAsync(businessSeed.Business.Id, null, null, CancellationToken.None);
-            var inactiveProductCategories = await repository.ListAsync(businessSeed.Business.Id, null, false, CancellationToken.None);
-            var categoryByName = await repository.GetByNormalizedNameAsync(businessSeed.Business.Id, activeProductCategory.NormalizedName, CancellationToken.None);
-            var missingTrackedProductCategory = await repository.GetTrackedByIdAndBusinessAsync(Guid.NewGuid(), businessSeed.Business.Id, CancellationToken.None);
+            var allProductCategories = await repository.ListAsync(
+                businessSeed.Business.Id,
+                null,
+                null,
+                CancellationToken.None
+            );
+            var inactiveProductCategories = await repository.ListAsync(
+                businessSeed.Business.Id,
+                null,
+                false,
+                CancellationToken.None
+            );
+            var categoryByName = await repository.GetByNormalizedNameAsync(
+                businessSeed.Business.Id,
+                activeProductCategory.NormalizedName,
+                CancellationToken.None
+            );
+            var missingTrackedProductCategory = await repository.GetTrackedByIdAndBusinessAsync(
+                Guid.NewGuid(),
+                businessSeed.Business.Id,
+                CancellationToken.None
+            );
 
-            allProductCategories.Should().Contain(currentProductCategory => currentProductCategory.Id == activeProductCategory.Id);
-            allProductCategories.Should().Contain(currentProductCategory => currentProductCategory.Id == inactiveProductCategory.Id);
-            inactiveProductCategories.Should().ContainSingle(currentProductCategory => currentProductCategory.Id == inactiveProductCategory.Id);
+            allProductCategories
+                .Should()
+                .Contain(currentProductCategory =>
+                    currentProductCategory.Id == activeProductCategory.Id
+                );
+            allProductCategories
+                .Should()
+                .Contain(currentProductCategory =>
+                    currentProductCategory.Id == inactiveProductCategory.Id
+                );
+            inactiveProductCategories
+                .Should()
+                .ContainSingle(currentProductCategory =>
+                    currentProductCategory.Id == inactiveProductCategory.Id
+                );
             categoryByName.Should().NotBeNull();
             missingTrackedProductCategory.Should().BeNull();
             dbContext.ChangeTracker.Entries<ProductCategory>().Should().BeEmpty();

@@ -117,6 +117,11 @@ try
 
                     var clock = context.HttpContext.RequestServices.GetRequiredService<IClock>();
 
+                    if (context.HttpContext.RequestAborted.IsCancellationRequested)
+                    {
+                        return;
+                    }
+
                     var isActive = await sessionRepository.IsActiveAsync(
                         sessionId,
                         userId,
