@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Mype.Application.Businesses.Interfaces;
 using Mype.Application.BusinessMemberships.Interfaces;
 using Mype.Application.BusinessRoles.Interfaces;
@@ -40,12 +41,13 @@ namespace Mype.Infrastructure.Extensions
     {
         public static IServiceCollection AddInfrastructure(
             this IServiceCollection services,
-            IConfiguration configuration
+            IConfiguration configuration,
+            IHostEnvironment environment
         )
         {
             services.AddPersistence(configuration);
             services.AddAuth();
-            services.AddObjectStorage(configuration);
+            services.AddObjectStorage(configuration, environment);
 
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<ICurrencyRepository, CurrencyRepository>();

@@ -1,9 +1,11 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
+using Azure.Core;
 using Azure.Identity;
 using Azure.Storage.Blobs;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Mype.Application.Common.Interfaces;
 using Mype.Application.MovementEvidences.Interfaces;
 using Mype.Shared.Constants;
@@ -15,7 +17,8 @@ namespace Mype.Infrastructure.Storage
     {
         public static IServiceCollection AddObjectStorage(
             this IServiceCollection services,
-            IConfiguration configuration
+            IConfiguration configuration,
+            IHostEnvironment environment
         )
         {
             var options = ReadOptions(configuration);
@@ -24,7 +27,7 @@ namespace Mype.Infrastructure.Storage
             services.AddSingleton<IEvidenceStorageSettings>(options);
             services.AddSingleton(_ => new BlobServiceClient(
                 new Uri(options.ServiceUri),
-                new DefaultAzureCredential()
+                CreateStorageCredential(environment)
             ));
             services.AddSingleton(provider =>
                 provider
@@ -34,6 +37,16 @@ namespace Mype.Infrastructure.Storage
             services.AddSingleton<IObjectStorage, AzureBlobObjectStorage>();
 
             return services;
+        }
+
+        private static TokenCredential CreateStorageCredential(IHostEnvironment environment)
+        {
+            if (environment.IsDevelopment())
+            {
+                return new AzureCliCredential();
+            }
+
+            return new ManagedIdentityCredential(ManagedIdentityId.SystemAssigned);
         }
 
         private static EvidenceStorageOptions ReadOptions(IConfiguration configuration)
