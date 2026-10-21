@@ -293,5 +293,123 @@ namespace Mype.Tests.Infrastructure.FinancialMovements.Repositories
         private sealed record SeedData(User User, Business Business, Product Product);
 
         private sealed record MovementIds(Guid MovementId, Guid BusinessId, Guid UserId);
+
+        [Fact]
+        public async Task GetDraftItemsByIdAndBusinessAsync_Should_Return_Only_Active_Sale_Items_Without_Tracking()
+        {
+            await using var factory = CreateFactory();
+            await using var seedScope = factory.Services.CreateAsyncScope();
+            var seedContext = seedScope.ServiceProvider.GetRequiredService<MypeDbContext>();
+            var seedData = await SeedDependenciesAsync(seedContext);
+            var movement = CreateMovement(seedData.Business.Id, seedData.User.Id);
+            var activeItem = movement.AddSaleItem(
+                seedData.Product,
+                2m,
+                5m,
+                seedData.User.Id,
+                UtcNow.AddMinutes(1)
+            );
+            var retiredItem = movement.AddSaleItem(
+                seedData.Product,
+                1m,
+                5m,
+                seedData.User.Id,
+                UtcNow.AddMinutes(2)
+            );
+            movement.RetireItem(retiredItem.Id, seedData.User.Id, UtcNow.AddMinutes(3));
+            var seedRepository = new FinancialMovementRepository(seedContext);
+            await seedRepository.AddAsync(movement, CancellationToken.None);
+            await seedContext.SaveChangesAsync(CancellationToken.None);
+
+            await using var queryScope = factory.Services.CreateAsyncScope();
+            var queryContext = queryScope.ServiceProvider.GetRequiredService<MypeDbContext>();
+            var repository = new FinancialMovementRepository(queryContext);
+
+            var projection = await repository.GetDraftItemsByIdAndBusinessAsync(
+                movement.Id,
+                seedData.Business.Id,
+                CancellationToken.None
+            );
+
+            projection.Should().NotBeNull();
+            projection.MovementType.Should().Be(FinancialMovementType.Sale);
+            var projectedItem = projection.Items.Should().ContainSingle().Subject;
+            projectedItem.Id.Should().Be(activeItem.Id);
+            projectedItem.ProductId.Should().Be(seedData.Product.Id);
+            projectedItem.ProductCategoryId.Should().Be(seedData.Product.ProductCategoryId);
+            projectedItem.Description.Should().Be(seedData.Product.Name);
+            projectedItem.CategoryName.Should().NotBeNullOrWhiteSpace();
+            queryContext.ChangeTracker.Entries().Should().BeEmpty();
+        }
+
+        [Fact]
+        public async Task GetDraftItemsByIdAndBusinessAsync_Should_Return_Active_Expense_Item()
+        {
+            await using var factory = CreateFactory();
+            await using var seedScope = factory.Services.CreateAsyncScope();
+            var seedContext = seedScope.ServiceProvider.GetRequiredService<MypeDbContext>();
+            var seedData = await SeedDependenciesAsync(seedContext);
+            var movement = FinancialMovement.CreateDraft(
+                seedData.Business.Id,
+                FinancialMovementType.Expense,
+                new DateOnly(2026, 10, 20),
+                "Gasto",
+                "PEN",
+                seedData.User.Id,
+                UtcNow
+            );
+            var item = movement.AddExpenseItem(
+                seedData.Product.CategoryId,
+                "Movilidad",
+                2m,
+                4m,
+                seedData.User.Id,
+                UtcNow.AddMinutes(1)
+            );
+            var seedRepository = new FinancialMovementRepository(seedContext);
+            await seedRepository.AddAsync(movement, CancellationToken.None);
+            await seedContext.SaveChangesAsync(CancellationToken.None);
+
+            await using var queryScope = factory.Services.CreateAsyncScope();
+            var queryContext = queryScope.ServiceProvider.GetRequiredService<MypeDbContext>();
+            var repository = new FinancialMovementRepository(queryContext);
+
+            var projection = await repository.GetDraftItemsByIdAndBusinessAsync(
+                movement.Id,
+                seedData.Business.Id,
+                CancellationToken.None
+            );
+
+            projection.MovementType.Should().Be(FinancialMovementType.Expense);
+            var projectedItem = projection.Items.Should().ContainSingle().Subject;
+            projectedItem.Id.Should().Be(item.Id);
+            projectedItem.ProductId.Should().BeNull();
+            projectedItem.ProductCategoryId.Should().BeNull();
+            projectedItem.UnitCostSnapshot.Should().BeNull();
+            projectedItem.Description.Should().Be("Movilidad");
+            queryContext.ChangeTracker.Entries().Should().BeEmpty();
+        }
+
+        [Fact]
+        public async Task GetDraftItemsByIdAndBusinessAsync_Should_Return_Null_For_Foreign_Business_Or_Non_Draft()
+        {
+            await using var factory = CreateFactory();
+            await using var scope = factory.Services.CreateAsyncScope();
+            var context = scope.ServiceProvider.GetRequiredService<MypeDbContext>();
+            var repository = new FinancialMovementRepository(context);
+            var seedData = await SeedDependenciesAsync(context);
+            var movement = CreateMovement(seedData.Business.Id, seedData.User.Id);
+            await repository.AddAsync(movement, CancellationToken.None);
+            await context.SaveChangesAsync(CancellationToken.None);
+            context.ChangeTracker.Clear();
+
+            var foreignBusinessProjection = await repository.GetDraftItemsByIdAndBusinessAsync(
+                movement.Id,
+                Guid.NewGuid(),
+                CancellationToken.None
+            );
+
+            foreignBusinessProjection.Should().BeNull();
+        }
     }
 }

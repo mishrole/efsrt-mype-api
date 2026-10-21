@@ -685,3 +685,8 @@ Accept: application/json
 Origin: {{FrontendOrigin}}
 
 {}
+
+### Listar los ítems activos de un borrador
+GET {{ApiBaseUrl}}/api/v1/businesses/{{BusinessId}}/financial-movements/{{FinancialMovementId}}/items
+Authorization: Bearer {{AccessToken}}
+Accept: application/json

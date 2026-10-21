@@ -26,6 +26,7 @@ using Mype.Application.FinancialMovements.Commands.UpdateFinancialMovementDraft;
 using Mype.Application.FinancialMovements.Models;
 using Mype.Application.FinancialMovements.Queries.GetFinancialMovementDraft;
 using Mype.Application.FinancialMovements.Queries.GetFinancialMovementHistoryDetail;
+using Mype.Application.FinancialMovements.Queries.ListFinancialMovementDraftItems;
 using Mype.Application.FinancialMovements.Queries.ListFinancialMovementDrafts;
 using Mype.Application.FinancialMovements.Queries.ListFinancialMovementHistory;
 using Mype.Application.MovementEvidences.Models;
@@ -389,6 +390,18 @@ namespace Mype.Api
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status403Forbidden)
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status404NotFound)
                 .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
+
+            financialMovementGroup
+                .MapGet("/{movementId:guid}/items", ListFinancialMovementDraftItemsEndpoint.DoAsync)
+                .WithName("ListFinancialMovementDraftItems")
+                .WithSummary("Listar los ítems activos de un borrador")
+                .Produces<FinancialMovementDraftItemsResult>(StatusCodes.Status200OK)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status401Unauthorized)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status403Forbidden)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status404NotFound)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status409Conflict)
+                .Produces<HttpStatusCodeInfo>(StatusCodes.Status500InternalServerError);
+
             financialMovementGroup
                 .MapGet("/{movementId:guid}", GetFinancialMovementDraftEndpoint.DoAsync)
                 .WithName("GetFinancialMovementDraft")

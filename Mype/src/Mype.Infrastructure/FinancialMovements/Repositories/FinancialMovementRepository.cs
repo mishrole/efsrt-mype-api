@@ -111,6 +111,68 @@ namespace Mype.Infrastructure.FinancialMovements.Repositories
                 ))
                 .SingleOrDefaultAsync(cancellationToken);
 
+        public async Task<FinancialMovementDraftItemsProjection> GetDraftItemsByIdAndBusinessAsync(
+            Guid movementId,
+            Guid businessId,
+            CancellationToken cancellationToken
+        )
+        {
+            var movement = await _dbContext
+                .FinancialMovements.AsNoTracking()
+                .Where(financialMovement =>
+                    financialMovement.Id == movementId
+                    && financialMovement.BusinessId == businessId
+                    && financialMovement.Status == FinancialMovementStatus.Draft
+                )
+                .Select(financialMovement => new
+                {
+                    financialMovement.Id,
+                    financialMovement.Type,
+                    financialMovement.Version,
+                })
+                .SingleOrDefaultAsync(cancellationToken);
+
+            if (movement == null)
+            {
+                return null;
+            }
+
+            var items = await (
+                from financialMovementItem in _dbContext.FinancialMovementItems.AsNoTracking()
+                join category in _dbContext.Categories.AsNoTracking()
+                    on new
+                    {
+                        financialMovementItem.CategoryId,
+                        financialMovementItem.BusinessId,
+                    } equals new { CategoryId = category.Id, category.BusinessId }
+                where
+                    financialMovementItem.MovementId == movementId
+                    && financialMovementItem.BusinessId == businessId
+                    && financialMovementItem.IsActive
+                orderby financialMovementItem.CreatedAt, financialMovementItem.Id
+                select new FinancialMovementDraftItemProjection(
+                    financialMovementItem.Id,
+                    financialMovementItem.CategoryId,
+                    category.Name,
+                    financialMovementItem.ProductId,
+                    financialMovementItem.ProductCategoryId,
+                    financialMovementItem.Description,
+                    financialMovementItem.Quantity,
+                    financialMovementItem.UnitAmount,
+                    financialMovementItem.UnitCostSnapshot,
+                    financialMovementItem.SubtotalAmount,
+                    financialMovementItem.Version
+                )
+            ).ToArrayAsync(cancellationToken);
+
+            return new FinancialMovementDraftItemsProjection(
+                movement.Id,
+                movement.Type,
+                movement.Version,
+                items
+            );
+        }
+
         public async Task<
             IReadOnlyCollection<FinancialMovementDraftListItemProjection>
         > ListDraftsByBusinessAsync(Guid businessId, CancellationToken cancellationToken) =>

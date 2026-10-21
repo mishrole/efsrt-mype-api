@@ -51,6 +51,12 @@ namespace Mype.Application.FinancialMovements.Interfaces
             CancellationToken cancellationToken
         );
 
+        Task<FinancialMovementDraftItemsProjection> GetDraftItemsByIdAndBusinessAsync(
+            Guid movementId,
+            Guid businessId,
+            CancellationToken cancellationToken
+        );
+
         Task<
             IReadOnlyCollection<FinancialMovementDraftListItemProjection>
         > ListDraftsByBusinessAsync(Guid businessId, CancellationToken cancellationToken);
